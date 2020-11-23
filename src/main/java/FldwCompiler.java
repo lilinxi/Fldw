@@ -5,7 +5,7 @@ import core.*;
 
 public class FldwCompiler implements FldwCompilerConstants {
     public static void main(String[] args) {
-        String[] tests={"true"};
+        String[] tests={"[1,2.2,1.2]"};
         for (String arg : tests) {
             try {
                 evaluate(arg);
