@@ -1,0 +1,226 @@
+options {
+    STATIC = false;
+}
+
+PARSER_BEGIN(FldwCompiler)
+import java.io.*;
+import core.*;
+
+public class FldwCompiler {
+    public static void main(String[] args) {
+        String[] tests={"true"};
+        for (String arg : tests) {
+            try {
+                evaluate(arg);
+//                System.out.println(evaluate(arg));
+//                return(evaluate(arg));
+            } catch (ParseException ex) {
+                System.err.println(ex.getMessage());
+            }
+        }
+    }
+
+    public static void evaluate(String src) throws ParseException {
+        Reader reader = new StringReader(src);
+        Object ret = new FldwCompiler(reader).list_flow();
+        System.out.println(ret);
+    }
+}
+
+PARSER_END(FldwCompiler)
+
+/*****************************************************************/
+/***************************词法分析*******************************/
+/*****************************************************************/
+
+SKIP : // Ignoring spaces/tabs/newlines
+{
+        " "
+    |   "\t"
+    |   "\n"
+    |   "\r"
+    |   "\f"
+}
+
+SPECIAL_TOKEN : // Ignoring line commit
+{
+    < LINE_COMMIT : "//"(~["\n","\r"])* ("\n"|"\r\n"|"\r")? >
+}
+
+TOKEN : // Keywords and punctuation
+{
+        < SEMIC : ";" >
+    |   < COMMA : "," >
+
+    |   < LBR : "(" >
+    |   < RBR : ")" >
+    |   < RCBR : "}" >
+    |   < LCBR : "{" >
+    |   < RSBR : "]" >
+    |   < LSBR : "[" >
+
+    |   < ASSIGN : "=" >
+    |   < PLUS : "+" >
+    |   < MINUS : "-" >
+    |   < MULT : "*" >
+    |   < DIV : "/" >
+    |   < MOD : "%" >
+    |   < INC : "++" >
+    |   < DEC : "--" >
+
+    |   < EXLM : "!" >
+    |   < LOGIC_EQUAL : "==" >
+    |   < LOGIC_NOT : "!=" >
+    |   < LOGIC_AND : "&&" >
+    |   < LOGIC_OR : "||" >
+    |   < LEFT : "<" >
+    |   < RIGHT : ">" >
+    |   < LEFT_EQUAL : "<=" >
+    |   < RIGHT_EQUAL : ">=" >
+
+    |   < IF : "if" >
+    |   < ELSE : "else" >
+    |   < RETURN : "return" >
+    |   < STRING : "string" >
+    |   < WHILE : "while" >
+}
+
+TOKEN : // value: int
+{
+    < INT_VALUE : ["1"-"9"] (["0"-"9"])*
+            |   "0" ["x", "X"] (["0"-"9", "a"-"f", "A"-"F"])+
+            |   "0" (["0"-"7"])*
+            >
+}
+
+TOKEN : // value: double
+{
+    < DOUBLE_VALUE : ["1"-"9"] (["0"-"9"])*("."(["0"-"9"])*)? >
+}
+
+TOKEN : // value: bool
+{
+    < BOOL_VALUE : "true"|"false" >
+}
+
+MORE : // value: string
+{
+    < "\"" > : IN_STRING
+}
+< IN_STRING > MORE :
+{
+        < (~["\"", "\\", "\n", "\r"])+ >
+    |   < "\\"(["0"-"7"]){3} >
+    |   < "\\"~[] >
+}
+< IN_STRING > TOKEN :
+{
+    < STRING_VALUE : "\"" > : DEFAULT
+}
+
+TOKEN : // symbol
+{
+    < SYMBOL : ["a"-"z", "A"-"Z", "_"] (["a"-"z", "A"-"Z", "_", "0"-"9"])* >
+}
+
+TOKEN : // anything not recognised so far
+{
+    < OTHER : ~[] >
+}
+
+/*****************************************************************/
+/***************************语法分析*******************************/
+/*****************************************************************/
+TerminalData terminal_data() :
+{
+    Datable.DataType type;
+    Token x;
+}
+{
+    // 语法：terminal_data() = < INT_VALUE > | < DOUBLE_VALUE > | < BOOL_VALUE > | < STRING_VALUE >
+    (   x = < INT_VALUE >
+        {
+            type = Datable.DataType.Int;
+        }
+    |   x = < DOUBLE_VALUE >
+        {
+            type = Datable.DataType.Double;
+        }
+    |   x = < BOOL_VALUE >
+        {
+            type = Datable.DataType.Bool;
+        }
+    |   x = < STRING_VALUE >
+        {
+            type = Datable.DataType.String;
+        }
+    )
+    {
+        return new TerminalData(type, x.image);
+    }
+}
+
+SymbolData symbol_data() :
+{
+    Token x;
+}
+{
+    // 语法：symbol_data() = < SYMBOL>
+    x = < SYMBOL>
+    {
+        return new SymbolData(x.image);
+    }
+}
+
+Datable data() :
+{
+    Datable data;
+}
+{
+    // 语法：data() = terminal_data() | symbol_data()
+    (    data = terminal_data()
+    |    data = symbol_data()
+    )
+    {
+        return data;
+    }
+}
+
+ListFlow list_flow() :
+{
+    ListFlow listFlow = new ListFlow();
+    Datable data;
+}
+{
+    // 语法：list_flow() = < LSBR  > data() ( < COMMA > data() )* < RSBR >
+    < LSBR  >
+    data = data()
+    {
+        listFlow.Push(data);
+    }
+    ( < COMMA > data = data()
+        {
+            listFlow.Push(data);
+        }
+    )*
+    < RSBR >
+    {
+        return listFlow;
+    }
+}
+
+//SKIP: { <[" ", "\t", "\r", "\n"]> }
+//TOKEN: {
+//    <INTEGER: (["0"-"9"])+>
+//}
+//
+//long expr():
+//{
+//    Token x, y;
+//}
+//{
+//    x=<INTEGER> "+" y=<INTEGER> <EOF>
+//    {
+//        return Long.parseLong(x.image) + Long.parseLong(y.image);
+//    }
+//}
