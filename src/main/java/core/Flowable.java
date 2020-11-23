@@ -10,6 +10,8 @@ public interface Flowable {
 
     int Len(); // 当前流长度
 
+    void SetNext(Flowable flow); // 设置下一个流
+
     Flowable Next(); // 下一个流
 
     boolean HasNext(); // 是否有下一个流

@@ -8,7 +8,7 @@ import core.*;
 
 public class FldwCompiler {
     public static void main(String[] args) {
-        String[] tests={"[1,2.2,1.2]"};
+        String[] tests={"[1, 2.2, 1.2] | [a, b]"};
         for (String arg : tests) {
             try {
                 evaluate(arg);
@@ -22,7 +22,7 @@ public class FldwCompiler {
 
     public static void evaluate(String src) throws ParseException {
         Reader reader = new StringReader(src);
-        Object ret = new FldwCompiler(reader).list_flow();
+        Object ret = new FldwCompiler(reader).match_flow();
         System.out.println(ret);
     }
 }
@@ -83,6 +83,8 @@ TOKEN : // Keywords and punctuation
     |   < RETURN : "return" >
     |   < STRING : "string" >
     |   < WHILE : "while" >
+
+    |   < FLOW : "|" >
 }
 
 TOKEN : // value: int
@@ -206,6 +208,37 @@ ListFlow list_flow() :
     < RSBR >
     {
         return listFlow;
+    }
+}
+
+Flowable flow() :
+{
+    Flowable flow;
+}
+{
+    // 语法：flow() = list_flow() |
+    (
+    flow = list_flow()
+    )
+    {
+        return; flow;
+    }
+}
+
+Flowable match_flow() :
+{
+    Flowable leftFlow, rightFlow;
+}
+{
+    // 语法：match_flow() = flow() < FLOW > flow()
+    (
+        leftFlow = flow()
+        < FLOW >
+        rightFlow = flow()
+    )
+    {
+        leftFlow.SetNext(rightFlow);
+        return leftFlow;
     }
 }
 

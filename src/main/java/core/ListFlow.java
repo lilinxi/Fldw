@@ -38,6 +38,11 @@ public class ListFlow implements Flowable {
     }
 
     @Override
+    public void SetNext(Flowable flow) {
+
+    }
+
+    @Override
     public Flowable Next() {
         return this.nextFlow;
     }
