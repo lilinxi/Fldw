@@ -8,22 +8,23 @@ import core.*;
 
 public class FldwCompiler {
     public static void main(String[] args) {
-        String[] tests={"a<1.2"};
-        for (String arg : tests) {
+//        String[] tests={"a<1.2"};
+//        for (String arg : tests) {
             try {
-                evaluate(arg);
+                evaluate(Examples.QuickSortExample);
 //                System.out.println(evaluate(arg));
 //                return(evaluate(arg));
             } catch (ParseException ex) {
                 System.err.println(ex.getMessage());
             }
-        }
+//        }
     }
 
     public static void evaluate(String src) throws ParseException {
         Reader reader = new StringReader(src);
-        Object ret = new FldwCompiler(reader).expr_data();
-        System.out.println(ret);
+//        Object ret = new FldwCompiler(reader).expr_data();
+//        System.out.println(ret);
+        new FldwCompiler(reader).program();
     }
 }
 
@@ -245,7 +246,7 @@ SymbolFlow symbol_flow() :
 {
     // 语法：symbol_flow() = < ITER> <SYMBOL> stmt()
     {
-        return null;
+        return new SymbolFlow();
     }
 }
 
@@ -254,7 +255,7 @@ IfElseFlow if_else_flow() :
 }
 {
     {
-        return null;
+        return new IfElseFlow();
     }
 }
 
@@ -262,19 +263,33 @@ FuncFlow func_flow() :
 {
 }
 {
+    symbol_data() < LBR > < RBR >
     {
-        return null;
+        return new FuncFlow();
+    }
+}
+
+HeadTailFlow head_tail_flow() :
+{
+}
+{
+    < LSBR  > data() < FLOW > data() < RSBR >
+    {
+        return new HeadTailFlow();
     }
 }
 
 Flowable flow() :
 {
-    Flowable flow;
+    Flowable flow = new ListFlow();
 }
 {
     // 语法：flow() = list_flow() | symbol_flow() | func_flow()
     (
-    flow = list_flow()
+        LOOKAHEAD(3) flow = list_flow()
+    |   LOOKAHEAD(2) symbol_data()
+    |   LOOKAHEAD(3) flow = head_tail_flow()
+    |   LOOKAHEAD(2) flow = func_flow()
     )
     {
         return flow;
@@ -283,13 +298,15 @@ Flowable flow() :
 
 Flowable flowing() :
 {
-    Flowable leftFlow, rightFlow;
+    Flowable leftFlow = new ListFlow();
+    Flowable rightFlow = new ListFlow();
 }
 {
     // 语法：match_flow() = flow() < FLOW > flow()
     leftFlow = flow()
-    < FLOW >
+    (< FLOW >
     rightFlow = flow()
+    )*
     {
         leftFlow.SetNext(rightFlow);
         return leftFlow;
