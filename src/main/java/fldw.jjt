@@ -236,6 +236,7 @@ ListFlow list_flow() :
     )*
     < RSBR >
     {
+//        System.out.println(listFlow);
         return listFlow;
     }
 }
@@ -246,6 +247,7 @@ SymbolFlow symbol_flow() :
 {
     // 语法：symbol_flow() = < ITER> <SYMBOL> stmt()
     {
+//        System.out.println(new SymbolFlow());
         return new SymbolFlow();
     }
 }
@@ -255,6 +257,7 @@ IfElseFlow if_else_flow() :
 }
 {
     {
+//        System.out.println(new IfElseFlow());
         return new IfElseFlow();
     }
 }
@@ -265,6 +268,7 @@ FuncFlow func_flow() :
 {
     symbol_data() < LBR > < RBR >
     {
+//        System.out.println(new FuncFlow());
         return new FuncFlow();
     }
 }
@@ -275,6 +279,7 @@ HeadTailFlow head_tail_flow() :
 {
     < LSBR  > data() < SEMIC > data() < RSBR >
     {
+//        System.out.println(new HeadTailFlow());
         return new HeadTailFlow();
     }
 }
@@ -306,6 +311,11 @@ Flowable flowing() :
     leftFlow = flow()
     (< FLOW >
     rightFlow = flow()
+    {
+        System.out.println(leftFlow);
+        System.out.println("->");
+        System.out.println(rightFlow);
+    }
     )*
     {
         leftFlow.SetNext(rightFlow);

@@ -144,17 +144,20 @@ listFlow.Push(data);
 listFlow.Push(data);
     }
     jj_consume_token(RSBR);
-{if ("" != null) return listFlow;}
+//        System.out.println(listFlow);
+        {if ("" != null) return listFlow;}
     throw new Error("Missing return statement in function");
 }
 
   final public SymbolFlow symbol_flow() throws ParseException {
-{if ("" != null) return new SymbolFlow();}
+//        System.out.println(new SymbolFlow());
+        {if ("" != null) return new SymbolFlow();}
     throw new Error("Missing return statement in function");
 }
 
   final public IfElseFlow if_else_flow() throws ParseException {
-{if ("" != null) return new IfElseFlow();}
+//        System.out.println(new IfElseFlow());
+        {if ("" != null) return new IfElseFlow();}
     throw new Error("Missing return statement in function");
 }
 
@@ -162,28 +165,30 @@ listFlow.Push(data);
     symbol_data();
     jj_consume_token(LBR);
     jj_consume_token(RBR);
-{if ("" != null) return new FuncFlow();}
+//        System.out.println(new FuncFlow());
+        {if ("" != null) return new FuncFlow();}
     throw new Error("Missing return statement in function");
 }
 
   final public HeadTailFlow head_tail_flow() throws ParseException {
     jj_consume_token(LSBR);
     data();
-    jj_consume_token(FLOW);
+    jj_consume_token(SEMIC);
     data();
     jj_consume_token(RSBR);
-{if ("" != null) return new HeadTailFlow();}
+//        System.out.println(new HeadTailFlow());
+        {if ("" != null) return new HeadTailFlow();}
     throw new Error("Missing return statement in function");
 }
 
   final public Flowable flow() throws ParseException {Flowable flow = new ListFlow();
     if (jj_2_1(3)) {
       flow = list_flow();
-    } else if (jj_2_2(2)) {
+    } else if (jj_2_2(3)) {
       symbol_data();
     } else if (jj_2_3(3)) {
       flow = head_tail_flow();
-    } else if (jj_2_4(2)) {
+    } else if (jj_2_4(3)) {
       flow = func_flow();
     } else {
       jj_consume_token(-1);
@@ -210,6 +215,9 @@ listFlow.Push(data);
       }
       jj_consume_token(FLOW);
       rightFlow = flow();
+System.out.println(leftFlow);
+        System.out.println("->");
+        System.out.println(rightFlow);
     }
 leftFlow.SetNext(rightFlow);
         {if ("" != null) return leftFlow;}
@@ -359,28 +367,23 @@ leftFlow.SetNext(rightFlow);
     finally { jj_save(3, xla); }
   }
 
-  private boolean jj_3_1()
- {
-    if (jj_3R_list_flow_227_5_5()) return true;
-    return false;
-  }
-
   private boolean jj_3R_terminal_data_150_9_15()
  {
     if (jj_scan_token(DOUBLE_VALUE)) return true;
     return false;
   }
 
-  private boolean jj_3R_symbol_data_174_5_6()
- {
-    if (jj_scan_token(SYMBOL)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_func_flow_266_5_8()
+  private boolean jj_3R_func_flow_269_5_8()
  {
     if (jj_3R_symbol_data_174_5_6()) return true;
     if (jj_scan_token(LBR)) return true;
+    if (jj_scan_token(RBR)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_symbol_data_174_5_6()
+ {
+    if (jj_scan_token(SYMBOL)) return true;
     return false;
   }
 
@@ -436,17 +439,41 @@ leftFlow.SetNext(rightFlow);
     return false;
   }
 
+  private boolean jj_3R_head_tail_flow_280_5_7()
+ {
+    if (jj_scan_token(LSBR)) return true;
+    if (jj_3R_data_212_5_9()) return true;
+    if (jj_scan_token(SEMIC)) return true;
+    return false;
+  }
+
+  private boolean jj_3_4()
+ {
+    if (jj_3R_func_flow_269_5_8()) return true;
+    return false;
+  }
+
   private boolean jj_3R_terminal_data_158_9_17()
  {
     if (jj_scan_token(STRING_VALUE)) return true;
     return false;
   }
 
-  private boolean jj_3R_head_tail_flow_276_5_7()
+  private boolean jj_3_3()
  {
-    if (jj_scan_token(LSBR)) return true;
-    if (jj_3R_data_212_5_9()) return true;
-    if (jj_scan_token(FLOW)) return true;
+    if (jj_3R_head_tail_flow_280_5_7()) return true;
+    return false;
+  }
+
+  private boolean jj_3_2()
+ {
+    if (jj_3R_symbol_data_174_5_6()) return true;
+    return false;
+  }
+
+  private boolean jj_3_1()
+ {
+    if (jj_3R_list_flow_227_5_5()) return true;
     return false;
   }
 
@@ -466,24 +493,6 @@ leftFlow.SetNext(rightFlow);
       if (jj_3R_list_flow_232_7_10()) { jj_scanpos = xsp; break; }
     }
     if (jj_scan_token(RSBR)) return true;
-    return false;
-  }
-
-  private boolean jj_3_4()
- {
-    if (jj_3R_func_flow_266_5_8()) return true;
-    return false;
-  }
-
-  private boolean jj_3_3()
- {
-    if (jj_3R_head_tail_flow_276_5_7()) return true;
-    return false;
-  }
-
-  private boolean jj_3_2()
- {
-    if (jj_3R_symbol_data_174_5_6()) return true;
     return false;
   }
 

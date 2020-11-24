@@ -44,4 +44,13 @@ public class IfElseFlow implements Flowable {
     public boolean Flow() {
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "IfElseFlow{" +
+                "trueFlow=" + trueFlow +
+                ", falseFlow=" + falseFlow +
+                ", boolExprData=" + boolExprData +
+                '}';
+    }
 }

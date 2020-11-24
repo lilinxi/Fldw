@@ -40,4 +40,9 @@ public class FuncFlow implements Flowable {
     public boolean Flow() {
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "FuncFlow{}";
+    }
 }

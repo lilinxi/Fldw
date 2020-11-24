@@ -1,5 +1,6 @@
 package core;
 
+
 public class HeadTailFlow implements Flowable {
     @Override
     public boolean Push(Datable data) {
@@ -39,5 +40,10 @@ public class HeadTailFlow implements Flowable {
     @Override
     public boolean Flow() {
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "HeadTailFlow{}";
     }
 }
