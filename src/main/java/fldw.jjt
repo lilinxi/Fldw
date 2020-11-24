@@ -303,23 +303,26 @@ Flowable flow() :
 
 Flowable flowing() :
 {
+    Flowable topFlow = new ListFlow();
     Flowable leftFlow = new ListFlow();
     Flowable rightFlow = new ListFlow();
 }
 {
     // 语法：match_flow() = flow() < FLOW > flow()
-    leftFlow = flow()
+    topFlow = flow()
+    {
+        leftFlow = topFlow;
+    }
     (< FLOW >
     rightFlow = flow()
     {
-        System.out.println(leftFlow);
-        System.out.println("->");
-        System.out.println(rightFlow);
+        leftFlow.SetNext(rightFlow);
+        leftFlow = rightFlow;
     }
     )*
     {
-        leftFlow.SetNext(rightFlow);
-        return leftFlow;
+        System.out.println(topFlow);
+        return topFlow;
     }
 }
 
