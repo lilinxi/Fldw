@@ -5,7 +5,7 @@ import core.*;
 
 public class FldwCompiler implements FldwCompilerConstants {
     public static void main(String[] args) {
-        String[] tests={"[1, 2.2, c] | [a, b, true]"};
+        String[] tests={"a<1.2"};
         for (String arg : tests) {
             try {
                 evaluate(arg);
@@ -19,7 +19,7 @@ public class FldwCompiler implements FldwCompilerConstants {
 
     public static void evaluate(String src) throws ParseException {
         Reader reader = new StringReader(src);
-        Object ret = new FldwCompiler(reader).match_flow();
+        Object ret = new FldwCompiler(reader).expr_data();
         System.out.println(ret);
     }
 
@@ -65,6 +65,41 @@ type = Datable.DataType.String;
     throw new Error("Missing return statement in function");
 }
 
+// tmp
+  final public ExprData expr_data() throws ParseException {ExprData exprData = new ExprData();
+    Datable leftData, rightData;
+    leftData = data();
+exprData.setLeftData(leftData);
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case LEFT:{
+      jj_consume_token(LEFT);
+exprData.setOp(ExprData.ExprOp.LeftOp);
+      break;
+      }
+    case RIGHT:{
+      jj_consume_token(RIGHT);
+exprData.setOp(ExprData.ExprOp.RightOp);
+      break;
+      }
+    case LEFT_EQUAL:{
+      jj_consume_token(LEFT_EQUAL);
+      break;
+      }
+    case RIGHT_EQUAL:{
+      jj_consume_token(RIGHT_EQUAL);
+      break;
+      }
+    default:
+      jj_la1[1] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    rightData = data();
+exprData.setRightData(rightData);
+{if ("" != null) return exprData;}
+    throw new Error("Missing return statement in function");
+}
+
   final public Datable data() throws ParseException {Datable data;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case INT_VALUE:
@@ -79,7 +114,7 @@ type = Datable.DataType.String;
       break;
       }
     default:
-      jj_la1[1] = jj_gen;
+      jj_la1[2] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -100,7 +135,7 @@ listFlow.Push(data);
         break;
         }
       default:
-        jj_la1[2] = jj_gen;
+        jj_la1[3] = jj_gen;
         break label_1;
       }
       jj_consume_token(COMMA);
@@ -143,39 +178,10 @@ leftFlow.SetNext(rightFlow);
     throw new Error("Missing return statement in function");
 }
 
-// tmp
-  final public void bool_expr() throws ParseException {
-    data();
-    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-    case LEFT:{
-      jj_consume_token(LEFT);
-      break;
-      }
-    case RIGHT:{
-      jj_consume_token(RIGHT);
-      break;
-      }
-    case LEFT_EQUAL:{
-      jj_consume_token(LEFT_EQUAL);
-      break;
-      }
-    case RIGHT_EQUAL:{
-      jj_consume_token(RIGHT_EQUAL);
-      break;
-      }
-    default:
-      jj_la1[3] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
-    }
-    data();
-{if ("" != null) return null;}
-}
-
   final public void if_else_stmt() throws ParseException {
     jj_consume_token(IF);
     jj_consume_token(LBR);
-    bool_expr();
+    expr_data();
     jj_consume_token(RBR);
     block();
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -188,16 +194,16 @@ leftFlow.SetNext(rightFlow);
       jj_la1[4] = jj_gen;
       ;
     }
-{if ("" != null) return null;}
+{if ("" != null) return;}
 }
 
   final public void while_stmt() throws ParseException {
     jj_consume_token(WHILE);
     jj_consume_token(LBR);
-    bool_expr();
+    expr_data();
     jj_consume_token(RBR);
     block();
-{if ("" != null) return null;}
+{if ("" != null) return;}
 }
 
   final public void def_func_stmt() throws ParseException {
@@ -219,7 +225,7 @@ leftFlow.SetNext(rightFlow);
     }
     jj_consume_token(RBR);
     block();
-{if ("" != null) return null;}
+{if ("" != null) return;}
 }
 
   final public void stmt() throws ParseException {
@@ -238,7 +244,7 @@ leftFlow.SetNext(rightFlow);
       }
     case FUNC:{
       def_func_stmt();
-{if ("" != null) return null;}
+{if ("" != null) return;}
       break;
       }
     default:
@@ -272,13 +278,13 @@ leftFlow.SetNext(rightFlow);
     jj_consume_token(LCBR);
     stmts();
     jj_consume_token(RCBR);
-{if ("" != null) return null;}
+{if ("" != null) return;}
 }
 
   final public void program() throws ParseException {
     stmts();
     jj_consume_token(0);
-{if ("" != null) return null;}
+{if ("" != null) return;}
 }
 
   /** Generated Token Manager. */
@@ -298,10 +304,10 @@ leftFlow.SetNext(rightFlow);
 	   jj_la1_init_1();
 	}
 	private static void jj_la1_init_0() {
-	   jj_la1_0 = new int[] {0x0,0x0,0x100,0xf0000000,0x0,0x0,0x4000,0x4000,};
+	   jj_la1_0 = new int[] {0x0,0xf0000000,0x0,0x100,0x0,0x0,0x4000,0x4000,};
 	}
 	private static void jj_la1_init_1() {
-	   jj_la1_1 = new int[] {0x21c0,0x61c0,0x0,0x0,0x2,0x4000,0xd,0xd,};
+	   jj_la1_1 = new int[] {0x21c0,0x0,0x61c0,0x0,0x2,0x4000,0xd,0xd,};
 	}
 
   /** Constructor with InputStream. */

@@ -8,7 +8,7 @@ import core.*;
 
 public class FldwCompiler {
     public static void main(String[] args) {
-        String[] tests={"[1, 2.2, c] | [a, b, true]"};
+        String[] tests={"a<1.2"};
         for (String arg : tests) {
             try {
                 evaluate(arg);
@@ -22,7 +22,7 @@ public class FldwCompiler {
 
     public static void evaluate(String src) throws ParseException {
         Reader reader = new StringReader(src);
-        Object ret = new FldwCompiler(reader).match_flow();
+        Object ret = new FldwCompiler(reader).expr_data();
         System.out.println(ret);
     }
 }
@@ -176,12 +176,38 @@ SymbolData symbol_data() :
     }
 }
 
+// tmp
+ExprData expr_data() :
+{
+    ExprData exprData = new ExprData();
+    Datable leftData, rightData;
+}
+{
+    leftData = data()
+    {
+        exprData.setLeftData(leftData);
+    }
+    (
+            < LEFT > { exprData.setOp(ExprData.ExprOp.LeftOp); }
+        |   < RIGHT > { exprData.setOp(ExprData.ExprOp.RightOp); }
+        |   < LEFT_EQUAL >
+        |   < RIGHT_EQUAL >
+    )
+    rightData = data()
+    {
+            exprData.setRightData(rightData);
+    }
+    {
+        return exprData;
+    }
+}
+
 Datable data() :
 {
     Datable data;
 }
 {
-    // 语法：data() = terminal_data() | symbol_data()
+    // 语法：data() = terminal_data() | symbol_data() | expr_data()
     (    data = terminal_data()
     |    data = symbol_data()
     )
@@ -270,32 +296,14 @@ Flowable flowing() :
     }
 }
 
-// tmp
-void bool_expr() :
-{
-}
-{
-    data()
-    (
-            < LEFT >
-        |   < RIGHT >
-        |   < LEFT_EQUAL >
-        |   < RIGHT_EQUAL >
-    )
-    data()
-    {
-        return null;
-    }
-}
-
 void if_else_stmt() :
 {
 }
 {
-    // 语法：if_else_stmt() = < IF > < LBR > bool_expr() < RBR > block() [ <ELSE > block() ]
-    < IF > < LBR > bool_expr() < RBR > block() [ <ELSE > block() ]
+    // 语法：if_else_stmt() = < IF > < LBR > expr_data() < RBR > block() [ <ELSE > block() ]
+    < IF > < LBR > expr_data() < RBR > block() [ <ELSE > block() ]
     {
-        return null;
+        return;
     }
 }
 
@@ -303,10 +311,10 @@ void while_stmt() :
 {
 }
 {
-    // 语法：< WHILE > < LBR > bool_expr() < RBR > block()
-    < WHILE > < LBR > bool_expr() < RBR > block()
+    // 语法：< WHILE > < LBR > expr_data() < RBR > block()
+    < WHILE > < LBR > expr_data() < RBR > block()
     {
-        return null;
+        return;
     }
 }
 
@@ -317,7 +325,7 @@ void def_func_stmt() :
     // 语法：< FUNC > symbol_data() < LBR > (symbol_data())* < RBR > block()
     < FUNC > symbol_data() < LBR > (symbol_data())* < RBR > block()
     {
-        return null;
+        return;
     }
 }
 
@@ -327,7 +335,7 @@ void stmt() :
 {
     flowing() | if_else_stmt() | while_stmt() | def_func_stmt()
     {
-        return null;
+        return;
     }
 }
 
@@ -348,7 +356,7 @@ void block() :
 {
     < LCBR > stmts() < RCBR >
     {
-        return null;
+        return;
     }
 }
 
@@ -358,7 +366,7 @@ void program() :
 {
     stmts() < EOF >
     {
-        return null;
+        return;
     }
 }
 
