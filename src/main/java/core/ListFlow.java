@@ -39,7 +39,7 @@ public class ListFlow implements Flowable {
 
     @Override
     public void SetNext(Flowable flow) {
-
+        this.nextFlow = flow;
     }
 
     @Override
@@ -56,6 +56,10 @@ public class ListFlow implements Flowable {
     public boolean Flow() {
         if (this.nextFlow == null) {
             return true;
+        } else if (this.nextFlow.Len() == 0) {
+            boolean success = this.nextFlow.Push(this);
+            if (!success) return false;
+            return this.nextFlow.Flow();
         } else {
             boolean success = this.nextFlow.Push(this);
             if (!success) return false;

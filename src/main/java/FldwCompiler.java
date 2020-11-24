@@ -5,7 +5,7 @@ import core.*;
 
 public class FldwCompiler implements FldwCompilerConstants {
     public static void main(String[] args) {
-        String[] tests={"[1,2.2,1.2]"};
+        String[] tests={"[1, 2.2, c] | [a, b, true]"};
         for (String arg : tests) {
             try {
                 evaluate(arg);
@@ -19,7 +19,7 @@ public class FldwCompiler implements FldwCompilerConstants {
 
     public static void evaluate(String src) throws ParseException {
         Reader reader = new StringReader(src);
-        Object ret = new FldwCompiler(reader).list_flow();
+        Object ret = new FldwCompiler(reader).match_flow();
         System.out.println(ret);
     }
 
@@ -112,6 +112,175 @@ listFlow.Push(data);
     throw new Error("Missing return statement in function");
 }
 
+  final public SymbolFlow symbol_flow() throws ParseException {
+{if ("" != null) return null;}
+    throw new Error("Missing return statement in function");
+}
+
+  final public IfElseFlow if_else_flow() throws ParseException {
+{if ("" != null) return null;}
+    throw new Error("Missing return statement in function");
+}
+
+  final public FuncFlow func_flow() throws ParseException {
+{if ("" != null) return null;}
+    throw new Error("Missing return statement in function");
+}
+
+  final public Flowable flow() throws ParseException {Flowable flow;
+    flow = list_flow();
+{if ("" != null) return flow;}
+    throw new Error("Missing return statement in function");
+}
+
+  final public Flowable flowing() throws ParseException {Flowable leftFlow, rightFlow;
+    // 语法：match_flow() = flow() < FLOW > flow()
+        leftFlow = flow();
+    jj_consume_token(FLOW);
+    rightFlow = flow();
+leftFlow.SetNext(rightFlow);
+        {if ("" != null) return leftFlow;}
+    throw new Error("Missing return statement in function");
+}
+
+// tmp
+  final public void bool_expr() throws ParseException {
+    data();
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case LEFT:{
+      jj_consume_token(LEFT);
+      break;
+      }
+    case RIGHT:{
+      jj_consume_token(RIGHT);
+      break;
+      }
+    case LEFT_EQUAL:{
+      jj_consume_token(LEFT_EQUAL);
+      break;
+      }
+    case RIGHT_EQUAL:{
+      jj_consume_token(RIGHT_EQUAL);
+      break;
+      }
+    default:
+      jj_la1[3] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    data();
+{if ("" != null) return null;}
+}
+
+  final public void if_else_stmt() throws ParseException {
+    jj_consume_token(IF);
+    jj_consume_token(LBR);
+    bool_expr();
+    jj_consume_token(RBR);
+    block();
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case ELSE:{
+      jj_consume_token(ELSE);
+      block();
+      break;
+      }
+    default:
+      jj_la1[4] = jj_gen;
+      ;
+    }
+{if ("" != null) return null;}
+}
+
+  final public void while_stmt() throws ParseException {
+    jj_consume_token(WHILE);
+    jj_consume_token(LBR);
+    bool_expr();
+    jj_consume_token(RBR);
+    block();
+{if ("" != null) return null;}
+}
+
+  final public void def_func_stmt() throws ParseException {
+    jj_consume_token(FUNC);
+    symbol_data();
+    jj_consume_token(LBR);
+    label_2:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case SYMBOL:{
+        ;
+        break;
+        }
+      default:
+        jj_la1[5] = jj_gen;
+        break label_2;
+      }
+      symbol_data();
+    }
+    jj_consume_token(RBR);
+    block();
+{if ("" != null) return null;}
+}
+
+  final public void stmt() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case LSBR:{
+      flowing();
+      break;
+      }
+    case IF:{
+      if_else_stmt();
+      break;
+      }
+    case WHILE:{
+      while_stmt();
+      break;
+      }
+    case FUNC:{
+      def_func_stmt();
+{if ("" != null) return null;}
+      break;
+      }
+    default:
+      jj_la1[6] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+}
+
+  final public void stmts() throws ParseException {
+    label_3:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case LSBR:
+      case IF:
+      case WHILE:
+      case FUNC:{
+        ;
+        break;
+        }
+      default:
+        jj_la1[7] = jj_gen;
+        break label_3;
+      }
+      stmt();
+    }
+{if ("" != null) return;}
+}
+
+  final public void block() throws ParseException {
+    jj_consume_token(LCBR);
+    stmts();
+    jj_consume_token(RCBR);
+{if ("" != null) return null;}
+}
+
+  final public void program() throws ParseException {
+    stmts();
+    jj_consume_token(0);
+{if ("" != null) return null;}
+}
+
   /** Generated Token Manager. */
   public FldwCompilerTokenManager token_source;
   SimpleCharStream jj_input_stream;
@@ -121,7 +290,7 @@ listFlow.Push(data);
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[3];
+  final private int[] jj_la1 = new int[8];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -129,10 +298,10 @@ listFlow.Push(data);
 	   jj_la1_init_1();
 	}
 	private static void jj_la1_init_0() {
-	   jj_la1_0 = new int[] {0x0,0x0,0x100,};
+	   jj_la1_0 = new int[] {0x0,0x0,0x100,0xf0000000,0x0,0x0,0x4000,0x4000,};
 	}
 	private static void jj_la1_init_1() {
-	   jj_la1_1 = new int[] {0x10e0,0x30e0,0x0,};
+	   jj_la1_1 = new int[] {0x21c0,0x61c0,0x0,0x0,0x2,0x4000,0xd,0xd,};
 	}
 
   /** Constructor with InputStream. */
@@ -146,7 +315,7 @@ listFlow.Push(data);
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 3; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 8; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -160,7 +329,7 @@ listFlow.Push(data);
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 3; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 8; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -170,7 +339,7 @@ listFlow.Push(data);
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 3; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 8; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -188,7 +357,7 @@ listFlow.Push(data);
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 3; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 8; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -197,7 +366,7 @@ listFlow.Push(data);
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 3; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 8; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -206,7 +375,7 @@ listFlow.Push(data);
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 3; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 8; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -257,12 +426,12 @@ listFlow.Push(data);
   /** Generate ParseException. */
   public ParseException generateParseException() {
 	 jj_expentries.clear();
-	 boolean[] la1tokens = new boolean[47];
+	 boolean[] la1tokens = new boolean[48];
 	 if (jj_kind >= 0) {
 	   la1tokens[jj_kind] = true;
 	   jj_kind = -1;
 	 }
-	 for (int i = 0; i < 3; i++) {
+	 for (int i = 0; i < 8; i++) {
 	   if (jj_la1[i] == jj_gen) {
 		 for (int j = 0; j < 32; j++) {
 		   if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -274,7 +443,7 @@ listFlow.Push(data);
 		 }
 	   }
 	 }
-	 for (int i = 0; i < 47; i++) {
+	 for (int i = 0; i < 48; i++) {
 	   if (la1tokens[i]) {
 		 jj_expentry = new int[1];
 		 jj_expentry[0] = i;

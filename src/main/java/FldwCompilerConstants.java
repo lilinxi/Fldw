@@ -65,23 +65,25 @@ public interface FldwCompilerConstants {
   /** RegularExpression Id. */
   int ELSE = 33;
   /** RegularExpression Id. */
-  int RETURN = 34;
+  int WHILE = 34;
   /** RegularExpression Id. */
-  int STRING = 35;
+  int FUNC = 35;
   /** RegularExpression Id. */
-  int WHILE = 36;
+  int FLOW = 36;
   /** RegularExpression Id. */
-  int INT_VALUE = 37;
+  int ITER = 37;
   /** RegularExpression Id. */
-  int DOUBLE_VALUE = 38;
+  int INT_VALUE = 38;
   /** RegularExpression Id. */
-  int BOOL_VALUE = 39;
+  int DOUBLE_VALUE = 39;
   /** RegularExpression Id. */
-  int STRING_VALUE = 44;
+  int BOOL_VALUE = 40;
   /** RegularExpression Id. */
-  int SYMBOL = 45;
+  int STRING_VALUE = 45;
   /** RegularExpression Id. */
-  int OTHER = 46;
+  int SYMBOL = 46;
+  /** RegularExpression Id. */
+  int OTHER = 47;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -124,16 +126,17 @@ public interface FldwCompilerConstants {
     "\">=\"",
     "\"if\"",
     "\"else\"",
-    "\"return\"",
-    "\"string\"",
     "\"while\"",
+    "\"function\"",
+    "\"|\"",
+    "\"->\"",
     "<INT_VALUE>",
     "<DOUBLE_VALUE>",
     "<BOOL_VALUE>",
     "\"\\\"\"",
-    "<token of kind 41>",
     "<token of kind 42>",
     "<token of kind 43>",
+    "<token of kind 44>",
     "\"\\\"\"",
     "<SYMBOL>",
     "<OTHER>",

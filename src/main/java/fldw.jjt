@@ -8,7 +8,7 @@ import core.*;
 
 public class FldwCompiler {
     public static void main(String[] args) {
-        String[] tests={"[1, 2.2, 1.2] | [a, b]"};
+        String[] tests={"[1, 2.2, c] | [a, b, true]"};
         for (String arg : tests) {
             try {
                 evaluate(arg);
@@ -80,11 +80,13 @@ TOKEN : // Keywords and punctuation
 
     |   < IF : "if" >
     |   < ELSE : "else" >
-    |   < RETURN : "return" >
-    |   < STRING : "string" >
+//    |   < RETURN : "return" >
+//    |   < STRING : "string" >
     |   < WHILE : "while" >
+    |   < FUNC : "function" >
 
     |   < FLOW : "|" >
+    |   < ITER : "->" >
 }
 
 TOKEN : // value: int
@@ -211,36 +213,156 @@ ListFlow list_flow() :
     }
 }
 
+SymbolFlow symbol_flow() :
+{
+}
+{
+    // 语法：symbol_flow() = < ITER> <SYMBOL> stmt()
+    {
+        return null;
+    }
+}
+
+IfElseFlow if_else_flow() :
+{
+}
+{
+    {
+        return null;
+    }
+}
+
+FuncFlow func_flow() :
+{
+}
+{
+    {
+        return null;
+    }
+}
+
 Flowable flow() :
 {
     Flowable flow;
 }
 {
-    // 语法：flow() = list_flow() |
+    // 语法：flow() = list_flow() | symbol_flow() | func_flow()
     (
     flow = list_flow()
     )
     {
-        return; flow;
+        return flow;
     }
 }
 
-Flowable match_flow() :
+Flowable flowing() :
 {
     Flowable leftFlow, rightFlow;
 }
 {
     // 语法：match_flow() = flow() < FLOW > flow()
-    (
-        leftFlow = flow()
-        < FLOW >
-        rightFlow = flow()
-    )
+    leftFlow = flow()
+    < FLOW >
+    rightFlow = flow()
     {
         leftFlow.SetNext(rightFlow);
         return leftFlow;
     }
 }
+
+// tmp
+void bool_expr() :
+{
+}
+{
+    data()
+    (
+            < LEFT >
+        |   < RIGHT >
+        |   < LEFT_EQUAL >
+        |   < RIGHT_EQUAL >
+    )
+    data()
+    {
+        return null;
+    }
+}
+
+void if_else_stmt() :
+{
+}
+{
+    // 语法：if_else_stmt() = < IF > < LBR > bool_expr() < RBR > block() [ <ELSE > block() ]
+    < IF > < LBR > bool_expr() < RBR > block() [ <ELSE > block() ]
+    {
+        return null;
+    }
+}
+
+void while_stmt() :
+{
+}
+{
+    // 语法：< WHILE > < LBR > bool_expr() < RBR > block()
+    < WHILE > < LBR > bool_expr() < RBR > block()
+    {
+        return null;
+    }
+}
+
+void def_func_stmt() :
+{
+}
+{
+    // 语法：< FUNC > symbol_data() < LBR > (symbol_data())* < RBR > block()
+    < FUNC > symbol_data() < LBR > (symbol_data())* < RBR > block()
+    {
+        return null;
+    }
+}
+
+void stmt() :
+{
+}
+{
+    flowing() | if_else_stmt() | while_stmt() | def_func_stmt()
+    {
+        return null;
+    }
+}
+
+void stmts() :
+{
+
+}
+{
+    (stmt())*
+    {
+        return;
+    }
+}
+
+void block() :
+{
+}
+{
+    < LCBR > stmts() < RCBR >
+    {
+        return null;
+    }
+}
+
+void program() :
+{
+}
+{
+    stmts() < EOF >
+    {
+        return null;
+    }
+}
+
+
 
 //SKIP: { <[" ", "\t", "\r", "\n"]> }
 //TOKEN: {
