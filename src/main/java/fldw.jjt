@@ -273,7 +273,7 @@ HeadTailFlow head_tail_flow() :
 {
 }
 {
-    < LSBR  > data() < FLOW > data() < RSBR >
+    < LSBR  > data() < SEMIC > data() < RSBR >
     {
         return new HeadTailFlow();
     }
@@ -287,9 +287,9 @@ Flowable flow() :
     // 语法：flow() = list_flow() | symbol_flow() | func_flow()
     (
         LOOKAHEAD(3) flow = list_flow()
-    |   LOOKAHEAD(2) symbol_data()
+    |   LOOKAHEAD(3) symbol_data()
     |   LOOKAHEAD(3) flow = head_tail_flow()
-    |   LOOKAHEAD(2) flow = func_flow()
+    |   LOOKAHEAD(3) flow = func_flow()
     )
     {
         return flow;
