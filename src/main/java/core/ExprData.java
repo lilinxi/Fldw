@@ -14,11 +14,9 @@ public class ExprData implements Datable {
 
     // 检查两元的类型和运算符是否匹配，并返回表达式的类型
     public static DataType CheckExprTypeMatch(DataType leftType, DataType rightType, ExprOp op) {
+//            需要类型强匹配，否则报错
         switch (op) {
-            case AddOp:
-            case SubOp:
-            case MulOp:
-            case DivOp: {
+            case AddOp, SubOp, MulOp, DivOp -> {
 //                两个类型都为 Int
                 if (leftType == DataType.Int && rightType == DataType.Int) {
                     return DataType.Int;
@@ -30,8 +28,7 @@ public class ExprData implements Datable {
                     return DataType.Double;
                 }
             }
-            case LeftOp:
-            case RightOp: {
+            case LeftOp, RightOp -> {
 //                两个类型必为 Int 或 Double，强转为 Double 进行比较，类型返回 Bool，否则报错
                 if ((leftType != DataType.Int && leftType != DataType.Double) ||
                         (rightType != DataType.Int && rightType != DataType.Double)) {
@@ -40,15 +37,14 @@ public class ExprData implements Datable {
                     return DataType.Bool;
                 }
             }
-//            需要类型强匹配，否则报错
-            case LogicEqualOp: {
+            case LogicEqualOp -> {
                 if (leftType == rightType) {
                     return leftType;
                 } else {
                     throw new RuntimeException("expr type mismatch with " + leftType + " " + op + " " + rightType);
                 }
             }
-            default: {
+            default -> {
                 throw new RuntimeException("unexpected op");
             }
         }
