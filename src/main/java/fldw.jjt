@@ -11,7 +11,7 @@ public class FldwCompiler {
 //        String[] tests={"a<1.2"};
 //        for (String arg : tests) {
             try {
-                evaluate(Examples.QuickSortExample);
+                evaluate(Examples.FlowingExample1);
 //                System.out.println(evaluate(arg));
 //                return(evaluate(arg));
             } catch (ParseException ex) {
@@ -277,7 +277,7 @@ HeadTailFlow head_tail_flow() :
 {
 }
 {
-    < LSBR  > data() < SEMIC > data() < RSBR >
+    < LSBR  > symbol_data() < SEMIC > symbol_data() < RSBR >
     {
 //        System.out.println(new HeadTailFlow());
         return new HeadTailFlow();
@@ -287,14 +287,21 @@ HeadTailFlow head_tail_flow() :
 Flowable flow() :
 {
     Flowable flow = new ListFlow();
+    Token symbol;
 }
 {
     // 语法：flow() = list_flow() | symbol_flow() | func_flow()
     (
-        LOOKAHEAD(3) flow = list_flow()
-    |   LOOKAHEAD(3) symbol_data()
+
+//        LOOKHEAD 的要放在最前面
+        LOOKAHEAD(3) flow = func_flow()
     |   LOOKAHEAD(3) flow = head_tail_flow()
-    |   LOOKAHEAD(3) flow = func_flow()
+    |   symbol = < SYMBOL>
+        {
+            flow = new ListFlow(symbol.image);
+            SymbolTable.RootSymbolTable.PutSymbol(symbol.image, SymbolTable.SymbolType.Flow, flow);
+        }
+    |   flow = list_flow()
     )
     {
         return flow;
@@ -321,7 +328,10 @@ Flowable flowing() :
     }
     )*
     {
-        System.out.println(topFlow);
+        System.out.println("Root Symbol Table: " + SymbolTable.RootSymbolTable);
+        System.out.println("before flowing: " + topFlow);
+        topFlow.Flowing();
+        System.out.println("after flowing: " + topFlow);
         return topFlow;
     }
 }

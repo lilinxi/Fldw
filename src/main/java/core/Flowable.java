@@ -2,6 +2,8 @@ package core;
 
 // 支持的流所提供的接口
 public interface Flowable {
+    String GetSymbol();// 获取流的符号
+
     boolean Push(Datable data); // 流入一个元素，返回是否成功
 
     boolean Push(Flowable flow); // 流入一个流，返回是否成功
@@ -16,5 +18,5 @@ public interface Flowable {
 
     boolean HasNext(); // 是否有下一个流
 
-    boolean Flow(); // 开始元素的流动
+    boolean Flowing(); // 开始元素的流动
 }

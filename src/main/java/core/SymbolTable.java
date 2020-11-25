@@ -3,10 +3,12 @@ package core;
 import java.util.HashMap;
 
 public class SymbolTable {
+    //    所有符号可以代表的类型：数据，流，函数，符号表
     public static enum SymbolType {
-        Data, Flow, Function
+        Data, Flow, Function, SymbolTable
     }
 
+    //    符号表项
     public static class SymbolItem {
         private String symbol;
         private SymbolType type;
@@ -44,14 +46,41 @@ public class SymbolTable {
         }
     }
 
-    private static HashMap<String, SymbolItem> SymbolItemHashMap = new HashMap<String, SymbolItem>();
+    private String symbol;
+    private SymbolTable parentSymbolTable;
+    private HashMap<String, SymbolItem> SymbolItemHashMap;
 
-    public static SymbolItem GetSymbol(String symbol) {
-        return SymbolTable.SymbolItemHashMap.get(symbol);
+    public SymbolTable(String symbol, SymbolTable parentSymbolTable) {
+        this.symbol = symbol;
+        this.parentSymbolTable = parentSymbolTable;
+        this.SymbolItemHashMap = new HashMap<>();
     }
 
-    public static void PutSymbol(String symbol, SymbolType type, Object value) {
-        SymbolTable.SymbolItemHashMap.put(symbol, new SymbolItem(symbol, type, value));
+    //    递归查找符号表
+    public SymbolItem GetSymbol(String symbol) {
+        SymbolItem value = this.SymbolItemHashMap.get(symbol);
+        if (value != null) {
+            return value;
+        } else if (this.parentSymbolTable != null) {
+            return this.parentSymbolTable.GetSymbol(symbol);
+        } else {
+            return null;
+        }
     }
 
+    public SymbolItem PutSymbol(String symbol, SymbolType type, Object value) {
+        return this.SymbolItemHashMap.put(symbol, new SymbolItem(symbol, type, value));
+    }
+
+    @Override
+    public String toString() {
+        return "SymbolTable{" +
+                "symbol='" + symbol + '\'' +
+                ", parentSymbolTable=" + parentSymbolTable +
+                ", SymbolItemHashMap=" + SymbolItemHashMap +
+                '}';
+    }
+
+    //    根符号表
+    public static SymbolTable RootSymbolTable = new SymbolTable("root", null);
 }

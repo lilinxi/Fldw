@@ -6,6 +6,11 @@ public class IfElseFlow implements Flowable {
     private BoolExprData boolExprData;
 
     @Override
+    public String GetSymbol() {
+        return null;
+    }
+
+    @Override
     public boolean Push(Datable data) {
         return false;
     }
@@ -41,7 +46,7 @@ public class IfElseFlow implements Flowable {
     }
 
     @Override
-    public boolean Flow() {
+    public boolean Flowing() {
         return false;
     }
 

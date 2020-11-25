@@ -3,10 +3,24 @@ package core;
 import java.util.LinkedList;
 
 public class ListFlow implements Flowable {
-    private LinkedList<Datable> dataList = new LinkedList<>();
-    private Flowable nextFlow = null;
+    private LinkedList<Datable> dataList;
+    private Flowable nextFlow;
+    private String symbol;
 
     public ListFlow() {
+        this.dataList = new LinkedList<>();
+        this.nextFlow = null;
+        this.symbol = null;
+    }
+
+    public ListFlow(String symbol) {
+        this();
+        this.symbol = symbol;
+    }
+
+    @Override
+    public String GetSymbol() {
+        return this.symbol;
     }
 
     @Override
@@ -53,17 +67,17 @@ public class ListFlow implements Flowable {
     }
 
     @Override
-    public boolean Flow() {
+    public boolean Flowing() {
         if (this.nextFlow == null) {
             return true;
         } else if (this.nextFlow.Len() == 0) {
             boolean success = this.nextFlow.Push(this);
             if (!success) return false;
-            return this.nextFlow.Flow();
+            return this.nextFlow.Flowing();
         } else {
             boolean success = this.nextFlow.Push(this);
             if (!success) return false;
-            return this.nextFlow.Flow();
+            return this.nextFlow.Flowing();
         }
     }
 

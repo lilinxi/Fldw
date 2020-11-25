@@ -3,6 +3,11 @@ package core;
 
 public class HeadTailFlow implements Flowable {
     @Override
+    public String GetSymbol() {
+        return null;
+    }
+
+    @Override
     public boolean Push(Datable data) {
         return false;
     }
@@ -38,7 +43,7 @@ public class HeadTailFlow implements Flowable {
     }
 
     @Override
-    public boolean Flow() {
+    public boolean Flowing() {
         return false;
     }
 

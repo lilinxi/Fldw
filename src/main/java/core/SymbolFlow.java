@@ -2,6 +2,14 @@ package core;
 
 public class SymbolFlow implements Flowable {
     private SymbolData symbolData; // 临时变量
+    private Flowable next;
+
+
+
+    @Override
+    public String GetSymbol() {
+        return null;
+    }
 
     @Override
     public boolean Push(Datable data) {
@@ -25,7 +33,7 @@ public class SymbolFlow implements Flowable {
 
     @Override
     public void SetNext(Flowable flow) {
-
+        this.next = flow;
     }
 
     @Override
@@ -39,7 +47,15 @@ public class SymbolFlow implements Flowable {
     }
 
     @Override
-    public boolean Flow() {
+    public boolean Flowing() {
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "SymbolFlow{" +
+                "symbolData=" + symbolData +
+                ", next=" + next +
+                '}';
     }
 }
