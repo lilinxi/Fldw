@@ -8,7 +8,7 @@ public class FldwCompiler implements FldwCompilerConstants {
 //        String[] tests={"a<1.2"};
 //        for (String arg : tests) {
             try {
-                evaluate(Examples.FlowingExample1);
+                evaluate(Examples.FlowingExample4);
 //                System.out.println(evaluate(arg));
 //                return(evaluate(arg));
             } catch (ParseException ex) {
@@ -170,19 +170,23 @@ listFlow.Push(data);
     throw new Error("Missing return statement in function");
 }
 
-  final public HeadTailFlow head_tail_flow() throws ParseException {
+  final public HeadTailFlow head_tail_flow() throws ParseException {SymbolData headData;
+    Token tailListFlowSymbol;
+    ListFlow tailListFlow;
+    HeadTailFlow headTailFlow;
     jj_consume_token(LSBR);
-    symbol_data();
+    headData = symbol_data();
     jj_consume_token(SEMIC);
-    symbol_data();
+    tailListFlowSymbol = jj_consume_token(SYMBOL);
+tailListFlow = new ListFlow(tailListFlowSymbol.image);
+        SymbolTable.RootSymbolTable.PutSymbol(tailListFlowSymbol.image, SymbolTable.SymbolType.Flow, tailListFlow);
     jj_consume_token(RSBR);
-//        System.out.println(new HeadTailFlow());
-        {if ("" != null) return new HeadTailFlow();}
+{if ("" != null) return new HeadTailFlow(headData, tailListFlow);}
     throw new Error("Missing return statement in function");
 }
 
   final public Flowable flow() throws ParseException {Flowable flow = new ListFlow();
-    Token symbol;
+    Token flowSymbol;
     if (jj_2_1(3)) {
       flow = func_flow();
     } else if (jj_2_2(3)) {
@@ -190,9 +194,9 @@ listFlow.Push(data);
     } else {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case SYMBOL:{
-        symbol = jj_consume_token(SYMBOL);
-flow = new ListFlow(symbol.image);
-            SymbolTable.RootSymbolTable.PutSymbol(symbol.image, SymbolTable.SymbolType.Flow, flow);
+        flowSymbol = jj_consume_token(SYMBOL);
+flow = new ListFlow(flowSymbol.image);
+            SymbolTable.RootSymbolTable.PutSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow, flow);
         break;
         }
       case LSBR:{
@@ -366,14 +370,6 @@ System.out.println("Root Symbol Table: " + SymbolTable.RootSymbolTable);
     finally { jj_save(1, xla); }
   }
 
-  private boolean jj_3R_head_tail_flow_280_5_6()
- {
-    if (jj_scan_token(LSBR)) return true;
-    if (jj_3R_symbol_data_174_5_7()) return true;
-    if (jj_scan_token(SEMIC)) return true;
-    return false;
-  }
-
   private boolean jj_3R_func_flow_269_5_5()
  {
     if (jj_3R_symbol_data_174_5_7()) return true;
@@ -384,13 +380,21 @@ System.out.println("Root Symbol Table: " + SymbolTable.RootSymbolTable);
 
   private boolean jj_3_2()
  {
-    if (jj_3R_head_tail_flow_280_5_6()) return true;
+    if (jj_3R_head_tail_flow_285_5_6()) return true;
     return false;
   }
 
   private boolean jj_3_1()
  {
     if (jj_3R_func_flow_269_5_5()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_head_tail_flow_285_5_6()
+ {
+    if (jj_scan_token(LSBR)) return true;
+    if (jj_3R_symbol_data_174_5_7()) return true;
+    if (jj_scan_token(SEMIC)) return true;
     return false;
   }
 

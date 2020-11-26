@@ -11,7 +11,7 @@ public class FldwCompiler {
 //        String[] tests={"a<1.2"};
 //        for (String arg : tests) {
             try {
-                evaluate(Examples.FlowingExample1);
+                evaluate(Examples.FlowingExample4);
 //                System.out.println(evaluate(arg));
 //                return(evaluate(arg));
             } catch (ParseException ex) {
@@ -275,19 +275,29 @@ FuncFlow func_flow() :
 
 HeadTailFlow head_tail_flow() :
 {
+    SymbolData headData;
+    Token tailListFlowSymbol;
+    ListFlow tailListFlow;
+    HeadTailFlow headTailFlow;
 }
 {
-    < LSBR  > symbol_data() < SEMIC > symbol_data() < RSBR >
+    // 语法：head_tail_flow() = < LSBR  > symbol_data() < SEMIC > < SYMBOL> < RSBR >
+    < LSBR  > headData = symbol_data() < SEMIC >
+    tailListFlowSymbol = < SYMBOL>
     {
-//        System.out.println(new HeadTailFlow());
-        return new HeadTailFlow();
+        tailListFlow = new ListFlow(tailListFlowSymbol.image);
+        SymbolTable.RootSymbolTable.PutSymbol(tailListFlowSymbol.image, SymbolTable.SymbolType.Flow, tailListFlow);
+    }
+    < RSBR >
+    {
+        return new HeadTailFlow(headData, tailListFlow);
     }
 }
 
 Flowable flow() :
 {
     Flowable flow = new ListFlow();
-    Token symbol;
+    Token flowSymbol;
 }
 {
     // 语法：flow() = list_flow() | symbol_flow() | func_flow()
@@ -296,10 +306,10 @@ Flowable flow() :
 //        LOOKHEAD 的要放在最前面
         LOOKAHEAD(3) flow = func_flow()
     |   LOOKAHEAD(3) flow = head_tail_flow()
-    |   symbol = < SYMBOL>
+    |   flowSymbol = < SYMBOL>
         {
-            flow = new ListFlow(symbol.image);
-            SymbolTable.RootSymbolTable.PutSymbol(symbol.image, SymbolTable.SymbolType.Flow, flow);
+            flow = new ListFlow(flowSymbol.image);
+            SymbolTable.RootSymbolTable.PutSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow, flow);
         }
     |   flow = list_flow()
     )

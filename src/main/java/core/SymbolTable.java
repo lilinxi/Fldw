@@ -64,12 +64,16 @@ public class SymbolTable {
         } else if (this.parentSymbolTable != null) {
             return this.parentSymbolTable.GetSymbol(symbol);
         } else {
-            return null;
+            throw new RuntimeException("undefine symbol"); // 未定义符号
         }
     }
 
     public SymbolItem PutSymbol(String symbol, SymbolType type, Object value) {
-        return this.SymbolItemHashMap.put(symbol, new SymbolItem(symbol, type, value));
+        if (this.SymbolItemHashMap.containsKey(symbol)) {
+            throw new RuntimeException("duplicate symbol"); // 符号重复
+        } else {
+            return this.SymbolItemHashMap.put(symbol, new SymbolItem(symbol, type, value));
+        }
     }
 
     @Override

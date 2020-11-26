@@ -10,7 +10,7 @@ public interface Flowable {
 
     Datable Pop(); // 流出一个元素，若无元素则流出 null
 
-    int Len(); // 当前流长度
+    int Len(); // 当前流长度，如果不为 0，则流入操作将转化为匹配操作
 
     void SetNext(Flowable flow); // 设置下一个流
 

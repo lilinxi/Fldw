@@ -86,6 +86,7 @@ public class ListFlow implements Flowable {
         return "ListFlow{" +
                 "dataList=" + dataList +
                 ", nextFlow=" + nextFlow +
+                ", symbol='" + symbol + '\'' +
                 '}';
     }
 }
