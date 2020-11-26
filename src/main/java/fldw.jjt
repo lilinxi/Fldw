@@ -5,13 +5,14 @@ options {
 PARSER_BEGIN(FldwCompiler)
 import java.io.*;
 import core.*;
+import std.*;
 
 public class FldwCompiler {
     public static void main(String[] args) {
 //        String[] tests={"a<1.2"};
 //        for (String arg : tests) {
             try {
-                evaluate(Examples.FlowingExample4);
+                evaluate(Examples.FlowingExample5);
 //                System.out.println(evaluate(arg));
 //                return(evaluate(arg));
             } catch (ParseException ex) {
@@ -85,9 +86,14 @@ TOKEN : // Keywords and punctuation
 //    |   < STRING : "string" >
     |   < WHILE : "while" >
     |   < FUNC : "function" >
+    |   < FUNC_IN : "in" >
+    |   < FUNC_OUT : "out" >
 
     |   < FLOW : "|" >
     |   < ITER : "->" >
+
+//    |   < STDIN : "stdin" >
+//    |   < STDOUT : "stdout" >
 }
 
 TOKEN : // value: int
