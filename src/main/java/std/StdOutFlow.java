@@ -5,12 +5,12 @@ import core.Flowable;
 import core.ListFlow;
 
 public class StdOutFlow implements Flowable {
-    private ListFlow cacheFlow;
-//    单例模式
+//    private ListFlow cacheFlow;
+    //    单例模式
     private static StdOutFlow Instance = new StdOutFlow();
 
     private StdOutFlow() {
-        this.cacheFlow = new ListFlow();
+//        this.cacheFlow = new ListFlow();
     }
 
     public static StdOutFlow GetInstance() {
@@ -24,27 +24,35 @@ public class StdOutFlow implements Flowable {
 
     @Override
     public boolean Push(Datable data) {
-        return this.cacheFlow.Push(data);
+//        TODO：Debug 模式，输出全部信息
+        System.out.println(data);
+//            System.out.println(this.cacheFlow.Pop().GetValue());
+        return true;
     }
 
     @Override
     public boolean Push(Flowable flow) {
-        return this.cacheFlow.Push(flow);
+        Datable data;
+        while ((data = flow.Pop()) != null) {
+            boolean success = this.Push(data);
+            if (!success) return false;
+        }
+        return true;
     }
 
     @Override
     public Datable Pop() {
-        if (this.Len() > 0) {
-//            TODO：Debug 模式，输出全部信息
-            System.out.println(this.cacheFlow.Pop());
-//            System.out.println(this.cacheFlow.Pop().GetValue());
-        }
+//        if (this.Len() > 0) {
+////            TODO：Debug 模式，输出全部信息
+//            System.out.println(this.cacheFlow.Pop());
+////            System.out.println(this.cacheFlow.Pop().GetValue());
+//        }
         return null;
     }
 
     @Override
     public int Len() {
-        return this.cacheFlow.Len();
+        return 0;
     }
 
     @Override
@@ -64,9 +72,10 @@ public class StdOutFlow implements Flowable {
 
     @Override
     public boolean Flowing() {
-        while (this.Len() > 0) {
-            this.Pop();
-        }
-        return true;
+//        while (this.Len() > 0) {
+//            this.Pop();
+//        }
+//        return true;
+        throw new RuntimeException("wrong call");
     }
 }

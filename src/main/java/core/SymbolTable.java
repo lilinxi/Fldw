@@ -5,7 +5,7 @@ import java.util.HashMap;
 public class SymbolTable {
     //    所有符号可以代表的类型：数据，流，函数，符号表
     public static enum SymbolType {
-        Data, Flow, Function, SymbolTable
+        Data, Flow, Function, InnerSymbolTable
     }
 
     //    符号表项
@@ -56,6 +56,30 @@ public class SymbolTable {
         this.SymbolItemHashMap = new HashMap<>();
     }
 
+    //    新增符号时，获取符号的默认值
+    public Object NewSymbolValue(String symbol, SymbolType type) {
+        switch (type) {
+            case Data -> {
+                return new SymbolData(symbol);
+            }
+            case Flow -> {
+                return new ListFlow(symbol);
+            }
+            case Function -> { // 因为函数变量不能赋值，所以创建默认值没有意义
+                throw new RuntimeException("wrong type");
+            }
+            case InnerSymbolTable -> {
+                SymbolTable innerSymbolTable = new SymbolTable(symbol, this);
+                innerSymbolTable.PutSymbol("in", SymbolType.Flow);
+                innerSymbolTable.PutSymbol("out", SymbolType.Flow);
+                return innerSymbolTable;
+            }
+            default -> {
+                throw new RuntimeException("wrong call");
+            }
+        }
+    }
+
     //    递归查找符号表
     public SymbolItem GetSymbol(String symbol) {
         SymbolItem value = this.SymbolItemHashMap.get(symbol);
@@ -68,11 +92,32 @@ public class SymbolTable {
         }
     }
 
+    //    新增符号
+    public SymbolItem PutSymbol(String symbol, SymbolType type) {
+        Object value = this.NewSymbolValue(symbol, type);
+        return this.PutSymbol(symbol, type, value);
+    }
+
+    //    新增符号
     public SymbolItem PutSymbol(String symbol, SymbolType type, Object value) {
         if (this.SymbolItemHashMap.containsKey(symbol)) {
             throw new RuntimeException("duplicate symbol"); // 符号重复
         } else {
             return this.SymbolItemHashMap.put(symbol, new SymbolItem(symbol, type, value));
+        }
+    }
+
+    //    遇见一个符号，不确定是已有的还是新增的，若有则返回，没有则新增
+    public SymbolItem PutOrGetSymbol(String symbol, SymbolType type) {
+        SymbolItem symbolItem = this.GetSymbol(symbol);
+        if (symbolItem != null) {
+            if (symbolItem.getType() == type) {
+                return symbolItem;
+            } else {
+                throw new RuntimeException("duplicate symbol"); // 符号重复
+            }
+        } else {
+            return this.PutSymbol(symbol, type, this.NewSymbolValue(symbol, type));
         }
     }
 

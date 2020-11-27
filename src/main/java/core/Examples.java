@@ -19,6 +19,18 @@ public class Examples {
     public static String FlowingExample6 = """
             [5, 6, 3, 2, 7, 8] | [a, b, c, d] | [e, f, g, h, i, j]
             """;
+    public static String ExprDataExample1 = """
+            [1+2]         
+            """;
+    public static String ExprDataExample2 = """
+            [1+2, 1+2-3, 2*3, 3/2]         
+            """;
+    public static String ExprDataExample3 = """
+            [(1+2)*3, (3+2.5)/1.5]         
+            """;
+    public static String ExprDataExample4 = """
+            [(1+2)*3, (3+2.5)/1.5] | [a, b]  
+            """;
     public static String QuickSortExample = """
             function sort() {
              	if ( 1<2 ) { }
