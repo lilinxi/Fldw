@@ -5,7 +5,7 @@ package core;
  */
 public class TerminalData implements Datable {
     private DataType type;
-    private Object value;
+    private final Object value;
 
     public TerminalData(DataType type, Object value) {
         this.type = type;

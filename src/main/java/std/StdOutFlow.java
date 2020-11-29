@@ -5,7 +5,7 @@ import core.Flowable;
 import core.ListFlow;
 
 public class StdOutFlow implements Flowable {
-//    private ListFlow cacheFlow;
+    //    private ListFlow cacheFlow;
     //    单例模式
     private static StdOutFlow Instance = new StdOutFlow();
 
@@ -25,7 +25,7 @@ public class StdOutFlow implements Flowable {
     @Override
     public boolean Push(Datable data) {
 //        TODO：Debug 模式，输出全部信息
-        System.out.println(data);
+        System.out.println("stdout: " + data);
 //            System.out.println(this.cacheFlow.Pop().GetValue());
         return true;
     }
@@ -75,7 +75,7 @@ public class StdOutFlow implements Flowable {
 //        while (this.Len() > 0) {
 //            this.Pop();
 //        }
-//        return true;
-        throw new RuntimeException("wrong call");
+        return true;
+//        throw new RuntimeException("wrong call");
     }
 }

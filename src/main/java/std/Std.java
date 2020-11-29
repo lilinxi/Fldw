@@ -8,8 +8,8 @@ public class Std {
 
     static {
         System.out.println("Std loading...");
-        SymbolTable.RootSymbolTable.PutSymbol(StdInFlowSymbol, SymbolTable.SymbolType.Flow, null);
-        SymbolTable.RootSymbolTable.PutSymbol(StdOutFlowSymbol, SymbolTable.SymbolType.Flow, null);
+        SymbolTable.CurrentSymbolTable().PutSymbol(StdInFlowSymbol, SymbolTable.SymbolType.Flow, StdOutFlow.GetInstance());
+        SymbolTable.CurrentSymbolTable().PutSymbol(StdOutFlowSymbol, SymbolTable.SymbolType.Flow, StdOutFlow.GetInstance());
         System.out.println("Std loaded");
     }
 }

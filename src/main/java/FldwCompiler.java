@@ -64,11 +64,11 @@ type = Datable.DataType.String;
   final public SymbolData symbol_data() throws ParseException {Token symbol;
     // 语法：symbol_data() = < SYMBOL>
         symbol = jj_consume_token(SYMBOL);
-{if ("" != null) return SymbolTable.RootSymbolTable.PutOrGetSymbol(symbol.image, SymbolTable.SymbolType.Data);}
+{if ("" != null) return SymbolTable.CurrentSymbolTable().PutOrGetSymbol(symbol.image, SymbolTable.SymbolType.Data).assertGetSymbolData();}
     throw new Error("Missing return statement in function");
 }
 
-// tmp
+// TODO：tmp
   final public ExprData expr_data() throws ParseException {ExprData exprData = new ExprData();
     Datable leftData, rightData;
     leftData = data();
@@ -180,7 +180,7 @@ listFlow.Push(data);
     headData = symbol_data();
     jj_consume_token(SEMIC);
     tailListFlowSymbol = jj_consume_token(SYMBOL);
-tailListFlow = SymbolTable.RootSymbolTable.PutOrGetSymbol(tailListFlowSymbol.image, SymbolTable.SymbolType.Flow);
+tailListFlow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(tailListFlowSymbol.image, SymbolTable.SymbolType.Flow).assertGetListFlow();
     jj_consume_token(RSBR);
 {if ("" != null) return new HeadTailFlow(headData, tailListFlow);}
     throw new Error("Missing return statement in function");
@@ -196,7 +196,9 @@ tailListFlow = SymbolTable.RootSymbolTable.PutOrGetSymbol(tailListFlowSymbol.ima
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case SYMBOL:{
         flowSymbol = jj_consume_token(SYMBOL);
-flow = SymbolTable.RootSymbolTable.PutOrGetSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow);
+System.out.println("get:" + flowSymbol);
+            flow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
+            System.out.println("get:" + flow);
         break;
         }
       case LSBR:{
@@ -209,7 +211,8 @@ flow = SymbolTable.RootSymbolTable.PutOrGetSymbol(flowSymbol.image, SymbolTable.
         throw new ParseException();
       }
     }
-{if ("" != null) return flow;}
+System.out.println("get:" + flow);
+        {if ("" != null) return flow;}
     throw new Error("Missing return statement in function");
 }
 
@@ -235,7 +238,7 @@ leftFlow = topFlow;
 leftFlow.SetNext(rightFlow);
         leftFlow = rightFlow;
     }
-System.out.println("Root Symbol Table: " + SymbolTable.RootSymbolTable);
+System.out.println("Root Symbol Table: " + SymbolTable.CurrentSymbolTable());
         System.out.println("before flowing: " + topFlow);
         topFlow.Flowing();
         System.out.println("after flowing: " + topFlow);
