@@ -1,6 +1,9 @@
 package core;
 
 public class Examples {
+    /*****************************************************************/
+    /***************************流实例*********************************/
+    /*****************************************************************/
     public static String FlowingExample1 = """
             [5, 6, 3, 2, 7, 8] 
             """;
@@ -27,6 +30,9 @@ public class Examples {
             import std.Std
             [5, 6, 3, 2, 7, 8] | [a, b, c, d] | [e, f, g, h, i, j] | stdout
             """;
+    /*****************************************************************/
+    /***************************表达式实例*****************************/
+    /*****************************************************************/
     public static String ExprDataExample1 = """
             [1+2]         
             """;
@@ -39,7 +45,53 @@ public class Examples {
     public static String ExprDataExample4 = """
             [(1+2)*3, (3+2.5)/1.5] | [a, b]  
             """;
+    /*****************************************************************/
+    /***************************控制语句实例****************************/
+    /*****************************************************************/
+    public static String StmtExample1 = """
+            import std.Std
+            if (1>2) {
+                [1] | stdout
+            } else {
+                [2] | stdout
+            }
+            """;
+    public static String StmtExample2 = """
+            import std.Std
+            [1, 2] | [a, b]
+            while(a>b) {
+                [a, b] | [b, a]
+            }
+            [a, b] | stdout
+            """;
+    public static String StmtExample3 = """
+            import std.Std
+            [1, 2, 3, 4, 5] -> x
+            [x] | stdout
+            """;
+    public static String StmtExample4 = """
+            import std.Std
+            [1, 2, 3, 4, 5] -> x
+            if (x>3) {
+                [x] | stdout
+            } else {
+                [3] | stdout
+            }
+            """;
+    /*****************************************************************/
+    /***************************函数实例*******************************/
+    /*****************************************************************/
+    public static String FuncExample = """
+            import std.Std
+            function func() {
+                in | [a, b, c]
+                [a, b, c] | out
+            }
+            [1, 2, 3, 4] | func() | stdout
+            [1, 2] | func() | stdout
+            """;
     public static String QuickSortExample = """
+            import std.Std
             function sort() {
              	if ( 1<2 ) { }
              	else { 
