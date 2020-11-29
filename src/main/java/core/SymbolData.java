@@ -12,10 +12,12 @@ public class SymbolData implements Datable {
         this.symbol = symbol;
     }
 
-    //    由符号值流到符号值，只保留符号不变，注意这里可以改变符号值绑定的类型
-    public void Push(Datable symbolData) {
-        this.type = symbolData.GetType();
-        this.value = symbolData.GetValue();
+
+    @Override
+    public boolean Push(Datable symbolData) {
+        this.SetType(symbolData.GetType());
+        this.SetValue(symbolData.GetValue());
+        return true;
     }
 
 
@@ -39,8 +41,11 @@ public class SymbolData implements Datable {
         if (this.type == null) {
             this.type = type;
             return true;
+        } else if (this.type == type) {
+            return true;
+        } else {
+            return false;
         }
-        return false;
     }
 
     @Override

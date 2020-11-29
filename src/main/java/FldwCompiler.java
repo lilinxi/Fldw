@@ -9,11 +9,11 @@ public class FldwCompiler implements FldwCompilerConstants {
 //        String[] tests={"a<1.2"};
 //        for (String arg : tests) {
             try {
-                Class clz = Class.forName("std.Std");
-                evaluate(Examples.FlowingExample5);
+//                            Class.forName("std.Std");
+                evaluate(Examples.FlowingExample8);
 //                System.out.println(evaluate(arg));
 //                return(evaluate(arg));
-            } catch (ParseException | ClassNotFoundException ex) {
+            } catch (ParseException ex) {
                 System.err.println(ex.getMessage());
             }
 //        }
@@ -196,9 +196,7 @@ tailListFlow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(tailListFlowSymbo
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case SYMBOL:{
         flowSymbol = jj_consume_token(SYMBOL);
-System.out.println("get:" + flowSymbol);
-            flow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
-            System.out.println("get:" + flow);
+flow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
         break;
         }
       case LSBR:{
@@ -211,8 +209,7 @@ System.out.println("get:" + flowSymbol);
         throw new ParseException();
       }
     }
-System.out.println("get:" + flow);
-        {if ("" != null) return flow;}
+{if ("" != null) return flow;}
     throw new Error("Missing return statement in function");
 }
 
@@ -244,6 +241,20 @@ System.out.println("Root Symbol Table: " + SymbolTable.CurrentSymbolTable());
         System.out.println("after flowing: " + topFlow);
         {if ("" != null) return topFlow;}
     throw new Error("Missing return statement in function");
+}
+
+  final public void import_stmt() throws ParseException {Token package_name;
+    Token module_name;
+    jj_consume_token(IMPORT);
+    package_name = jj_consume_token(SYMBOL);
+    jj_consume_token(DOT);
+    module_name = jj_consume_token(SYMBOL);
+try {
+            Class.forName(package_name.image + "." + module_name.image);
+//        Std std=new Std();
+        } catch (ClassNotFoundException ex) {
+            {if (true) throw new RuntimeException(ex.getMessage());}
+        }
 }
 
   final public void if_else_stmt() throws ParseException {
@@ -303,6 +314,10 @@ System.out.println("Root Symbol Table: " + SymbolTable.CurrentSymbolTable());
       flowing();
       break;
       }
+    case IMPORT:{
+      import_stmt();
+      break;
+      }
     case IF:{
       if_else_stmt();
       break;
@@ -331,6 +346,7 @@ System.out.println("Root Symbol Table: " + SymbolTable.CurrentSymbolTable());
       case IF:
       case WHILE:
       case FUNC:
+      case IMPORT:
       case SYMBOL:{
         ;
         break;
@@ -373,9 +389,9 @@ System.out.println("Root Symbol Table: " + SymbolTable.CurrentSymbolTable());
     finally { jj_save(1, xla); }
   }
 
-  private boolean jj_3R_func_flow_277_5_5()
+  private boolean jj_3R_func_flow_278_5_5()
  {
-    if (jj_3R_symbol_data_182_5_7()) return true;
+    if (jj_3R_symbol_data_183_5_7()) return true;
     if (jj_scan_token(LBR)) return true;
     if (jj_scan_token(RBR)) return true;
     return false;
@@ -383,25 +399,25 @@ System.out.println("Root Symbol Table: " + SymbolTable.CurrentSymbolTable());
 
   private boolean jj_3_2()
  {
-    if (jj_3R_head_tail_flow_293_5_6()) return true;
+    if (jj_3R_head_tail_flow_294_5_6()) return true;
     return false;
   }
 
   private boolean jj_3_1()
  {
-    if (jj_3R_func_flow_277_5_5()) return true;
+    if (jj_3R_func_flow_278_5_5()) return true;
     return false;
   }
 
-  private boolean jj_3R_head_tail_flow_293_5_6()
+  private boolean jj_3R_head_tail_flow_294_5_6()
  {
     if (jj_scan_token(LSBR)) return true;
-    if (jj_3R_symbol_data_182_5_7()) return true;
+    if (jj_3R_symbol_data_183_5_7()) return true;
     if (jj_scan_token(SEMIC)) return true;
     return false;
   }
 
-  private boolean jj_3R_symbol_data_182_5_7()
+  private boolean jj_3R_symbol_data_183_5_7()
  {
     if (jj_scan_token(SYMBOL)) return true;
     return false;
@@ -429,7 +445,7 @@ System.out.println("Root Symbol Table: " + SymbolTable.CurrentSymbolTable());
 	   jj_la1_0 = new int[] {0x0,0xf0000000,0x0,0x100,0x4000,0x0,0x0,0x0,0x4000,0x4000,};
 	}
 	private static void jj_la1_init_1() {
-	   jj_la1_1 = new int[] {0x10e00,0x0,0x30e00,0x0,0x20000,0x40,0x2,0x20000,0x2000d,0x2000d,};
+	   jj_la1_1 = new int[] {0x21c00,0x0,0x61c00,0x0,0x40000,0x40,0x2,0x40000,0x4010d,0x4010d,};
 	}
   final private JJCalls[] jj_2_rtns = new JJCalls[2];
   private boolean jj_rescan = false;
@@ -642,7 +658,7 @@ System.out.println("Root Symbol Table: " + SymbolTable.CurrentSymbolTable());
   /** Generate ParseException. */
   public ParseException generateParseException() {
 	 jj_expentries.clear();
-	 boolean[] la1tokens = new boolean[51];
+	 boolean[] la1tokens = new boolean[52];
 	 if (jj_kind >= 0) {
 	   la1tokens[jj_kind] = true;
 	   jj_kind = -1;
@@ -659,7 +675,7 @@ System.out.println("Root Symbol Table: " + SymbolTable.CurrentSymbolTable());
 		 }
 	   }
 	 }
-	 for (int i = 0; i < 51; i++) {
+	 for (int i = 0; i < 52; i++) {
 	   if (la1tokens[i]) {
 		 jj_expentry = new int[1];
 		 jj_expentry[0] = i;

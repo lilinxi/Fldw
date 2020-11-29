@@ -156,7 +156,6 @@ public class SymbolTable {
 //            java hashmap put 的返回值并不是插入的元素，而是 null 或者被重复 key 覆盖的元素
             SymbolItem item = new SymbolItem(symbol, type, value);
             this.SymbolItemHashMap.put(symbol, item);
-            System.out.println("add item: " + item);
             return item;
         }
     }

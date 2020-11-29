@@ -17,7 +17,15 @@ public class Examples {
             [5, 6, 3, 2, 7, 8] | stdout
             """;
     public static String FlowingExample6 = """
+            import std.Std
+            [5, 6, 3, 2, 7, 8] | stdout
+            """;
+    public static String FlowingExample7 = """
             [5, 6, 3, 2, 7, 8] | [a, b, c, d] | [e, f, g, h, i, j]
+            """;
+    public static String FlowingExample8 = """
+            import std.Std
+            [5, 6, 3, 2, 7, 8] | [a, b, c, d] | [e, f, g, h, i, j] | stdout
             """;
     public static String ExprDataExample1 = """
             [1+2]         

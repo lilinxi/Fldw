@@ -1,13 +1,18 @@
 package core;
 
-public class AddExprData implements Datable{
+public class AddExprData implements Datable {
     private Datable leftChild, rightChild;
+
+    @Override
+    public boolean Push(Datable data) {
+        return false;
+    }
 
     @Override
     public DataType GetType() {
         if (leftChild.GetType() != rightChild.GetType()) {
             throw new RuntimeException();
-        }else {
+        } else {
             return leftChild.GetType();
         }
     }
@@ -16,7 +21,7 @@ public class AddExprData implements Datable{
     public Object GetValue() {
         if (leftChild.GetType() != rightChild.GetType()) {
             throw new RuntimeException();
-        }else{
+        } else {
             switch (leftChild.GetType()) {
                 case Int -> {
                     return Integer.parseInt(leftChild.GetValue().toString()) + Integer.parseInt(rightChild.GetValue().toString());

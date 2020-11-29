@@ -6,6 +6,11 @@ public class BoolExprData implements Datable {
     }
 
     @Override
+    public boolean Push(Datable data) {
+        return false;
+    }
+
+    @Override
     public DataType GetType() {
         return null;
     }

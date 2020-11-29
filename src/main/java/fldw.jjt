@@ -12,11 +12,11 @@ public class FldwCompiler {
 //        String[] tests={"a<1.2"};
 //        for (String arg : tests) {
             try {
-                Class clz = Class.forName("std.Std");
-                evaluate(Examples.FlowingExample5);
+//                            Class.forName("std.Std");
+                evaluate(Examples.FlowingExample7);
 //                System.out.println(evaluate(arg));
 //                return(evaluate(arg));
-            } catch (ParseException | ClassNotFoundException ex) {
+            } catch (ParseException ex) {
                 System.err.println(ex.getMessage());
             }
 //        }
@@ -96,6 +96,7 @@ TOKEN : // Keywords and punctuation
 //    |   < STDIN : "stdin" >
 //    |   < STDOUT : "stdout" >
     |   < IMPORT : "import" >
+    |   < DOT : "." >
 }
 
 TOKEN : // value: int
@@ -315,14 +316,11 @@ Flowable flow() :
     |   LOOKAHEAD(3) flow = head_tail_flow()
     |   flowSymbol = < SYMBOL>
         {
-            System.out.println("get:" + flowSymbol);
             flow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
-            System.out.println("get:" + flow);
         }
     |   flow = list_flow()
     )
     {
-                    System.out.println("get:" + flow);
         return flow;
     }
 }
@@ -352,6 +350,27 @@ Flowable flowing() :
         topFlow.Flowing();
         System.out.println("after flowing: " + topFlow);
         return topFlow;
+    }
+}
+
+void import_stmt() :
+{
+    Token package_name;
+    Token module_name;
+}
+{
+    // 语法：import_stmt() = < IMPORT > < STRING_VALUE >
+    < IMPORT >
+    package_name = < SYMBOL >
+    < DOT >
+    module_name = < SYMBOL >
+    {
+        try {
+            Class.forName(package_name.image + "." + module_name.image);
+//        Std std=new Std();
+        } catch (ClassNotFoundException ex) {
+            throw new RuntimeException(ex.getMessage());
+        }
     }
 }
 
@@ -392,7 +411,7 @@ void stmt() :
 {
 }
 {
-    flowing() | if_else_stmt() | while_stmt() | def_func_stmt()
+    flowing() | import_stmt() | if_else_stmt() | while_stmt() | def_func_stmt()
     {
         return;
     }

@@ -72,6 +72,11 @@ public class ExprData implements Datable {
     }
 
     @Override
+    public boolean Push(Datable data) {
+        return false;
+    }
+
+    @Override
     public DataType GetType() {
         if (this.type == null) {
             this.type = ExprData.CheckExprTypeMatch(this.leftData.GetType(), this.rightData.GetType(), this.op);

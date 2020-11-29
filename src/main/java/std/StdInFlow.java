@@ -1,9 +1,10 @@
 package std;
 
 import core.Datable;
+import core.Flow;
 import core.Flowable;
 
-public class StdInFlow implements Flowable {
+public class StdInFlow extends Flow {
     @Override
     public String GetSymbol() {
         return null;

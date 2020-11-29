@@ -1,6 +1,6 @@
 package core;
 
-public class SymbolFlow implements Flowable {
+public class SymbolFlow extends Flow {
     private SymbolData symbolData; // 临时变量
     private Flowable next;
 

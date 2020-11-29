@@ -1,10 +1,11 @@
 package std;
 
 import core.Datable;
+import core.Flow;
 import core.Flowable;
 import core.ListFlow;
 
-public class StdOutFlow implements Flowable {
+public class StdOutFlow extends Flow {
     //    private ListFlow cacheFlow;
     //    单例模式
     private static StdOutFlow Instance = new StdOutFlow();
