@@ -2,4 +2,4 @@ cd $(dirname $0)
 git add .
 time=$(date "+%Y-%m-%d %H:%M:%S")
 git commit -m"daily add at ${time}"
-git push
+git push origin v0.0.1

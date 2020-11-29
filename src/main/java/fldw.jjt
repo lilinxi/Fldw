@@ -181,11 +181,11 @@ SymbolData symbol_data() :
     // 语法：symbol_data() = < SYMBOL>
     symbol = < SYMBOL>
     {
-        return SymbolTable.RootSymbolTable.PutOrGetSymbol(symbol.image, SymbolTable.SymbolType.Data);
+        return SymbolTable.CurrentSymbolTable().PutOrGetSymbol(symbol.image, SymbolTable.SymbolType.Data).assertGetSymbolData();
     }
 }
 
-// tmp
+// TODO：tmp
 ExprData expr_data() :
 {
     ExprData exprData = new ExprData();
@@ -293,7 +293,7 @@ HeadTailFlow head_tail_flow() :
     < LSBR  > headData = symbol_data() < SEMIC >
     tailListFlowSymbol = < SYMBOL>
     {
-        tailListFlow = SymbolTable.RootSymbolTable.PutOrGetSymbol(tailListFlowSymbol.image, SymbolTable.SymbolType.Flow);
+        tailListFlow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(tailListFlowSymbol.image, SymbolTable.SymbolType.Flow).assertGetListFlow();
     }
     < RSBR >
     {
@@ -315,11 +315,14 @@ Flowable flow() :
     |   LOOKAHEAD(3) flow = head_tail_flow()
     |   flowSymbol = < SYMBOL>
         {
-            flow = SymbolTable.RootSymbolTable.PutOrGetSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow);
+            System.out.println("get:" + flowSymbol);
+            flow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
+            System.out.println("get:" + flow);
         }
     |   flow = list_flow()
     )
     {
+                    System.out.println("get:" + flow);
         return flow;
     }
 }
@@ -344,7 +347,7 @@ Flowable flowing() :
     }
     )*
     {
-        System.out.println("Root Symbol Table: " + SymbolTable.RootSymbolTable);
+        System.out.println("Root Symbol Table: " + SymbolTable.CurrentSymbolTable());
         System.out.println("before flowing: " + topFlow);
         topFlow.Flowing();
         System.out.println("after flowing: " + topFlow);
