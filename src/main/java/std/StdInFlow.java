@@ -5,9 +5,19 @@ import core.Flow;
 import core.Flowable;
 
 public class StdInFlow extends Flow {
+    //    单例模式
+    private static StdInFlow Instance = new StdInFlow();
+
+    private StdInFlow() {
+    }
+
+    public static StdInFlow GetInstance() {
+        return StdInFlow.Instance;
+    }
+
     @Override
     public String GetSymbol() {
-        return null;
+        return Std.StdInFlowSymbol;
     }
 
     @Override

@@ -29,7 +29,7 @@ public class Flow implements Flowable {
 
     @Override
     public int Len() {
-        throw new RuntimeException("no impl, wrong call");
+        return 0;
     }
 
     @Override
@@ -49,11 +49,11 @@ public class Flow implements Flowable {
 
     @Override
     public boolean HasNext() {
-        throw new RuntimeException("no impl, wrong call");
+        return false;
     }
 
     @Override
     public boolean Flowing() {
-        throw new RuntimeException("no impl, wrong call");
+        return true;
     }
 }

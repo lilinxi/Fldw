@@ -3,7 +3,7 @@ package core;
 /**
  * 符号值，创建是只指定符号，类型定义后不可修改，可以修改值为多个符合类型的值
  */
-public class SymbolData implements Datable {
+public class SymbolData extends Data {
     private DataType type;
     private Object value;
     private String symbol;

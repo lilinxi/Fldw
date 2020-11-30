@@ -8,6 +8,7 @@ public class Core {
     }
 
     public static void setEagerFlowing(boolean eagerFlowing) {
+        System.out.println("set eager flow: " + eagerFlowing);
         Core.EagerFlowing = eagerFlowing;
     }
 }

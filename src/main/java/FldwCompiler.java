@@ -10,7 +10,7 @@ public class FldwCompiler implements FldwCompilerConstants {
 //        for (String arg : tests) {
             try {
 //                            Class.forName("std.Std");
-                evaluate(Examples.FlowingExample8);
+                evaluate(Examples.FlowingExample9);
 //                System.out.println(evaluate(arg));
 //                return(evaluate(arg));
             } catch (ParseException ex) {
@@ -158,6 +158,32 @@ listFlow.Push(data);
 }
 
   final public IfElseFlow if_else_flow() throws ParseException {
+    jj_consume_token(IF);
+    jj_consume_token(LBR);
+    expr_data();
+    jj_consume_token(RBR);
+    block();
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case ELSE:{
+      jj_consume_token(ELSE);
+      block();
+      break;
+      }
+    default:
+      jj_la1[4] = jj_gen;
+      ;
+    }
+//        System.out.println(new IfElseFlow());
+        {if ("" != null) return new IfElseFlow();}
+    throw new Error("Missing return statement in function");
+}
+
+  final public IfElseFlow while_flow() throws ParseException {
+    jj_consume_token(WHILE);
+    jj_consume_token(LBR);
+    expr_data();
+    jj_consume_token(RBR);
+    block();
 //        System.out.println(new IfElseFlow());
         {if ("" != null) return new IfElseFlow();}
     throw new Error("Missing return statement in function");
@@ -188,7 +214,7 @@ tailListFlow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(tailListFlowSymbo
 
   final public Flowable flow() throws ParseException {Flowable flow = new ListFlow();
     Token flowSymbol;
-    if (jj_2_1(3)) {
+    if (jj_2_1(2)) {
       flow = func_flow();
     } else if (jj_2_2(3)) {
       flow = head_tail_flow();
@@ -203,8 +229,16 @@ flow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(flowSymbol.image, SymbolT
         flow = list_flow();
         break;
         }
+      case IF:{
+        flow = if_else_flow();
+        break;
+        }
+      case WHILE:{
+        flow = while_flow();
+        break;
+        }
       default:
-        jj_la1[4] = jj_gen;
+        jj_la1[5] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -227,7 +261,7 @@ leftFlow = topFlow;
         break;
         }
       default:
-        jj_la1[5] = jj_gen;
+        jj_la1[6] = jj_gen;
         break label_2;
       }
       jj_consume_token(FLOW);
@@ -237,10 +271,37 @@ leftFlow.SetNext(rightFlow);
     }
 System.out.println("Root Symbol Table: " + SymbolTable.CurrentSymbolTable());
         System.out.println("before flowing: " + topFlow);
-        topFlow.Flowing();
+        if (Core.isEagerFlowing()) {
+            System.out.println("eager! flowing");
+            topFlow.Flowing();
+        }
         System.out.println("after flowing: " + topFlow);
         {if ("" != null) return topFlow;}
     throw new Error("Missing return statement in function");
+}
+
+  final public void block() throws ParseException {
+    jj_consume_token(LCBR);
+Core.setEagerFlowing(false);
+    label_3:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case LSBR:
+      case IF:
+      case WHILE:
+      case SYMBOL:{
+        ;
+        break;
+        }
+      default:
+        jj_la1[7] = jj_gen;
+        break label_3;
+      }
+      flowing();
+    }
+    jj_consume_token(RCBR);
+Core.setEagerFlowing(true);
+{if ("" != null) return;}
 }
 
   final public void import_stmt() throws ParseException {Token package_name;
@@ -257,59 +318,44 @@ try {
         }
 }
 
-  final public void if_else_stmt() throws ParseException {
-    jj_consume_token(IF);
-    jj_consume_token(LBR);
-    expr_data();
-    jj_consume_token(RBR);
-    block();
-    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-    case ELSE:{
-      jj_consume_token(ELSE);
-      block();
-      break;
-      }
-    default:
-      jj_la1[6] = jj_gen;
-      ;
-    }
-{if ("" != null) return;}
-}
+//void if_else_stmt() :
+//{
+//}
+//{
+//    // 语法：if_else_stmt() = < IF > < LBR > expr_data() < RBR > block() [ <ELSE > block() ]
+//    < IF > < LBR > expr_data() < RBR > block() [ <ELSE > block() ]
+//    {
+//        return;
+//    }
+//}
 
-  final public void while_stmt() throws ParseException {
-    jj_consume_token(WHILE);
-    jj_consume_token(LBR);
-    expr_data();
-    jj_consume_token(RBR);
-    block();
-{if ("" != null) return;}
-}
-
-  final public void def_func_stmt() throws ParseException {
-    jj_consume_token(FUNC);
-    symbol_data();
-    jj_consume_token(LBR);
-    label_3:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case SYMBOL:{
-        ;
-        break;
-        }
-      default:
-        jj_la1[7] = jj_gen;
-        break label_3;
-      }
-      symbol_data();
-    }
-    jj_consume_token(RBR);
-    block();
-{if ("" != null) return;}
-}
-
+//void while_stmt() :
+//{
+//}
+//{
+//    // 语法：< WHILE > < LBR > expr_data() < RBR > block()
+//    < WHILE > < LBR > expr_data() < RBR > block()
+//    {
+//        return;
+//    }
+//}
+//
+//void def_func_stmt() :
+//{
+//}
+//{
+//    // 语法：< FUNC > symbol_data() < LBR > (symbol_data())* < RBR > block()
+//    < FUNC > symbol_data() < LBR > (symbol_data())* < RBR > block()
+//    {
+//        return;
+//    }
+//}
+//
   final public void stmt() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case LSBR:
+    case IF:
+    case WHILE:
     case SYMBOL:{
       flowing();
       break;
@@ -318,16 +364,8 @@ try {
       import_stmt();
       break;
       }
-    case IF:{
-      if_else_stmt();
-      break;
-      }
-    case WHILE:{
-      while_stmt();
-      break;
-      }
-    case FUNC:{
-      def_func_stmt();
+    case LCBR:{
+      block();
 {if ("" != null) return;}
       break;
       }
@@ -342,10 +380,10 @@ try {
     label_4:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case LCBR:
       case LSBR:
       case IF:
       case WHILE:
-      case FUNC:
       case IMPORT:
       case SYMBOL:{
         ;
@@ -357,13 +395,6 @@ try {
       }
       stmt();
     }
-{if ("" != null) return;}
-}
-
-  final public void block() throws ParseException {
-    jj_consume_token(LCBR);
-    stmts();
-    jj_consume_token(RCBR);
 {if ("" != null) return;}
 }
 
@@ -389,27 +420,19 @@ try {
     finally { jj_save(1, xla); }
   }
 
-  private boolean jj_3R_func_flow_278_5_5()
- {
-    if (jj_3R_symbol_data_183_5_7()) return true;
-    if (jj_scan_token(LBR)) return true;
-    if (jj_scan_token(RBR)) return true;
-    return false;
-  }
-
   private boolean jj_3_2()
  {
-    if (jj_3R_head_tail_flow_294_5_6()) return true;
+    if (jj_3R_head_tail_flow_308_5_6()) return true;
     return false;
   }
 
   private boolean jj_3_1()
  {
-    if (jj_3R_func_flow_278_5_5()) return true;
+    if (jj_3R_func_flow_292_5_5()) return true;
     return false;
   }
 
-  private boolean jj_3R_head_tail_flow_294_5_6()
+  private boolean jj_3R_head_tail_flow_308_5_6()
  {
     if (jj_scan_token(LSBR)) return true;
     if (jj_3R_symbol_data_183_5_7()) return true;
@@ -420,6 +443,13 @@ try {
   private boolean jj_3R_symbol_data_183_5_7()
  {
     if (jj_scan_token(SYMBOL)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_func_flow_292_5_5()
+ {
+    if (jj_3R_symbol_data_183_5_7()) return true;
+    if (jj_scan_token(LBR)) return true;
     return false;
   }
 
@@ -442,10 +472,10 @@ try {
 	   jj_la1_init_1();
 	}
 	private static void jj_la1_init_0() {
-	   jj_la1_0 = new int[] {0x0,0xf0000000,0x0,0x100,0x4000,0x0,0x0,0x0,0x4000,0x4000,};
+	   jj_la1_0 = new int[] {0x0,0xf0000000,0x0,0x100,0x0,0x4000,0x0,0x4000,0x5000,0x5000,};
 	}
 	private static void jj_la1_init_1() {
-	   jj_la1_1 = new int[] {0x21c00,0x0,0x61c00,0x0,0x40000,0x40,0x2,0x40000,0x4010d,0x4010d,};
+	   jj_la1_1 = new int[] {0x21c00,0x0,0x61c00,0x0,0x2,0x40005,0x40,0x40005,0x40105,0x40105,};
 	}
   final private JJCalls[] jj_2_rtns = new JJCalls[2];
   private boolean jj_rescan = false;
