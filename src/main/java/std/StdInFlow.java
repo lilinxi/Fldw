@@ -76,4 +76,11 @@ public class StdInFlow extends Flow {
         sc.close();
         return this.cacheFlow.Flowing();
     }
+
+    @Override
+    public String toString() {
+        return "StdInFlow{" +
+                "cacheFlow=" + cacheFlow +
+                '}';
+    }
 }
