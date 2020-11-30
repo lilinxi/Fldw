@@ -11,7 +11,7 @@ public class FldwCompiler implements FldwCompilerConstants {
 //        for (String arg : tests) {
             try {
 //                            Class.forName("std.Std");
-                evaluate(Examples.FlowingExample9);
+                evaluate(Examples.FlowingExample10);
 //                System.out.println(evaluate(arg));
 //                return(evaluate(arg));
             } catch (ParseException ex) {
