@@ -8,7 +8,7 @@ public class Std {
 
     static {
         System.out.println("Std loading...");
-        SymbolTable.CurrentSymbolTable().PutSymbol(StdInFlowSymbol, SymbolTable.SymbolType.Flow, StdOutFlow.GetInstance());
+        SymbolTable.CurrentSymbolTable().PutSymbol(StdInFlowSymbol, SymbolTable.SymbolType.Flow, StdInFlow.GetInstance());
         SymbolTable.CurrentSymbolTable().PutSymbol(StdOutFlowSymbol, SymbolTable.SymbolType.Flow, StdOutFlow.GetInstance());
         System.out.println("Std loaded");
     }

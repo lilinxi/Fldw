@@ -1,6 +1,6 @@
 package core;
 
-public class HeadTailFlow implements Flowable {
+public class HeadTailFlow extends Flow {
     private SymbolData headData;
     private ListFlow tailListFlow;
     private boolean setHead;

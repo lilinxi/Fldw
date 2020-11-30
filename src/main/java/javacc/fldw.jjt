@@ -3,20 +3,21 @@ options {
 }
 
 PARSER_BEGIN(FldwCompiler)
+package javacc;
+
 import java.io.*;
 import core.*;
-import std.*;
 
 public class FldwCompiler {
     public static void main(String[] args) {
 //        String[] tests={"a<1.2"};
 //        for (String arg : tests) {
             try {
-                Class clz = Class.forName("std.Std");
-                evaluate(Examples.FlowingExample5);
+//                            Class.forName("std.Std");
+                evaluate(Examples.FlowingExample9);
 //                System.out.println(evaluate(arg));
 //                return(evaluate(arg));
-            } catch (ParseException | ClassNotFoundException ex) {
+            } catch (ParseException ex) {
                 System.err.println(ex.getMessage());
             }
 //        }
@@ -96,6 +97,7 @@ TOKEN : // Keywords and punctuation
 //    |   < STDIN : "stdin" >
 //    |   < STDOUT : "stdout" >
     |   < IMPORT : "import" >
+    |   < DOT : "." >
 }
 
 TOKEN : // value: int
@@ -264,6 +266,20 @@ IfElseFlow if_else_flow() :
 {
 }
 {
+    // 语法：if_else_stmt() = < IF > < LBR > expr_data() < RBR > block() [ <ELSE > block() ]
+    < IF > < LBR > expr_data() < RBR > block() [ <ELSE > block() ]
+    {
+//        System.out.println(new IfElseFlow());
+        return new IfElseFlow();
+    }
+}
+
+IfElseFlow while_flow() :
+{
+}
+{
+    // 语法：< WHILE > < LBR > expr_data() < RBR > block()
+    < WHILE > < LBR > expr_data() < RBR > block()
     {
 //        System.out.println(new IfElseFlow());
         return new IfElseFlow();
@@ -311,18 +327,17 @@ Flowable flow() :
     (
 
 //        LOOKHEAD 的要放在最前面
-        LOOKAHEAD(3) flow = func_flow()
-    |   LOOKAHEAD(3) flow = head_tail_flow()
+        LOOKAHEAD(2) flow = func_flow() // 预读 < SYMBOL > < LBR >
+    |   LOOKAHEAD(3) flow = head_tail_flow() // 预读 < LSBR > < SYMBOL > <SEMIC >
     |   flowSymbol = < SYMBOL>
         {
-            System.out.println("get:" + flowSymbol);
             flow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
-            System.out.println("get:" + flow);
         }
     |   flow = list_flow()
+    |   flow = if_else_flow()
+    |   flow = while_flow()
     )
     {
-                    System.out.println("get:" + flow);
         return flow;
     }
 }
@@ -349,63 +364,12 @@ Flowable flowing() :
     {
         System.out.println("Root Symbol Table: " + SymbolTable.CurrentSymbolTable());
         System.out.println("before flowing: " + topFlow);
-        topFlow.Flowing();
+        if (Core.isEagerFlowing()) {
+            System.out.println("eager! flowing");
+            topFlow.Flowing();
+        }
         System.out.println("after flowing: " + topFlow);
         return topFlow;
-    }
-}
-
-void if_else_stmt() :
-{
-}
-{
-    // 语法：if_else_stmt() = < IF > < LBR > expr_data() < RBR > block() [ <ELSE > block() ]
-    < IF > < LBR > expr_data() < RBR > block() [ <ELSE > block() ]
-    {
-        return;
-    }
-}
-
-void while_stmt() :
-{
-}
-{
-    // 语法：< WHILE > < LBR > expr_data() < RBR > block()
-    < WHILE > < LBR > expr_data() < RBR > block()
-    {
-        return;
-    }
-}
-
-void def_func_stmt() :
-{
-}
-{
-    // 语法：< FUNC > symbol_data() < LBR > (symbol_data())* < RBR > block()
-    < FUNC > symbol_data() < LBR > (symbol_data())* < RBR > block()
-    {
-        return;
-    }
-}
-
-void stmt() :
-{
-}
-{
-    flowing() | if_else_stmt() | while_stmt() | def_func_stmt()
-    {
-        return;
-    }
-}
-
-void stmts() :
-{
-
-}
-{
-    (stmt())*
-    {
-        return;
     }
 }
 
@@ -413,11 +377,92 @@ void block() :
 {
 }
 {
-    < LCBR > stmts() < RCBR >
+    // 语法：block() = < LCBR > stmts() < RCBR >
+    < LCBR > { Core.setEagerFlowing(false); }
+//    ( import_stmt() )*
+    ( flowing() )*
+//    stmts()
+    < RCBR > { Core.setEagerFlowing(true); }
     {
         return;
     }
 }
+
+void import_stmt() :
+{
+    Token package_name;
+    Token module_name;
+}
+{
+    // 语法：import_stmt() = < IMPORT > < STRING_VALUE >
+    < IMPORT >
+    package_name = < SYMBOL >
+    < DOT >
+    module_name = < SYMBOL >
+    {
+        try {
+            Class.forName(package_name.image + "." + module_name.image);
+//        Std std=new Std();
+        } catch (ClassNotFoundException ex) {
+            throw new RuntimeException(ex.getMessage());
+        }
+    }
+}
+
+//void if_else_stmt() :
+//{
+//}
+//{
+//    // 语法：if_else_stmt() = < IF > < LBR > expr_data() < RBR > block() [ <ELSE > block() ]
+//    < IF > < LBR > expr_data() < RBR > block() [ <ELSE > block() ]
+//    {
+//        return;
+//    }
+//}
+
+//void while_stmt() :
+//{
+//}
+//{
+//    // 语法：< WHILE > < LBR > expr_data() < RBR > block()
+//    < WHILE > < LBR > expr_data() < RBR > block()
+//    {
+//        return;
+//    }
+//}
+//
+//void def_func_stmt() :
+//{
+//}
+//{
+//    // 语法：< FUNC > symbol_data() < LBR > (symbol_data())* < RBR > block()
+//    < FUNC > symbol_data() < LBR > (symbol_data())* < RBR > block()
+//    {
+//        return;
+//    }
+//}
+//
+void stmt() :
+{
+}
+{
+    flowing() | import_stmt() | block() // | if_else_stmt() | while_stmt() | def_func_stmt()
+    {
+        return;
+    }
+}
+
+void stmts() :
+{
+}
+{
+    ( stmt() )*
+    {
+        return;
+    }
+}
+
+
 
 void program() :
 {
@@ -438,7 +483,7 @@ void program() :
 //
 //long expr():
 //{
-//    Token x, y;
+//    javacc.Token x, y;
 //}
 //{
 //    x=<INTEGER> "+" y=<INTEGER> <EOF>

@@ -1,6 +1,6 @@
 package core;
 
-public class FuncFlow implements Flowable {
+public class FuncFlow extends Flow {
     @Override
     public String GetSymbol() {
         return null;

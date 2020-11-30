@@ -1,51 +1,79 @@
 package std;
 
 import core.Datable;
+import core.Flow;
 import core.Flowable;
+import core.ListFlow;
+import javacc.ParseException;
 
-public class StdInFlow implements Flowable {
+import java.io.StringReader;
+import java.util.Scanner;
+
+public class StdInFlow extends Flow {
+    //    单例模式
+    private static StdInFlow Instance = new StdInFlow();
+
+    private ListFlow cacheFlow;
+
+    private StdInFlow() {
+        this.cacheFlow = new ListFlow();
+    }
+
+    public static StdInFlow GetInstance() {
+        return StdInFlow.Instance;
+    }
+
     @Override
     public String GetSymbol() {
-        return null;
-    }
-
-    @Override
-    public boolean Push(Datable data) {
-        return false;
-    }
-
-    @Override
-    public boolean Push(Flowable flow) {
-        return false;
+        return Std.StdInFlowSymbol;
     }
 
     @Override
     public Datable Pop() {
-        return null;
+        return this.cacheFlow.Pop();
     }
 
     @Override
     public int Len() {
-        return 0;
+        return this.cacheFlow.Len();
+    }
+
+    @Override
+    public Datable Get(int index) {
+        return this.cacheFlow.Get(index);
     }
 
     @Override
     public void SetNext(Flowable flow) {
-
+        this.cacheFlow.SetNext(flow);
     }
 
     @Override
     public Flowable Next() {
-        return null;
+        return this.cacheFlow.Next();
     }
 
     @Override
     public boolean HasNext() {
-        return false;
+        return this.cacheFlow.HasNext();
     }
 
     @Override
     public boolean Flowing() {
-        return false;
+        Scanner sc = new Scanner(System.in);
+        if (sc.hasNextLine()) {
+            String stdin = sc.nextLine();
+            if (!stdin.startsWith("[")) {
+                stdin = "[" + stdin + "]";
+            }
+            System.out.println(stdin);
+            try {
+                this.cacheFlow.Push(new javacc.FldwCompiler(new StringReader(stdin)).flowing());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        sc.close();
+        return this.cacheFlow.Flowing();
     }
 }

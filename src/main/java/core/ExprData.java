@@ -1,7 +1,7 @@
 package core;
 
 // 只实现简单的二元运算
-public class ExprData implements Datable {
+public class ExprData extends Data {
     public static enum ExprOp {
         AddOp,
         SubOp,
@@ -69,6 +69,11 @@ public class ExprData implements Datable {
 
     public void setOp(ExprOp op) {
         this.op = op;
+    }
+
+    @Override
+    public boolean Push(Datable data) {
+        return false;
     }
 
     @Override

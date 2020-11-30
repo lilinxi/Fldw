@@ -8,9 +8,13 @@ public interface Flowable {
 
     boolean Push(Flowable flow); // 流入一个流，返回是否成功
 
+    boolean Push(int index, Datable data); // 将一个元素的类型和值流入到一个元素的符号中，返回是否成功
+
     Datable Pop(); // 流出一个元素，若无元素则流出 null
 
     int Len(); // 当前流长度，如果不为 0，则流入操作将转化为匹配操作
+
+    Datable Get(int index); // 获取某个位置上的元素
 
     void SetNext(Flowable flow); // 设置下一个流
 

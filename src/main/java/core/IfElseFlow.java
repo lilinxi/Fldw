@@ -1,6 +1,6 @@
 package core;
 
-public class IfElseFlow implements Flowable {
+public class IfElseFlow extends Flow {
     private Flowable trueFlow;
     private Flowable falseFlow;
     private BoolExprData boolExprData;

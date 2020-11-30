@@ -2,7 +2,7 @@ package core;
 
 import java.util.LinkedList;
 
-public class ListFlow implements Flowable {
+public class ListFlow extends Flow {
     private LinkedList<Datable> dataList;
     private Flowable nextFlow;
     private String symbol;
@@ -39,6 +39,11 @@ public class ListFlow implements Flowable {
     }
 
     @Override
+    public boolean Push(int index, Datable data) {
+        return this.Get(index).Push(data);
+    }
+
+    @Override
     public Datable Pop() {
         if (this.Len() > 0) {
             return dataList.pop();
@@ -49,6 +54,15 @@ public class ListFlow implements Flowable {
     @Override
     public int Len() {
         return this.dataList.size();
+    }
+
+    @Override
+    public Datable Get(int index) {
+        if (index >= 0 && index < this.dataList.size()) {
+            return this.dataList.get(index);
+        } else {
+            throw new RuntimeException("out of arrange");
+        }
     }
 
     @Override
@@ -75,8 +89,11 @@ public class ListFlow implements Flowable {
             if (!success) return false;
             return this.nextFlow.Flowing();
         } else {
-            boolean success = this.nextFlow.Push(this);
-            if (!success) return false;
+            int minSize = Math.min(this.Len(), this.nextFlow.Len());
+            for (int i = 0; i < minSize; i++) {
+                boolean success = this.nextFlow.Push(i, this.Get(i));
+                if (!success) return false;
+            }
             return this.nextFlow.Flowing();
         }
     }
