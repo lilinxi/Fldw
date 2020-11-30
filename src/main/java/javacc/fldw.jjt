@@ -3,9 +3,10 @@ options {
 }
 
 PARSER_BEGIN(FldwCompiler)
+package javacc;
+
 import java.io.*;
 import core.*;
-import std.*;
 
 public class FldwCompiler {
     public static void main(String[] args) {
@@ -482,7 +483,7 @@ void program() :
 //
 //long expr():
 //{
-//    Token x, y;
+//    javacc.Token x, y;
 //}
 //{
 //    x=<INTEGER> "+" y=<INTEGER> <EOF>
