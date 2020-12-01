@@ -11,7 +11,7 @@ public class FldwCompiler implements FldwCompilerConstants {
 //        for (String arg : tests) {
             try {
 //                            Class.forName("std.Std");
-                evaluate(Examples.FlowingExample10);
+                evaluate(Examples.FlowingExample9);
 //                System.out.println(evaluate(arg));
 //                return(evaluate(arg));
             } catch (ParseException ex) {
@@ -152,7 +152,7 @@ listFlow.Push(data);
     throw new Error("Missing return statement in function");
 }
 
-  final public SymbolDataFlow symbol_flow() throws ParseException {
+  final public SymbolFlow symbol_flow() throws ParseException {
 //        System.out.println(new SymbolFlow());
         {if ("" != null) return new SymbolDataFlow();}
     throw new Error("Missing return statement in function");
@@ -281,7 +281,8 @@ System.out.println("Root Symbol Table: " + SymbolTable.CurrentSymbolTable());
     throw new Error("Missing return statement in function");
 }
 
-  final public void block() throws ParseException {
+  final public BlockFlow block() throws ParseException {BlockFlow blockFlow = new BlockFlow();
+    Flowable topFlow;
     jj_consume_token(LCBR);
 Core.setEagerFlowing(false);
     label_3:
@@ -298,11 +299,13 @@ Core.setEagerFlowing(false);
         jj_la1[7] = jj_gen;
         break label_3;
       }
-      flowing();
+      topFlow = flowing();
+blockFlow.addFlow(topFlow);
     }
     jj_consume_token(RCBR);
 Core.setEagerFlowing(true);
-{if ("" != null) return;}
+{if ("" != null) return blockFlow;}
+    throw new Error("Missing return statement in function");
 }
 
   final public void import_stmt() throws ParseException {Token package_name;

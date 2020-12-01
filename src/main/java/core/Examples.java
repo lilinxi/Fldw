@@ -121,5 +121,24 @@ public class Examples {
              }
              [5, 6, 3, 2, 7, 8] | sort() | stdout
              """;
+    public static String QuickSortExample1 = """
+            import std.Std
+            function sort() {
+                in | [head;tail]
+             	if ( head == null ) { }
+             	else {
+             		tail | x
+             		if ( x < head ) {
+             			x | a
+             		} else {
+             			x | b
+             		}
+             		a|sort()|out
+             		head|out
+             		b|sort()|out
+             	}
+             }
+             [5, 6, 3, 2, 7, 8] | sort() | stdout
+             """;
 
 }

@@ -24,5 +24,5 @@ public interface Flowable {
 
     boolean HasNext(); // 是否有下一个流
 
-    boolean Flowing(); // 开始元素的流动
+    boolean Flowing(); // 解释执行：开始元素的流动
 }

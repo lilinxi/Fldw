@@ -1,16 +1,13 @@
 package core;
 
-public class IfElseFlow extends Flow {
+public class WhileFlow extends Flow {
     private ExprData conditionData; // 因为是动态类型语言，所以每次运行时都要重新判定类型
     private Flowable trueFlow;
-    private Flowable falseFlow;
     private Flowable nextFlow;
 
-    public IfElseFlow(ExprData conditionData, Flowable trueFlow, Flowable falseFlow) {
+    public WhileFlow(ExprData conditionData, Flowable trueFlow) {
         this.conditionData = conditionData;
         this.trueFlow = trueFlow;
-        this.falseFlow = falseFlow;
-        this.nextFlow = null;
     }
 
     @Override
@@ -21,7 +18,7 @@ public class IfElseFlow extends Flow {
         if (conditionData.GetValue().equals(true)) {
             return this.trueFlow.Push(data);
         } else {
-            return this.falseFlow.Push(data);
+            return false;
         }
     }
 
@@ -33,7 +30,7 @@ public class IfElseFlow extends Flow {
         if (conditionData.GetValue().equals(true)) {
             return this.trueFlow.Push(flow);
         } else {
-            return this.falseFlow.Push(flow);
+            return false;
         }
     }
 
@@ -45,7 +42,7 @@ public class IfElseFlow extends Flow {
         if (conditionData.GetValue().equals(true)) {
             return this.trueFlow.Push(index, data);
         } else {
-            return this.falseFlow.Push(index, data);
+            return false;
         }
     }
 
@@ -57,7 +54,7 @@ public class IfElseFlow extends Flow {
         if (conditionData.GetValue().equals(true)) {
             return this.trueFlow.Pop();
         } else {
-            return this.falseFlow.Pop();
+            return null;
         }
     }
 
@@ -69,7 +66,7 @@ public class IfElseFlow extends Flow {
         if (conditionData.GetValue().equals(true)) {
             return this.trueFlow.inLen();
         } else {
-            return this.falseFlow.outLen();
+            return 0;
         }
     }
 
@@ -81,14 +78,13 @@ public class IfElseFlow extends Flow {
         if (conditionData.GetValue().equals(true)) {
             return this.trueFlow.Get(index);
         } else {
-            return this.falseFlow.Get(index);
+            return null;
         }
     }
 
     @Override
     public void SetNext(Flowable flow) { // 同时绑定 nextFlow
         this.trueFlow.SetNext(flow);
-        this.falseFlow.SetNext(flow);
         this.nextFlow = flow;
     }
 
@@ -107,19 +103,21 @@ public class IfElseFlow extends Flow {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new RuntimeException("type mismatch");
         }
-        if (conditionData.GetValue().equals(true)) {
-            return this.trueFlow.Flowing();
-        } else {
-            return this.falseFlow.Flowing();
+        while (conditionData.GetValue().equals(true)) {
+            boolean success = this.trueFlow.Flowing();
+            if (!success) return false;
+            if (conditionData.GetType() != Datable.DataType.Bool) {
+                throw new RuntimeException("type mismatch");
+            }
         }
+        return true;
     }
 
     @Override
     public String toString() {
-        return "IfElseFlow{" +
+        return "WhileFlow{" +
                 "conditionData=" + conditionData +
                 ", trueFlow=" + trueFlow +
-                ", falseFlow=" + falseFlow +
                 ", nextFlow=" + nextFlow +
                 '}';
     }

@@ -264,25 +264,28 @@ SymbolFlow symbol_flow() :
 
 IfElseFlow if_else_flow() :
 {
+    ExprData conditionData;
+    Flowable trueFlow;
+    Flowable falseFlow;
 }
 {
     // 语法：if_else_stmt() = < IF > < LBR > expr_data() < RBR > block() [ <ELSE > block() ]
-    < IF > < LBR > expr_data() < RBR > block() [ <ELSE > block() ]
+    < IF > < LBR > conditionData = expr_data() < RBR > trueFlow = block() [ <ELSE > falseFlow = block() ]
     {
-//        System.out.println(new IfElseFlow());
-        return new IfElseFlow();
+        return new IfElseFlow(conditionData, trueFlow, falseFlow);
     }
 }
 
-IfElseFlow while_flow() :
+WhileFlow while_flow() :
 {
+    ExprData conditionData;
+    Flowable trueFlow;
 }
 {
     // 语法：< WHILE > < LBR > expr_data() < RBR > block()
-    < WHILE > < LBR > expr_data() < RBR > block()
+    < WHILE > < LBR > conditionData = expr_data() < RBR > trueFlow = block()
     {
-//        System.out.println(new IfElseFlow());
-        return new IfElseFlow();
+        return new WhileFlow(conditionData, trueFlow);
     }
 }
 
@@ -373,18 +376,22 @@ Flowable flowing() :
     }
 }
 
-void block() :
+BlockFlow block() : // block 不能嵌套
 {
+    BlockFlow blockFlow = new BlockFlow();
+    Flowable topFlow;
 }
 {
     // 语法：block() = < LCBR > stmts() < RCBR >
-    < LCBR > { Core.setEagerFlowing(false); }
+    < LCBR > { Core.setEagerFlowing(false); SymbolTable.EnterBlock(null); }
 //    ( import_stmt() )*
-    ( flowing() )*
+    (
+        topFlow = flowing() { blockFlow.addFlow(topFlow); }
+    )*
 //    stmts()
-    < RCBR > { Core.setEagerFlowing(true); }
+    < RCBR > { Core.setEagerFlowing(true); SymbolTable.ExitBlock(); }
     {
-        return;
+        return blockFlow;
     }
 }
 
