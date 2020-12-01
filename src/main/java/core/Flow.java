@@ -18,12 +18,22 @@ public class Flow implements Flowable {
     }
 
     @Override
+    public boolean Push(ExprData expr) {
+        throw new RuntimeException("no impl, wrong call");
+    }
+
+    @Override
     public boolean Push(int index, Datable data) {
         throw new RuntimeException("no impl, wrong call");
     }
 
     @Override
     public Datable Pop() {
+        throw new RuntimeException("no impl, wrong call");
+    }
+
+    @Override
+    public ExprData PopExpr() {
         throw new RuntimeException("no impl, wrong call");
     }
 

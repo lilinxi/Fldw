@@ -55,6 +55,7 @@ public class ExprData extends Data {
     private Datable rightData;
     private ExprOp op;
     private DataType type;
+    private Datable cal;
 
     public ExprData() {
     }

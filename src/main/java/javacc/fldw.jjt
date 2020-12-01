@@ -171,6 +171,7 @@ TerminalData terminal_data() :
         }
     )
     {
+        System.out.println("=================测试terminal_data==================");
         return new TerminalData(type, x.image);
     }
 }
@@ -213,6 +214,85 @@ ExprData expr_data() :
     }
 }
 
+//Expr
+ExprData two_op():
+{
+    ExprData res = new ExprData();;
+    Datable leftData,rightData;
+
+}
+{
+    //语法：two_op = terminal_data()  (<MULT> | <DIV> | <PLUS> | <MINUS>) terminal_data()
+    leftData = terminal_data(){ res.setLeftData(leftData);}
+    (
+        <MULT> {res.setOp(ExprData.ExprOp.MulOp);}
+        | <DIV> {res.setOp(ExprData.ExprOp.DivOp);}
+        | <PLUS> {res.setOp(ExprData.ExprOp.AddOp);}
+        | <MINUS> {res.setOp(ExprData.ExprOp.SubOp);}
+    )
+    rightData = terminal_data(){res.setRightData(rightData);}
+    {
+        System.out.println("=================测试two_op==================");
+        return res;}
+}
+
+ExprFlow expr_flow():
+{
+    ExprFlow exprFlow = new ExprFlow();
+    ExprData expr;
+}
+{
+    // 语法：expr_flow() = < LSBR  > two_op() ( < COMMA > two_op() )* < RSBR >
+    < LSBR  >
+    expr = two_op()
+    {
+        exprFlow.Push(expr);
+    }
+    ( < COMMA > expr = two_op()
+        {
+            exprFlow.Push(expr);
+        }
+    )*
+    < RSBR >
+    {
+        System.out.println("=================测试expr_flow==================");
+//        System.out.println(listFlow);
+        return exprFlow;
+    }
+}
+
+// 语法：match_flow() = flow() < FLOW > flow()
+Flowable expr_flowing():
+{
+    Flowable topFlow = new ExprFlow();
+    Flowable leftFlow = new ExprFlow();
+    Flowable rightFlow = new ExprFlow();
+}
+{
+    topFlow = flow()
+    {
+        leftFlow = topFlow;
+    }
+    (< FLOW >
+    rightFlow = flow()
+    {
+        leftFlow.SetNext(rightFlow);
+        leftFlow = rightFlow;
+    }
+    )*
+    {
+        System.out.println("Root Symbol Table: " + SymbolTable.CurrentSymbolTable());
+        System.out.println("before flowing: " + topFlow);
+        if (Core.isEagerFlowing()) {
+            System.out.println("eager! flowing");
+            topFlow.Flowing();
+        }
+        System.out.println("after flowing: " + topFlow);
+        return topFlow;
+    }
+}
+
+
 Datable data() :
 {
     Datable data;
@@ -223,6 +303,7 @@ Datable data() :
     |    data = symbol_data()
     )
     {
+        System.out.println("=================测试data==================");
         return data;
     }
 }
@@ -246,6 +327,7 @@ ListFlow list_flow() :
     )*
     < RSBR >
     {
+        System.out.println("=================测试list_flow==================");
 //        System.out.println(listFlow);
         return listFlow;
     }
@@ -317,13 +399,13 @@ HeadTailFlow head_tail_flow() :
     }
 }
 
+// 语法：flow() = list_flow() | symbol_flow() | func_flow() | expr_flow()
 Flowable flow() :
 {
-    Flowable flow = new ListFlow();
+    Flowable flow = new Flow();
     Token flowSymbol;
 }
 {
-    // 语法：flow() = list_flow() | symbol_flow() | func_flow()
     (
 
 //        LOOKHEAD 的要放在最前面
@@ -333,23 +415,25 @@ Flowable flow() :
         {
             flow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
         }
-    |   flow = list_flow()
+    |   LOOKAHEAD(3) flow = list_flow()
     |   flow = if_else_flow()
     |   flow = while_flow()
+    |   flow = expr_flow()
     )
     {
+        System.out.println("=================测试flow==================");
         return flow;
     }
 }
 
+// 语法：match_flow() = flow() < FLOW > flow()
 Flowable flowing() :
 {
-    Flowable topFlow = new ListFlow();
-    Flowable leftFlow = new ListFlow();
-    Flowable rightFlow = new ListFlow();
+    Flowable topFlow = new Flow();
+    Flowable leftFlow = new Flow();
+    Flowable rightFlow = new Flow();
 }
 {
-    // 语法：match_flow() = flow() < FLOW > flow()
     topFlow = flow()
     {
         leftFlow = topFlow;
@@ -362,6 +446,7 @@ Flowable flowing() :
     }
     )*
     {
+        System.out.println("=================测试flowing==================");
         System.out.println("Root Symbol Table: " + SymbolTable.CurrentSymbolTable());
         System.out.println("before flowing: " + topFlow);
         if (Core.isEagerFlowing()) {
@@ -448,6 +533,7 @@ void stmt() :
 {
     flowing() | import_stmt() | block() // | if_else_stmt() | while_stmt() | def_func_stmt()
     {
+        System.out.println("=================测试stmt==================");
         return;
     }
 }
@@ -458,6 +544,7 @@ void stmts() :
 {
     ( stmt() )*
     {
+        System.out.println("=================测试stmts==================");
         return;
     }
 }

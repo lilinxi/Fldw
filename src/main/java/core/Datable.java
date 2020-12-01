@@ -1,5 +1,4 @@
 package core;
-
 // 支持的数据所提供的接口
 public interface Datable {
     enum DataType { // 数据支持的类型
