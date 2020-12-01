@@ -58,6 +58,38 @@ public class Examples {
             [(1+2)*3, (3+2.5)/1.5] | [a, b]  
             """;
     /*****************************************************************/
+    /***************************符号空间实例****************************/
+    /*****************************************************************/
+    public static String BlockExample1 = """
+            import std.Std
+            [1, 2, 3, 4] | [a, b, c, d] | stdout
+            {
+                [5, 6, 7, 8] | [a, b, c, d] | stdout
+            }
+            [a, b, c, d] | stdout
+            """;
+    public static String BlockExample2 = """
+            import std.Std
+            [1, 2, 3, 4] | [a, b, c, d] | stdout
+            {
+                [5, 6, 7, 8] | [a, b, c, d] | stdout
+            }!
+            [a, b, c, d] | stdout
+            """;
+    public static String BlockExample3 = """
+            import std.Std
+            {
+                [5, 6, 7, 8] | [a, b, c, d] | stdout
+            }
+            [a, b, c, d] | stdout
+            """;
+    public static String BlockExample4 = """
+            import std.Std
+            [1, 2, 3, 4] | {
+                in | [a, b, c] | out
+            } | stdout
+            """;
+    /*****************************************************************/
     /***************************控制语句实例****************************/
     /*****************************************************************/
     public static String StmtExample1 = """

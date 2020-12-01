@@ -14,7 +14,7 @@ public class FldwCompiler {
 //        for (String arg : tests) {
             try {
 //                            Class.forName("std.Std");
-                evaluate(Examples.FlowingExample9);
+                parse(Examples.BlockExample4);
 //                System.out.println(evaluate(arg));
 //                return(evaluate(arg));
             } catch (ParseException ex) {
@@ -23,7 +23,7 @@ public class FldwCompiler {
 //        }
     }
 
-    public static void evaluate(String src) throws ParseException {
+    public static void parse(String src) throws ParseException {
         Reader reader = new StringReader(src);
 //        Object ret = new FldwCompiler(reader).expr_data();
 //        System.out.println(ret);
@@ -87,9 +87,10 @@ TOKEN : // Keywords and punctuation
 //    |   < RETURN : "return" >
 //    |   < STRING : "string" >
     |   < WHILE : "while" >
+
     |   < FUNC : "function" >
-    |   < FUNC_IN : "in" >
-    |   < FUNC_OUT : "out" >
+//    |   < FUNC_IN : "in" >
+//    |   < FUNC_OUT : "out" >
 
     |   < FLOW : "|" >
     |   < ITER : "->" >
@@ -251,26 +252,26 @@ ListFlow list_flow() :
     }
 }
 
-SymbolFlow symbol_flow() :
-{
-}
-{
-    // 语法：symbol_flow() = < ITER> <SYMBOL> stmt()
-    {
-//        System.out.println(new SymbolFlow());
-        return new SymbolDataFlow();
-    }
-}
+//SymbolFlow symbol_flow() :
+//{
+//}
+//{
+//    // 语法：symbol_flow() = < ITER> <SYMBOL> stmt()
+//    {
+////        System.out.println(new SymbolFlow());
+//        return new SymbolDataFlow();
+//    }
+//}
 
 IfElseFlow if_else_flow() :
 {
     ExprData conditionData;
     Flowable trueFlow;
-    Flowable falseFlow;
+    Flowable falseFlow = null;
 }
 {
     // 语法：if_else_stmt() = < IF > < LBR > expr_data() < RBR > block() [ <ELSE > block() ]
-    < IF > < LBR > conditionData = expr_data() < RBR > trueFlow = block() [ <ELSE > falseFlow = block() ]
+    < IF > < LBR > conditionData = expr_data() < RBR > trueFlow = block_flow() [ <ELSE > falseFlow = block_flow() ]
     {
         return new IfElseFlow(conditionData, trueFlow, falseFlow);
     }
@@ -283,20 +284,20 @@ WhileFlow while_flow() :
 }
 {
     // 语法：< WHILE > < LBR > expr_data() < RBR > block()
-    < WHILE > < LBR > conditionData = expr_data() < RBR > trueFlow = block()
+    < WHILE > < LBR > conditionData = expr_data() < RBR > trueFlow = block_flow()
     {
         return new WhileFlow(conditionData, trueFlow);
     }
 }
 
-FuncFlow func_flow() :
+Flowable func_flow() :
 {
+    Token func_symbol;
 }
 {
-    symbol_data() < LBR > < RBR >
+    func_symbol = < SYMBOL > < LBR > < RBR >
     {
-//        System.out.println(new FuncFlow());
-        return new FuncFlow();
+        return SymbolTable.CurrentSymbolTable().GetSymbol(func_symbol.image).assertGetFlowable();
     }
 }
 
@@ -304,7 +305,7 @@ HeadTailFlow head_tail_flow() :
 {
     SymbolData headData;
     Token tailListFlowSymbol;
-    ListFlow tailListFlow;
+    Flowable tailListFlow;
     HeadTailFlow headTailFlow;
 }
 {
@@ -312,11 +313,31 @@ HeadTailFlow head_tail_flow() :
     < LSBR  > headData = symbol_data() < SEMIC >
     tailListFlowSymbol = < SYMBOL>
     {
-        tailListFlow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(tailListFlowSymbol.image, SymbolTable.SymbolType.Flow).assertGetListFlow();
+        tailListFlow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(tailListFlowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
     }
     < RSBR >
     {
         return new HeadTailFlow(headData, tailListFlow);
+    }
+}
+
+BlockFlow block_flow() : // block 不能嵌套
+{
+    BlockFlow blockFlow = new BlockFlow();
+    Flowable topFlow;
+}
+{
+    // 语法：block() = < LCBR > (flowing)* < RCBR > [ < EXLM > ]
+    < LCBR > { Core.setEagerFlowing(false); SymbolTable.EnterBlock(null); }
+//    ( import_stmt() )*
+    (
+        topFlow = flowing() { blockFlow.addFlow(topFlow); }
+    )*
+//    stmts()
+    < RCBR > { Core.setEagerFlowing(true); SymbolTable.ExitBlock(); }
+//    [ < EXLM > { blockFlow.Flowing(); } ]
+    {
+        return blockFlow;
     }
 }
 
@@ -339,6 +360,7 @@ Flowable flow() :
     |   flow = list_flow()
     |   flow = if_else_flow()
     |   flow = while_flow()
+    |   flow = block_flow()
     )
     {
         return flow;
@@ -365,33 +387,32 @@ Flowable flowing() :
     }
     )*
     {
-        System.out.println("Root Symbol Table: " + SymbolTable.CurrentSymbolTable());
-        System.out.println("before flowing: " + topFlow);
+//        System.out.println("Root Symbol Table: " + SymbolTable.CurrentSymbolTable());
+//        System.out.println("before flowing: " + topFlow);
         if (Core.isEagerFlowing()) {
-            System.out.println("eager! flowing");
+//            System.out.println("eager! flowing");
             topFlow.Flowing();
         }
-        System.out.println("after flowing: " + topFlow);
+//        System.out.println("after flowing: " + topFlow);
         return topFlow;
     }
 }
 
-BlockFlow block() : // block 不能嵌套
+void def_func_stmt() : // 函数就是一个有参数和符号关联的 Block
 {
-    BlockFlow blockFlow = new BlockFlow();
-    Flowable topFlow;
+    Token func_symbol;
+    ListFlow param_flow = null;
+    BlockFlow block_flow;
 }
 {
-    // 语法：block() = < LCBR > stmts() < RCBR >
-    < LCBR > { Core.setEagerFlowing(false); SymbolTable.EnterBlock(null); }
-//    ( import_stmt() )*
-    (
-        topFlow = flowing() { blockFlow.addFlow(topFlow); }
-    )*
-//    stmts()
-    < RCBR > { Core.setEagerFlowing(true); SymbolTable.ExitBlock(); }
+    // 语法：def_func_stmt() = < FUNC > < SYMBOL > < LBR > [ list_flow() ] < RBR > block_stmt()
+    < FUNC > func_symbol = < SYMBOL >
+    < LBR > { SymbolTable.EnterBlock(func_symbol.image); }
+    [ param_flow = list_flow() ]
+    < RBR >
+    block_flow = block_flow() { SymbolTable.ExitBlock(); }
     {
-        return blockFlow;
+        SymbolTable.CurrentSymbolTable().PutSymbol(func_symbol.image, SymbolTable.SymbolType.Flow, new FuncFlow(func_symbol.image, param_flow, block_flow));
     }
 }
 
@@ -416,44 +437,11 @@ void import_stmt() :
     }
 }
 
-//void if_else_stmt() :
-//{
-//}
-//{
-//    // 语法：if_else_stmt() = < IF > < LBR > expr_data() < RBR > block() [ <ELSE > block() ]
-//    < IF > < LBR > expr_data() < RBR > block() [ <ELSE > block() ]
-//    {
-//        return;
-//    }
-//}
-
-//void while_stmt() :
-//{
-//}
-//{
-//    // 语法：< WHILE > < LBR > expr_data() < RBR > block()
-//    < WHILE > < LBR > expr_data() < RBR > block()
-//    {
-//        return;
-//    }
-//}
-//
-//void def_func_stmt() :
-//{
-//}
-//{
-//    // 语法：< FUNC > symbol_data() < LBR > (symbol_data())* < RBR > block()
-//    < FUNC > symbol_data() < LBR > (symbol_data())* < RBR > block()
-//    {
-//        return;
-//    }
-//}
-//
 void stmt() :
 {
 }
 {
-    flowing() | import_stmt() | block() // | if_else_stmt() | while_stmt() | def_func_stmt()
+    flowing() | def_func_stmt() | import_stmt() //| block_flow()
     {
         return;
     }
@@ -480,21 +468,3 @@ void program() :
         return;
     }
 }
-
-
-
-//SKIP: { <[" ", "\t", "\r", "\n"]> }
-//TOKEN: {
-//    <INTEGER: (["0"-"9"])+>
-//}
-//
-//long expr():
-//{
-//    javacc.Token x, y;
-//}
-//{
-//    x=<INTEGER> "+" y=<INTEGER> <EOF>
-//    {
-//        return Long.parseLong(x.image) + Long.parseLong(y.image);
-//    }
-//}

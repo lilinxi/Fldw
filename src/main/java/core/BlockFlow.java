@@ -3,13 +3,13 @@ package core;
 import java.util.ArrayList;
 
 public class BlockFlow extends Flow {
-    private ListFlow inFlow;
-    private ListFlow outFlow;
+    private Flowable inFlow;
+    private Flowable outFlow;
     private ArrayList<Flowable> flowList;
 
-    public BlockFlow(String symbol) {
-        this.inFlow = SymbolTable.CurrentSymbolTable().GetSymbol(SymbolTable.InSymbol).assertGetListFlow();
-        this.outFlow = SymbolTable.CurrentSymbolTable().GetSymbol(SymbolTable.OutSymbol).assertGetListFlow();
+    public BlockFlow() {
+        this.inFlow = SymbolTable.CurrentSymbolTable().GetSymbol(SymbolTable.InSymbol).assertGetFlowable();
+        this.outFlow = SymbolTable.CurrentSymbolTable().GetSymbol(SymbolTable.OutSymbol).assertGetFlowable();
         this.flowList = new ArrayList<>();
     }
 

@@ -56,12 +56,12 @@ public class SymbolTable {
             return (SymbolData) this.getValue();
         }
 
-        public ListFlow assertGetListFlow() {
-            if (this.getType() != SymbolType.Flow) {
-                throw new RuntimeException("assert type mismatch");
-            }
-            return (ListFlow) this.getValue();
-        }
+//        public ListFlow assertGetListFlow() {
+//            if (this.getType() != SymbolType.Flow) {
+//                throw new RuntimeException("assert type mismatch");
+//            }
+//            return (ListFlow) this.getValue();
+//        }
 
         public Flowable assertGetFlowable() {
             if (this.getType() != SymbolType.Flow) {
@@ -163,11 +163,15 @@ public class SymbolTable {
     //    遇见一个符号，不确定是已有的还是新增的，若有则返回，没有则新增
     public SymbolItem PutOrGetSymbol(String symbol, SymbolType type) {
         SymbolItem symbolItem = this.GetSymbol(symbol);
+//        System.err.println("At: " + this);
+//        System.err.println("At: " + this.symbol);
+//        System.err.println("Get: " + symbolItem);
+
         if (symbolItem != null) {
             if (symbolItem.getType() == type) {
                 return symbolItem;
             } else {
-                throw new RuntimeException("duplicate symbol"); // 符号重复
+                throw new RuntimeException("duplicate symbol:" + symbolItem.getType() + ", " + type); // 符号重复
             }
         } else {
             return this.PutSymbol(symbol, type);
@@ -178,20 +182,26 @@ public class SymbolTable {
     public String toString() {
         return "SymbolTable{" +
                 "symbol='" + symbol + '\'' +
-                ", parentSymbolTable=" + parentSymbolTable +
+                ", parentSymbolTable=" + (parentSymbolTable == null ? "" : parentSymbolTable.symbol) + // 打印整个 parentSymbolTable 会导致递归栈溢出
                 ", SymbolItemHashMap=" + SymbolItemHashMap +
                 '}';
     }
 
     //    根符号表
-    private static final SymbolTable RootSymbolTable = new SymbolTable(SymbolTable.RootSymbol, null);
+    private static SymbolTable RootSymbolTable;
 
     //    符号表栈
-    private static final Stack<SymbolTable> SymbolTableStack = new Stack<>();
+    private static Stack<SymbolTable> SymbolTableStack;
 
-    static {
+    public static void Clear() {
+        SymbolTable.RootSymbolTable = new SymbolTable(SymbolTable.RootSymbol, null);
+        SymbolTable.SymbolTableStack = new Stack<>();
         //        符号表栈从根符号表开始
         SymbolTable.SymbolTableStack.push(SymbolTable.RootSymbolTable);
+    }
+
+    static {
+        Clear();
     }
 
     //    获取当前符号表，即栈顶符号表
@@ -204,13 +214,16 @@ public class SymbolTable {
         if (name == null) {
             name = SymbolTable.getTmpSymbol();
         }
+//        System.err.println("Goto: " + name);
         SymbolTable.SymbolTableStack.push(
                 SymbolTable.CurrentSymbolTable().PutOrGetSymbol(name, SymbolType.BlockSymbolTable)
                         .assertGetSymbolTable());
+//        System.err.println("Goto: " + name + ", At: " + SymbolTable.CurrentSymbolTable().symbol);
         return SymbolTable.CurrentSymbolTable();
     }
 
     public static SymbolTable ExitBlock() {
+//        System.err.println("Go out");
         return SymbolTable.SymbolTableStack.pop();
     }
 

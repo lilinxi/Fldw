@@ -1,6 +1,16 @@
 package core;
 
 public class FuncFlow extends Flow {
+    private String symbol;
+    private ListFlow paramFlow;
+    private BlockFlow blockFlow;
+
+    public FuncFlow(String symbol, ListFlow paramFlow, BlockFlow blockFlow) {
+        this.symbol = symbol;
+        this.paramFlow = paramFlow;
+        this.blockFlow = blockFlow;
+    }
+
     @Override
     public String GetSymbol() {
         return null;

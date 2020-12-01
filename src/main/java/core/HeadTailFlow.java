@@ -2,12 +2,12 @@ package core;
 
 public class HeadTailFlow extends Flow {
     private SymbolData headData;
-    private ListFlow tailListFlow;
+    private Flowable tailFlow;
     private boolean setHead;
 
-    public HeadTailFlow(SymbolData headData, ListFlow tailDataList) {
+    public HeadTailFlow(SymbolData headData, Flowable tailFlow) {
         this.headData = headData;
-        this.tailListFlow = tailDataList;
+        this.tailFlow = tailFlow;
         this.setHead = true;
     }
 
@@ -23,7 +23,7 @@ public class HeadTailFlow extends Flow {
             this.setHead = false;
             return true;
         } else {
-            return this.tailListFlow.Push(data);
+            return this.tailFlow.Push(data);
         }
     }
 
@@ -71,7 +71,7 @@ public class HeadTailFlow extends Flow {
     public String toString() {
         return "HeadTailFlow{" +
                 "headData=" + headData +
-                ", tailDataList=" + tailListFlow +
+                ", tailDataList=" + tailFlow +
                 ", setHead=" + setHead +
                 '}';
     }
