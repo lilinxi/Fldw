@@ -26,7 +26,7 @@ public class IfElseFlow extends Flow {
     }
 
     @Override
-    public int Len() {
+    public int inLen() {
         return 0;
     }
 

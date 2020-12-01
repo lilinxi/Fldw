@@ -12,7 +12,9 @@ public interface Flowable {
 
     Datable Pop(); // 流出一个元素，若无元素则流出 null
 
-    int Len(); // 当前流长度，如果不为 0，则流入操作将转化为匹配操作
+    int inLen(); // 当前流输出长度，如果不为 0，则流入操作将转化为匹配操作
+
+    int outLen(); // 当前流输入长度
 
     Datable Get(int index); // 获取某个位置上的元素
 

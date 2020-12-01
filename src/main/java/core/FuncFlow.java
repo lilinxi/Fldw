@@ -22,7 +22,7 @@ public class FuncFlow extends Flow {
     }
 
     @Override
-    public int Len() {
+    public int inLen() {
         return 0;
     }
 

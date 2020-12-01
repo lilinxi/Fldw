@@ -152,9 +152,9 @@ listFlow.Push(data);
     throw new Error("Missing return statement in function");
 }
 
-  final public SymbolFlow symbol_flow() throws ParseException {
+  final public SymbolDataFlow symbol_flow() throws ParseException {
 //        System.out.println(new SymbolFlow());
-        {if ("" != null) return new SymbolFlow();}
+        {if ("" != null) return new SymbolDataFlow();}
     throw new Error("Missing return statement in function");
 }
 

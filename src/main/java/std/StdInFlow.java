@@ -34,8 +34,8 @@ public class StdInFlow extends Flow {
     }
 
     @Override
-    public int Len() {
-        return this.cacheFlow.Len();
+    public int inLen() {
+        return this.cacheFlow.inLen();
     }
 
     @Override

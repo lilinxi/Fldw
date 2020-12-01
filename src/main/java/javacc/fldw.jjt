@@ -258,7 +258,7 @@ SymbolFlow symbol_flow() :
     // 语法：symbol_flow() = < ITER> <SYMBOL> stmt()
     {
 //        System.out.println(new SymbolFlow());
-        return new SymbolFlow();
+        return new SymbolDataFlow();
     }
 }
 

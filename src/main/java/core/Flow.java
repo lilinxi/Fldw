@@ -28,8 +28,13 @@ public class Flow implements Flowable {
     }
 
     @Override
-    public int Len() {
+    public int inLen() {
         return 0;
+    }
+
+    @Override
+    public int outLen() { // 默认输出长度等于输入长度
+        return this.inLen();
     }
 
     @Override

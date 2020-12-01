@@ -45,14 +45,14 @@ public class ListFlow extends Flow {
 
     @Override
     public Datable Pop() {
-        if (this.Len() > 0) {
+        if (this.inLen() > 0) {
             return dataList.pop();
         }
         return null;
     }
 
     @Override
-    public int Len() {
+    public int inLen() {
         return this.dataList.size();
     }
 
@@ -84,12 +84,12 @@ public class ListFlow extends Flow {
     public boolean Flowing() {
         if (this.nextFlow == null) {
             return true;
-        } else if (this.nextFlow.Len() == 0) {
+        } else if (this.nextFlow.inLen() == 0) {
             boolean success = this.nextFlow.Push(this);
             if (!success) return false;
             return this.nextFlow.Flowing();
         } else {
-            int minSize = Math.min(this.Len(), this.nextFlow.Len());
+            int minSize = Math.min(this.inLen(), this.nextFlow.inLen());
             for (int i = 0; i < minSize; i++) {
                 boolean success = this.nextFlow.Push(i, this.Get(i));
                 if (!success) return false;

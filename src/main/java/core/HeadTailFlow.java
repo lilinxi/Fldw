@@ -43,7 +43,7 @@ public class HeadTailFlow extends Flow {
     }
 
     @Override
-    public int Len() {
+    public int inLen() {
         return 0;
     }
 
