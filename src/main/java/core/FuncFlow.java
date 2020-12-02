@@ -1,6 +1,8 @@
 package core;
 
 public class FuncFlow extends Flow {
+    public final static String FuncSymbolTableSuffix = "_funcSymbolTable";
+
     private String symbol;
     private ListFlow paramFlow;
     private BlockFlow blockFlow;
@@ -41,7 +43,7 @@ public class FuncFlow extends Flow {
 
     @Override
     public boolean Push(int index, Datable data) {
-        return this.blockFlow.Push(index,data);
+        return this.blockFlow.Push(index, data);
     }
 
     @Override

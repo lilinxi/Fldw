@@ -294,11 +294,11 @@ WhileFlow while_flow() :
 FuncFlow func_flow() :
 {
     Token funcSymbol;
-    ListFlow paramFlow;
+    ListFlow paramFlow = new ListFlow();
     FuncFlow funcFlow;
 }
 {
-    func_symbol = < SYMBOL > < LBR > [ paramFlow = list_flow()] < RBR >
+    funcSymbol = < SYMBOL > < LBR > [ paramFlow = list_flow()] < RBR >
     {
         funcFlow = SymbolTable.CurrentSymbolTable().GetSymbol(funcSymbol.image).assertGetFuncFlow();
         return new FuncFlow(funcFlow, paramFlow);
@@ -418,7 +418,7 @@ void def_func_stmt() : // 函数就是一个有参数和符号关联的 Block
 {
     // 语法：def_func_stmt() = < FUNC > < SYMBOL > < LBR > [ list_flow() ] < RBR > block_stmt()
     < FUNC > func_symbol = < SYMBOL >
-    < LBR > { SymbolTable.EnterBlock(func_symbol.image); }
+    < LBR > { SymbolTable.EnterBlock(func_symbol.image + FuncFlow.FuncSymbolTableSuffix); }
     [ param_flow = list_flow() ]
     < RBR >
     block_flow = block_flow() { SymbolTable.ExitBlock(); }
