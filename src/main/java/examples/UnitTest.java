@@ -11,7 +11,7 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 
 public class UnitTest {
     public final static boolean UnitTest = true;
@@ -351,6 +351,225 @@ public class UnitTest {
                 |-- b: SymbolItem{symbol='b', type=Data, value=SymbolData{type=Int, value=2, symbol='b'}}
                 |-- c: SymbolItem{symbol='c', type=Data, value=SymbolData{type=Int, value=3, symbol='c'}}
                 |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[TerminalData{type=Int, value=1}, TerminalData{type=Int, value=2}, TerminalData{type=Int, value=3}, TerminalData{type=Int, value=4}], nextFlow=ListFlow{, symbol='null', dataList=[], nextFlow=ListFlow{, symbol='out', dataList=[], nextFlow=StdOutFlow{}}}}}
+                |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=StdOutFlow{}}}
+                }}
+                }
+                """, output.toString());
+    }
+
+    @Test
+    public void TestIfElseExample1() {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+
+        try {
+            SymbolTable.Clear();
+            FldwCompiler.parse("""
+                    import std.Std
+                    if ( 1>2 ) {
+                        [1] | stdout
+                    } else {
+                        [2] | stdout
+                    }
+                    """);
+            System.out.println(SymbolTable.CurrentSymbolTable());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        System.setOut(System.out);
+
+        assertEquals("""
+                stdout: TerminalData{type=Int, value=2}
+                SymbolTable{
+                symbol='root', parentSymbolTable=, SymbolItemTreeMap=
+                in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+                stdin: SymbolItem{symbol='stdin', type=Flow, value=StdInFlow{cacheFlow=ListFlow{, symbol='null', dataList=[], nextFlow=null}}}
+                stdout: SymbolItem{symbol='stdout', type=Flow, value=StdOutFlow{}}
+                tmp0: SymbolItem{symbol='tmp0', type=BlockSymbolTable, value=SymbolTable{
+                symbol='tmp0', parentSymbolTable=root, SymbolItemTreeMap=
+                |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+                }}
+                tmp1: SymbolItem{symbol='tmp1', type=BlockSymbolTable, value=SymbolTable{
+                symbol='tmp1', parentSymbolTable=root, SymbolItemTreeMap=
+                |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+                }}
+                }
+                """, output.toString());
+    }
+
+    @Test
+    public void TestIfElseExample2() {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+
+        try {
+            SymbolTable.Clear();
+            FldwCompiler.parse("""
+                    import std.Std
+                    if ( 1<2 ) {
+                        [1] | stdout
+                    }
+                    """);
+            System.out.println(SymbolTable.CurrentSymbolTable());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        System.setOut(System.out);
+
+        assertEquals("""
+                stdout: TerminalData{type=Int, value=1}
+                SymbolTable{
+                symbol='root', parentSymbolTable=, SymbolItemTreeMap=
+                in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+                stdin: SymbolItem{symbol='stdin', type=Flow, value=StdInFlow{cacheFlow=ListFlow{, symbol='null', dataList=[], nextFlow=null}}}
+                stdout: SymbolItem{symbol='stdout', type=Flow, value=StdOutFlow{}}
+                tmp0: SymbolItem{symbol='tmp0', type=BlockSymbolTable, value=SymbolTable{
+                symbol='tmp0', parentSymbolTable=root, SymbolItemTreeMap=
+                |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+                }}
+                }
+                """, output.toString());
+    }
+
+    @Test
+    public void TestIfElseExample3() {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+
+        try {
+            SymbolTable.Clear();
+            FldwCompiler.parse("""
+                    import std.Std
+                    [1, 2, 3, 4] | if ( 1<2 ) {
+                        in | [a, b] | out
+                    } else {
+                       in | out
+                    } | stdout
+                    """);
+            System.out.println(SymbolTable.CurrentSymbolTable());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        System.setOut(System.out);
+
+        assertEquals("""
+                stdout: SymbolData{type=Int, value=1, symbol='a'}
+                stdout: SymbolData{type=Int, value=2, symbol='b'}
+                SymbolTable{
+                symbol='root', parentSymbolTable=, SymbolItemTreeMap=
+                in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+                stdin: SymbolItem{symbol='stdin', type=Flow, value=StdInFlow{cacheFlow=ListFlow{, symbol='null', dataList=[], nextFlow=null}}}
+                stdout: SymbolItem{symbol='stdout', type=Flow, value=StdOutFlow{}}
+                tmp0: SymbolItem{symbol='tmp0', type=BlockSymbolTable, value=SymbolTable{
+                symbol='tmp0', parentSymbolTable=root, SymbolItemTreeMap=
+                |-- a: SymbolItem{symbol='a', type=Data, value=SymbolData{type=Int, value=1, symbol='a'}}
+                |-- b: SymbolItem{symbol='b', type=Data, value=SymbolData{type=Int, value=2, symbol='b'}}
+                |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[TerminalData{type=Int, value=1}, TerminalData{type=Int, value=2}, TerminalData{type=Int, value=3}, TerminalData{type=Int, value=4}], nextFlow=ListFlow{, symbol='null', dataList=[], nextFlow=ListFlow{, symbol='out', dataList=[], nextFlow=StdOutFlow{}}}}}
+                |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=StdOutFlow{}}}
+                }}
+                tmp1: SymbolItem{symbol='tmp1', type=BlockSymbolTable, value=SymbolTable{
+                symbol='tmp1', parentSymbolTable=root, SymbolItemTreeMap=
+                |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=ListFlow{, symbol='out', dataList=[], nextFlow=StdOutFlow{}}}}
+                |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=StdOutFlow{}}}
+                }}
+                }
+                """, output.toString());
+    }
+
+    @Test
+    public void TestWhileExample1() {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+
+        try {
+            SymbolTable.Clear();
+            FldwCompiler.parse("""
+                    import std.Std
+                    [1, 2] | [a, b]
+                    while ( a<b ) {
+                        [a, b] | stdout
+                        [b, a] | [a, b]
+                    }
+                    [a, b] | stdout
+                    """);
+            System.out.println(SymbolTable.CurrentSymbolTable());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        System.setOut(System.out);
+
+        assertEquals("""
+                stdout: SymbolData{type=Int, value=1, symbol='a'}
+                stdout: SymbolData{type=Int, value=2, symbol='b'}
+                stdout: SymbolData{type=Int, value=2, symbol='a'}
+                stdout: SymbolData{type=Int, value=2, symbol='b'}
+                SymbolTable{
+                symbol='root', parentSymbolTable=, SymbolItemTreeMap=
+                a: SymbolItem{symbol='a', type=Data, value=SymbolData{type=Int, value=2, symbol='a'}}
+                b: SymbolItem{symbol='b', type=Data, value=SymbolData{type=Int, value=2, symbol='b'}}
+                in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+                stdin: SymbolItem{symbol='stdin', type=Flow, value=StdInFlow{cacheFlow=ListFlow{, symbol='null', dataList=[], nextFlow=null}}}
+                stdout: SymbolItem{symbol='stdout', type=Flow, value=StdOutFlow{}}
+                tmp0: SymbolItem{symbol='tmp0', type=BlockSymbolTable, value=SymbolTable{
+                symbol='tmp0', parentSymbolTable=root, SymbolItemTreeMap=
+                |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+                }}
+                }
+                """, output.toString());
+    }
+
+    @Test
+    public void TestWhileExample2() {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+
+        try {
+            SymbolTable.Clear();
+            FldwCompiler.parse("""
+                    import std.Std
+                    [1, 2] | [a, b] | while ( a<b ) {
+                        in | [b, a] | [c, d, e, f] | out
+                    } | stdout
+                    """);
+            System.out.println(SymbolTable.CurrentSymbolTable());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        System.setOut(System.out);
+
+        assertEquals("""
+                stdout: SymbolData{type=Int, value=1, symbol='c'}
+                stdout: SymbolData{type=Int, value=1, symbol='d'}
+                stdout: SymbolData{type=null, value=null, symbol='e'}
+                stdout: SymbolData{type=null, value=null, symbol='f'}
+                SymbolTable{
+                symbol='root', parentSymbolTable=, SymbolItemTreeMap=
+                a: SymbolItem{symbol='a', type=Data, value=SymbolData{type=Int, value=1, symbol='a'}}
+                b: SymbolItem{symbol='b', type=Data, value=SymbolData{type=Int, value=1, symbol='b'}}
+                in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+                stdin: SymbolItem{symbol='stdin', type=Flow, value=StdInFlow{cacheFlow=ListFlow{, symbol='null', dataList=[], nextFlow=null}}}
+                stdout: SymbolItem{symbol='stdout', type=Flow, value=StdOutFlow{}}
+                tmp0: SymbolItem{symbol='tmp0', type=BlockSymbolTable, value=SymbolTable{
+                symbol='tmp0', parentSymbolTable=root, SymbolItemTreeMap=
+                |-- c: SymbolItem{symbol='c', type=Data, value=SymbolData{type=Int, value=1, symbol='c'}}
+                |-- d: SymbolItem{symbol='d', type=Data, value=SymbolData{type=Int, value=1, symbol='d'}}
+                |-- e: SymbolItem{symbol='e', type=Data, value=SymbolData{type=null, value=null, symbol='e'}}
+                |-- f: SymbolItem{symbol='f', type=Data, value=SymbolData{type=null, value=null, symbol='f'}}
+                |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[SymbolData{type=Int, value=1, symbol='a'}, SymbolData{type=Int, value=1, symbol='b'}], nextFlow=ListFlow{, symbol='null', dataList=[SymbolData{type=Int, value=1, symbol='b'}, SymbolData{type=Int, value=1, symbol='a'}], nextFlow=ListFlow{, symbol='null', dataList=[], nextFlow=ListFlow{, symbol='out', dataList=[], nextFlow=StdOutFlow{}}}}}}
                 |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=StdOutFlow{}}}
                 }}
                 }
