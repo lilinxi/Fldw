@@ -730,4 +730,54 @@ public class UnitTest {
                 }
                 """, output.toString());
     }
+
+//    @Test
+//    public void TestFuncExample4() {
+//        ByteArrayOutputStream output = new ByteArrayOutputStream();
+//        System.setOut(new PrintStream(output));
+//
+//        try {
+//            SymbolTable.Clear();
+//            FldwCompiler.parse("""
+//                    import std.Std
+//                    function func([a, b, c]) {
+//                        [a, b, c] | stdout
+//                    }
+//                    func([1, 2])
+//                    func([1, 2, 3, 4])
+//                    """);
+//            System.out.println(SymbolTable.CurrentSymbolTable());
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+//
+//        System.setOut(System.out);
+//
+//        assertEquals("""
+//                stdout: SymbolData{type=Int, value=1, symbol='a'}
+//                stdout: SymbolData{type=Int, value=2, symbol='b'}
+//                stdout: SymbolData{type=Int, value=3, symbol='c'}
+//                SymbolTable{
+//                symbol='root', parentSymbolTable=, SymbolItemTreeMap=
+//                func: SymbolItem{symbol='func', type=Flow, value=FuncFlow{symbol='func', paramFlow=ListFlow{, symbol='null', dataList=[SymbolData{type=Int, value=1, symbol='a'}, SymbolData{type=Int, value=2, symbol='b'}, SymbolData{type=Int, value=3, symbol='c'}], nextFlow=null}, blockFlow=BlockFlow{, inFlow=ListFlow{, symbol='in', dataList=[], nextFlow=null}, outFlow=ListFlow{, symbol='out', dataList=[], nextFlow=null}, flowList=[ListFlow{, symbol='null', dataList=[], nextFlow=StdOutFlow{}}]}}}
+//                func_funcSymbolTable: SymbolItem{symbol='func_funcSymbolTable', type=BlockSymbolTable, value=SymbolTable{
+//                symbol='func_funcSymbolTable', parentSymbolTable=root, SymbolItemTreeMap=
+//                |-- a: SymbolItem{symbol='a', type=Data, value=SymbolData{type=Int, value=1, symbol='a'}}
+//                |-- b: SymbolItem{symbol='b', type=Data, value=SymbolData{type=Int, value=2, symbol='b'}}
+//                |-- c: SymbolItem{symbol='c', type=Data, value=SymbolData{type=Int, value=3, symbol='c'}}
+//                |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+//                |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+//                |-- tmp0: SymbolItem{symbol='tmp0', type=BlockSymbolTable, value=SymbolTable{
+//                symbol='tmp0', parentSymbolTable=func_funcSymbolTable, SymbolItemTreeMap=
+//                |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+//                |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+//                }}
+//                }}
+//                in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+//                out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+//                stdin: SymbolItem{symbol='stdin', type=Flow, value=StdInFlow{cacheFlow=ListFlow{, symbol='null', dataList=[], nextFlow=null}}}
+//                stdout: SymbolItem{symbol='stdout', type=Flow, value=StdOutFlow{}}
+//                }
+//                """, output.toString());
+//    }
 }

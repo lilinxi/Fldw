@@ -212,8 +212,8 @@ IfElseFlow if_else_flow() throws ParseException {ExprData conditionData;
       ;
     }
     jj_consume_token(RBR);
-funcFlow = SymbolTable.CurrentSymbolTable().GetSymbol(funcSymbol.image).assertGetFuncFlow();
-        {if ("" != null) return new FuncFlow(funcFlow, paramFlow);}
+funcFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(funcSymbol.image).assertGetFuncFlow();
+    {if ("" != null) return new FuncFlow(funcFlow, paramFlow);}
     throw new Error("Missing return statement in function");
 }
 

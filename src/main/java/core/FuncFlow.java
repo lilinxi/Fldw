@@ -84,6 +84,8 @@ public class FuncFlow extends Flow {
 
     @Override
     public boolean Flowing() {
+//        System.err.println("this: "+this);
+//        System.err.println("flowing: "+this.blockFlow);
         return this.blockFlow.Flowing();
     }
 

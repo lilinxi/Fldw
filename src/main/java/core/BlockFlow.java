@@ -10,8 +10,8 @@ public class BlockFlow extends Flow {
 
     public BlockFlow() {
         this.identity = System.identityHashCode(this);
-        this.inFlow = SymbolTable.CurrentSymbolTable().GetSymbol(SymbolTable.InSymbol).assertGetFlowable();
-        this.outFlow = SymbolTable.CurrentSymbolTable().GetSymbol(SymbolTable.OutSymbol).assertGetFlowable();
+        this.inFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(SymbolTable.InSymbol).assertGetFlowable();
+        this.outFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(SymbolTable.OutSymbol).assertGetFlowable();
         this.flowList = new ArrayList<>();
     }
 

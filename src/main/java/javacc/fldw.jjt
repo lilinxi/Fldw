@@ -300,9 +300,9 @@ FuncFlow func_flow() :
 {
     funcSymbol = < SYMBOL > < LBR > [ paramFlow = list_flow()] < RBR >
     {
-        funcFlow = SymbolTable.CurrentSymbolTable().GetSymbol(funcSymbol.image).assertGetFuncFlow();
-        return new FuncFlow(funcFlow, paramFlow);
-    }
+    funcFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(funcSymbol.image).assertGetFuncFlow();
+    return new FuncFlow(funcFlow, paramFlow);
+}
 }
 
 HeadTailFlow head_tail_flow() :
