@@ -6,7 +6,8 @@ PARSER_BEGIN(FldwCompiler)
 package javacc;
 
 import java.io.*;
-import core.*;
+import java.lang.reflect.*;
+import core.*;import examples.Examples;
 
 public class FldwCompiler {
     public static void main(String[] args) {
@@ -29,6 +30,7 @@ public class FldwCompiler {
 //        System.out.println(ret);
         new FldwCompiler(reader).program();
     }
+}}
 }
 
 PARSER_END(FldwCompiler)
@@ -429,9 +431,10 @@ void import_stmt() :
     module_name = < SYMBOL >
     {
         try {
-            Class.forName(package_name.image + "." + module_name.image);
-//        Std std=new Std();
-        } catch (ClassNotFoundException ex) {
+             Class<?> clazz = Class.forName(package_name.image + "." + module_name.image);
+             Method loadModule = clazz.getMethod(Core.ModuleLoadFunc);
+             loadModule.invoke(null);
+        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
             throw new RuntimeException(ex.getMessage());
         }
     }

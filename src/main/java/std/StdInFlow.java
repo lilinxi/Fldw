@@ -10,17 +10,10 @@ import java.io.StringReader;
 import java.util.Scanner;
 
 public class StdInFlow extends Flow {
-    //    单例模式
-    private static StdInFlow Instance = new StdInFlow();
-
     private ListFlow cacheFlow;
 
-    private StdInFlow() {
+    public StdInFlow() {
         this.cacheFlow = new ListFlow();
-    }
-
-    public static StdInFlow GetInstance() {
-        return StdInFlow.Instance;
     }
 
     @Override

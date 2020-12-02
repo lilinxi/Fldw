@@ -1,4 +1,4 @@
-package core;
+package examples;
 
 public class Examples {
     /*****************************************************************/

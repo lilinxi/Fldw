@@ -11,4 +11,7 @@ public class Core {
 //        System.out.println("set eager flow: " + eagerFlowing);
         Core.EagerFlowing = eagerFlowing;
     }
+
+    public final static String ModuleLoadFunc = "Load";
+
 }

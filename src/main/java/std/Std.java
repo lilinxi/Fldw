@@ -6,10 +6,10 @@ public class Std {
     public static String StdInFlowSymbol = "stdin";
     public static String StdOutFlowSymbol = "stdout";
 
-    static {
+    public static void Load() {
 //        System.out.println("Std loading...");
-        SymbolTable.CurrentSymbolTable().PutSymbol(StdInFlowSymbol, SymbolTable.SymbolType.Flow, StdInFlow.GetInstance());
-        SymbolTable.CurrentSymbolTable().PutSymbol(StdOutFlowSymbol, SymbolTable.SymbolType.Flow, StdOutFlow.GetInstance());
+        SymbolTable.CurrentSymbolTable().PutSymbol(StdInFlowSymbol, SymbolTable.SymbolType.Flow, new StdInFlow());
+        SymbolTable.CurrentSymbolTable().PutSymbol(StdOutFlowSymbol, SymbolTable.SymbolType.Flow, new StdOutFlow());
 //        System.out.println("Std loaded");
     }
 }

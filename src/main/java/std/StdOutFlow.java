@@ -3,17 +3,10 @@ package std;
 import core.Datable;
 import core.Flow;
 import core.Flowable;
-import core.UnitTest;
+import examples.UnitTest;
 
 public class StdOutFlow extends Flow {
-    //    单例模式
-    private static StdOutFlow Instance = new StdOutFlow();
-
-    private StdOutFlow() {
-    }
-
-    public static StdOutFlow GetInstance() {
-        return StdOutFlow.Instance;
+    public StdOutFlow() {
     }
 
     @Override

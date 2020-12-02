@@ -3,7 +3,9 @@
 package javacc;
 
 import java.io.*;
+import java.lang.reflect.*;
 import core.*;
+import examples.Examples;
 
 public class FldwCompiler implements FldwCompilerConstants {
     public static void main(String[] args) {
@@ -21,6 +23,7 @@ public class FldwCompiler implements FldwCompilerConstants {
     }
 
     public static void parse(String src) throws ParseException {
+        SymbolTable.Clear();
         Reader reader = new StringReader(src);
 //        Object ret = new FldwCompiler(reader).expr_data();
 //        System.out.println(ret);
@@ -347,9 +350,10 @@ SymbolTable.CurrentSymbolTable().PutSymbol(func_symbol.image, SymbolTable.Symbol
     jj_consume_token(DOT);
     module_name = jj_consume_token(SYMBOL);
 try {
-            Class.forName(package_name.image + "." + module_name.image);
-//        Std std=new Std();
-        } catch (ClassNotFoundException ex) {
+             Class<?> clazz = Class.forName(package_name.image + "." + module_name.image);
+             Method loadModule = clazz.getMethod(Core.ModuleLoadFunc);
+             loadModule.invoke(null);
+        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
             {if (true) throw new RuntimeException(ex.getMessage());}
         }
 }
@@ -425,22 +429,14 @@ try {
     finally { jj_save(1, xla); }
   }
 
-  private boolean jj_3R_head_tail_flow_313_5_6()
- {
-    if (jj_scan_token(LSBR)) return true;
-    if (jj_3R_symbol_data_185_5_7()) return true;
-    if (jj_scan_token(SEMIC)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_func_flow_298_5_5()
+  private boolean jj_3R_func_flow_300_5_5()
  {
     if (jj_scan_token(SYMBOL)) return true;
     if (jj_scan_token(LBR)) return true;
     return false;
   }
 
-  private boolean jj_3R_symbol_data_185_5_7()
+  private boolean jj_3R_symbol_data_187_5_7()
  {
     if (jj_scan_token(SYMBOL)) return true;
     return false;
@@ -448,13 +444,21 @@ try {
 
   private boolean jj_3_2()
  {
-    if (jj_3R_head_tail_flow_313_5_6()) return true;
+    if (jj_3R_head_tail_flow_315_5_6()) return true;
     return false;
   }
 
   private boolean jj_3_1()
  {
-    if (jj_3R_func_flow_298_5_5()) return true;
+    if (jj_3R_func_flow_300_5_5()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_head_tail_flow_315_5_6()
+ {
+    if (jj_scan_token(LSBR)) return true;
+    if (jj_3R_symbol_data_187_5_7()) return true;
+    if (jj_scan_token(SEMIC)) return true;
     return false;
   }
 
