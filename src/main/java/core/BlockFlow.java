@@ -3,11 +3,13 @@ package core;
 import java.util.ArrayList;
 
 public class BlockFlow extends Flow {
+    private int identity; // System.identityHashCode(this) 返回对象的内存地址，不管该对象的类是否重写了 hashCode() 方法。
     private Flowable inFlow;
     private Flowable outFlow;
     private ArrayList<Flowable> flowList;
 
     public BlockFlow() {
+        this.identity = System.identityHashCode(this);
         this.inFlow = SymbolTable.CurrentSymbolTable().GetSymbol(SymbolTable.InSymbol).assertGetFlowable();
         this.outFlow = SymbolTable.CurrentSymbolTable().GetSymbol(SymbolTable.OutSymbol).assertGetFlowable();
         this.flowList = new ArrayList<>();
@@ -74,5 +76,14 @@ public class BlockFlow extends Flow {
             if (!success) return false;
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "BlockFlow{" +
+                ", inFlow=" + inFlow +
+                ", outFlow=" + outFlow +
+                ", flowList=" + flowList +
+                '}';
     }
 }

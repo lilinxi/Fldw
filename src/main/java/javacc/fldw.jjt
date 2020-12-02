@@ -30,7 +30,6 @@ public class FldwCompiler {
 //        System.out.println(ret);
         new FldwCompiler(reader).program();
     }
-}}
 }
 
 PARSER_END(FldwCompiler)
@@ -325,12 +324,12 @@ HeadTailFlow head_tail_flow() :
 
 BlockFlow block_flow() : // block 不能嵌套
 {
-    BlockFlow blockFlow = new BlockFlow();
+    BlockFlow blockFlow;
     Flowable topFlow;
 }
 {
     // 语法：block() = < LCBR > (flowing)* < RCBR > [ < EXLM > ]
-    < LCBR > { Core.setEagerFlowing(false); SymbolTable.EnterBlock(null); }
+    < LCBR > { Core.setEagerFlowing(false); SymbolTable.EnterBlock(null); blockFlow = new BlockFlow();}
 //    ( import_stmt() )*
     (
         topFlow = flowing() { blockFlow.addFlow(topFlow); }
@@ -339,6 +338,7 @@ BlockFlow block_flow() : // block 不能嵌套
     < RCBR > { Core.setEagerFlowing(true); SymbolTable.ExitBlock(); }
 //    [ < EXLM > { blockFlow.Flowing(); } ]
     {
+//        System.err.println("blcokFlow: "+blockFlow);
         return blockFlow;
     }
 }
@@ -385,6 +385,10 @@ Flowable flowing() :
     rightFlow = flow()
     {
         leftFlow.SetNext(rightFlow);
+//                                        System.err.println(leftFlow.GetSymbol() +leftFlow.GetIdentity()+ "->"+rightFlow.GetSymbol()+rightFlow.GetIdentity());
+//                                        System.err.println("leftFlow:\n"+leftFlow);
+//                                        System.err.println("rightFlow:\n"+rightFlow);
+//                                        System.err.println("symboltable:\n"+SymbolTable.CurrentSymbolTable());
         leftFlow = rightFlow;
     }
     )*
@@ -396,6 +400,8 @@ Flowable flowing() :
             topFlow.Flowing();
         }
 //        System.out.println("after flowing: " + topFlow);
+//                                        System.err.println("topFlow:\n"+topFlow);
+//                                                System.err.println("symboltable:\n"+SymbolTable.CurrentSymbolTable());
         return topFlow;
     }
 }

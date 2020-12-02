@@ -3,19 +3,26 @@ package core;
 import java.util.LinkedList;
 
 public class ListFlow extends Flow {
+    private int identity; // System.identityHashCode 返回对象的内存地址，不管该对象的类是否重写了 hashCode() 方法。
+    private String symbol;
     private LinkedList<Datable> dataList;
     private Flowable nextFlow;
-    private String symbol;
 
     public ListFlow() {
+        this.identity = System.identityHashCode(this);
+        this.symbol = null;
         this.dataList = new LinkedList<>();
         this.nextFlow = null;
-        this.symbol = null;
     }
 
     public ListFlow(String symbol) {
         this();
         this.symbol = symbol;
+    }
+
+    @Override
+    public int GetIdentity() {
+        return this.identity;
     }
 
     @Override
@@ -101,9 +108,9 @@ public class ListFlow extends Flow {
     @Override
     public String toString() {
         return "ListFlow{" +
-                "dataList=" + dataList +
-                ", nextFlow=" + nextFlow +
                 ", symbol='" + symbol + '\'' +
+                ", dataList=" + dataList +
+                ", nextFlow=" + nextFlow +
                 '}';
     }
 }

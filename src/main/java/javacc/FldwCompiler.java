@@ -4,8 +4,7 @@ package javacc;
 
 import java.io.*;
 import java.lang.reflect.*;
-import core.*;
-import examples.Examples;
+import core.*;import examples.Examples;
 
 public class FldwCompiler implements FldwCompilerConstants {
     public static void main(String[] args) {
@@ -23,7 +22,6 @@ public class FldwCompiler implements FldwCompilerConstants {
     }
 
     public static void parse(String src) throws ParseException {
-        SymbolTable.Clear();
         Reader reader = new StringReader(src);
 //        Object ret = new FldwCompiler(reader).expr_data();
 //        System.out.println(ret);
@@ -221,10 +219,10 @@ tailListFlow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(tailListFlowSymbo
     throw new Error("Missing return statement in function");
 }
 
-  final public BlockFlow block_flow() throws ParseException {BlockFlow blockFlow = new BlockFlow();
+  final public BlockFlow block_flow() throws ParseException {BlockFlow blockFlow;
     Flowable topFlow;
     jj_consume_token(LCBR);
-Core.setEagerFlowing(false); SymbolTable.EnterBlock(null);
+Core.setEagerFlowing(false); SymbolTable.EnterBlock(null); blockFlow = new BlockFlow();
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -245,7 +243,8 @@ blockFlow.addFlow(topFlow);
     }
     jj_consume_token(RCBR);
 Core.setEagerFlowing(true); SymbolTable.ExitBlock();
-{if ("" != null) return blockFlow;}
+//        System.err.println("blcokFlow: "+blockFlow);
+        {if ("" != null) return blockFlow;}
     throw new Error("Missing return statement in function");
 }
 
@@ -308,6 +307,10 @@ leftFlow = topFlow;
       jj_consume_token(FLOW);
       rightFlow = flow();
 leftFlow.SetNext(rightFlow);
+//                                        System.err.println(leftFlow.GetSymbol() +leftFlow.GetIdentity()+ "->"+rightFlow.GetSymbol()+rightFlow.GetIdentity());
+//                                        System.err.println("leftFlow:\n"+leftFlow);
+//                                        System.err.println("rightFlow:\n"+rightFlow);
+//                                        System.err.println("symboltable:\n"+SymbolTable.CurrentSymbolTable());
         leftFlow = rightFlow;
     }
 //        System.out.println("Root Symbol Table: " + SymbolTable.CurrentSymbolTable());
@@ -317,6 +320,8 @@ leftFlow.SetNext(rightFlow);
             topFlow.Flowing();
         }
 //        System.out.println("after flowing: " + topFlow);
+//                                        System.err.println("topFlow:\n"+topFlow);
+//                                                System.err.println("symboltable:\n"+SymbolTable.CurrentSymbolTable());
         {if ("" != null) return topFlow;}
     throw new Error("Missing return statement in function");
 }
@@ -429,14 +434,14 @@ try {
     finally { jj_save(1, xla); }
   }
 
-  private boolean jj_3R_func_flow_300_5_5()
+  private boolean jj_3R_func_flow_299_5_5()
  {
     if (jj_scan_token(SYMBOL)) return true;
     if (jj_scan_token(LBR)) return true;
     return false;
   }
 
-  private boolean jj_3R_symbol_data_187_5_7()
+  private boolean jj_3R_symbol_data_186_5_7()
  {
     if (jj_scan_token(SYMBOL)) return true;
     return false;
@@ -444,20 +449,20 @@ try {
 
   private boolean jj_3_2()
  {
-    if (jj_3R_head_tail_flow_315_5_6()) return true;
+    if (jj_3R_head_tail_flow_314_5_6()) return true;
     return false;
   }
 
   private boolean jj_3_1()
  {
-    if (jj_3R_func_flow_300_5_5()) return true;
+    if (jj_3R_func_flow_299_5_5()) return true;
     return false;
   }
 
-  private boolean jj_3R_head_tail_flow_315_5_6()
+  private boolean jj_3R_head_tail_flow_314_5_6()
  {
     if (jj_scan_token(LSBR)) return true;
-    if (jj_3R_symbol_data_187_5_7()) return true;
+    if (jj_3R_symbol_data_186_5_7()) return true;
     if (jj_scan_token(SEMIC)) return true;
     return false;
   }

@@ -4,6 +4,7 @@ package javacc;
 import java.io.*;
 import java.lang.reflect.*;
 import core.*;
+import examples.Examples;
 
 /** Token Manager. */
 @SuppressWarnings ("unused")

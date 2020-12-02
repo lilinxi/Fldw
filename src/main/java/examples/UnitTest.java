@@ -34,7 +34,7 @@ public class UnitTest {
 
         System.setOut(System.out);
 
-        assertEquals(output.toString(), """
+        assertEquals("""
                 stdout: TerminalData{type=Int, value=5}
                 stdout: TerminalData{type=Int, value=6}
                 stdout: TerminalData{type=Int, value=3}
@@ -43,12 +43,12 @@ public class UnitTest {
                 stdout: TerminalData{type=Int, value=8}
                 SymbolTable{
                 symbol='root', parentSymbolTable=, SymbolItemTreeMap=
-                in: SymbolItem{symbol='in', type=Flow, value=ListFlow{dataList=[], nextFlow=null, symbol='in'}}
-                out: SymbolItem{symbol='out', type=Flow, value=ListFlow{dataList=[], nextFlow=null, symbol='out'}}
-                stdin: SymbolItem{symbol='stdin', type=Flow, value=StdInFlow{cacheFlow=ListFlow{dataList=[], nextFlow=null, symbol='null'}}}
+                in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+                stdin: SymbolItem{symbol='stdin', type=Flow, value=StdInFlow{cacheFlow=ListFlow{, symbol='null', dataList=[], nextFlow=null}}}
                 stdout: SymbolItem{symbol='stdout', type=Flow, value=StdOutFlow{}}
                 }
-                """);
+                """, output.toString());
     }
 
     @Test
@@ -69,7 +69,7 @@ public class UnitTest {
 
         System.setOut(System.out);
 
-        assertEquals(output.toString(), """
+        assertEquals("""
                 stdout: TerminalData{type=Int, value=5}
                 stdout: TerminalData{type=Int, value=6}
                 stdout: TerminalData{type=Int, value=3}
@@ -78,14 +78,14 @@ public class UnitTest {
                 stdout: TerminalData{type=Int, value=8}
                 SymbolTable{
                 symbol='root', parentSymbolTable=, SymbolItemTreeMap=
-                in: SymbolItem{symbol='in', type=Flow, value=ListFlow{dataList=[], nextFlow=null, symbol='in'}}
-                out: SymbolItem{symbol='out', type=Flow, value=ListFlow{dataList=[], nextFlow=null, symbol='out'}}
-                stdin: SymbolItem{symbol='stdin', type=Flow, value=StdInFlow{cacheFlow=ListFlow{dataList=[], nextFlow=null, symbol='null'}}}
+                in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+                stdin: SymbolItem{symbol='stdin', type=Flow, value=StdInFlow{cacheFlow=ListFlow{, symbol='null', dataList=[], nextFlow=null}}}
                 stdout: SymbolItem{symbol='stdout', type=Flow, value=StdOutFlow{}}
-                sym: SymbolItem{symbol='sym', type=Flow, value=ListFlow{dataList=[], nextFlow=ListFlow{dataList=[], nextFlow=StdOutFlow{}, symbol='sym1'}, symbol='sym'}}
-                sym1: SymbolItem{symbol='sym1', type=Flow, value=ListFlow{dataList=[], nextFlow=StdOutFlow{}, symbol='sym1'}}
+                sym: SymbolItem{symbol='sym', type=Flow, value=ListFlow{, symbol='sym', dataList=[], nextFlow=ListFlow{, symbol='sym1', dataList=[], nextFlow=StdOutFlow{}}}}
+                sym1: SymbolItem{symbol='sym1', type=Flow, value=ListFlow{, symbol='sym1', dataList=[], nextFlow=StdOutFlow{}}}
                 }
-                """);
+                """, output.toString());
     }
 
     @Test
@@ -106,7 +106,7 @@ public class UnitTest {
 
         System.setOut(System.out);
 
-        assertEquals(output.toString(), """
+        assertEquals("""
                 stdout: SymbolData{type=Int, value=5, symbol='e'}
                 stdout: SymbolData{type=Int, value=6, symbol='f'}
                 stdout: SymbolData{type=Int, value=3, symbol='g'}
@@ -124,13 +124,13 @@ public class UnitTest {
                 g: SymbolItem{symbol='g', type=Data, value=SymbolData{type=Int, value=3, symbol='g'}}
                 h: SymbolItem{symbol='h', type=Data, value=SymbolData{type=Int, value=2, symbol='h'}}
                 i: SymbolItem{symbol='i', type=Data, value=SymbolData{type=null, value=null, symbol='i'}}
-                in: SymbolItem{symbol='in', type=Flow, value=ListFlow{dataList=[], nextFlow=null, symbol='in'}}
+                in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
                 j: SymbolItem{symbol='j', type=Data, value=SymbolData{type=null, value=null, symbol='j'}}
-                out: SymbolItem{symbol='out', type=Flow, value=ListFlow{dataList=[], nextFlow=null, symbol='out'}}
-                stdin: SymbolItem{symbol='stdin', type=Flow, value=StdInFlow{cacheFlow=ListFlow{dataList=[], nextFlow=null, symbol='null'}}}
+                out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+                stdin: SymbolItem{symbol='stdin', type=Flow, value=StdInFlow{cacheFlow=ListFlow{, symbol='null', dataList=[], nextFlow=null}}}
                 stdout: SymbolItem{symbol='stdout', type=Flow, value=StdOutFlow{}}
                 }
-                """);
+                """, output.toString());
     }
 
     @Test
@@ -153,7 +153,7 @@ public class UnitTest {
 
         System.setOut(System.out);
 
-        assertEquals(output.toString(), """
+        assertEquals("""
                 stdout: TerminalData{type=Int, value=6}
                 stdout: TerminalData{type=Int, value=3}
                 stdout: TerminalData{type=Int, value=2}
@@ -163,13 +163,13 @@ public class UnitTest {
                 SymbolTable{
                 symbol='root', parentSymbolTable=, SymbolItemTreeMap=
                 head: SymbolItem{symbol='head', type=Data, value=SymbolData{type=Int, value=5, symbol='head'}}
-                in: SymbolItem{symbol='in', type=Flow, value=ListFlow{dataList=[], nextFlow=null, symbol='in'}}
-                out: SymbolItem{symbol='out', type=Flow, value=ListFlow{dataList=[], nextFlow=null, symbol='out'}}
-                stdin: SymbolItem{symbol='stdin', type=Flow, value=StdInFlow{cacheFlow=ListFlow{dataList=[], nextFlow=null, symbol='null'}}}
+                in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+                stdin: SymbolItem{symbol='stdin', type=Flow, value=StdInFlow{cacheFlow=ListFlow{, symbol='null', dataList=[], nextFlow=null}}}
                 stdout: SymbolItem{symbol='stdout', type=Flow, value=StdOutFlow{}}
-                tail: SymbolItem{symbol='tail', type=Flow, value=ListFlow{dataList=[], nextFlow=StdOutFlow{}, symbol='tail'}}
+                tail: SymbolItem{symbol='tail', type=Flow, value=ListFlow{, symbol='tail', dataList=[], nextFlow=StdOutFlow{}}}
                 }
-                """);
+                """, output.toString());
     }
 
     @Test
@@ -192,19 +192,19 @@ public class UnitTest {
         System.setOut(System.out);
         System.setIn(System.in);
 
-        assertEquals(output.toString(), """
+        assertEquals("""
                 stdout: TerminalData{type=Int, value=1}
                 stdout: TerminalData{type=Double, value=1.213}
                 stdout: TerminalData{type=Bool, value=true}
                 stdout: TerminalData{type=String, value="dada"}
                 SymbolTable{
                 symbol='root', parentSymbolTable=, SymbolItemTreeMap=
-                in: SymbolItem{symbol='in', type=Flow, value=ListFlow{dataList=[], nextFlow=null, symbol='in'}}
-                out: SymbolItem{symbol='out', type=Flow, value=ListFlow{dataList=[], nextFlow=null, symbol='out'}}
-                stdin: SymbolItem{symbol='stdin', type=Flow, value=StdInFlow{cacheFlow=ListFlow{dataList=[], nextFlow=StdOutFlow{}, symbol='null'}}}
+                in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+                stdin: SymbolItem{symbol='stdin', type=Flow, value=StdInFlow{cacheFlow=ListFlow{, symbol='null', dataList=[], nextFlow=StdOutFlow{}}}}
                 stdout: SymbolItem{symbol='stdout', type=Flow, value=StdOutFlow{}}
                 }
-                """);
+                """, output.toString());
     }
 
     @Test
@@ -229,7 +229,7 @@ public class UnitTest {
 
         System.setOut(System.out);
 
-        assertEquals(output.toString(), """
+        assertEquals("""
                 stdout: SymbolData{type=Int, value=1, symbol='a'}
                 stdout: SymbolData{type=Int, value=2, symbol='b'}
                 stdout: SymbolData{type=Int, value=3, symbol='c'}
@@ -248,17 +248,17 @@ public class UnitTest {
                 b: SymbolItem{symbol='b', type=Data, value=SymbolData{type=Int, value=6, symbol='b'}}
                 c: SymbolItem{symbol='c', type=Data, value=SymbolData{type=Int, value=7, symbol='c'}}
                 d: SymbolItem{symbol='d', type=Data, value=SymbolData{type=Int, value=8, symbol='d'}}
-                in: SymbolItem{symbol='in', type=Flow, value=ListFlow{dataList=[], nextFlow=null, symbol='in'}}
-                out: SymbolItem{symbol='out', type=Flow, value=ListFlow{dataList=[], nextFlow=null, symbol='out'}}
-                stdin: SymbolItem{symbol='stdin', type=Flow, value=StdInFlow{cacheFlow=ListFlow{dataList=[], nextFlow=null, symbol='null'}}}
+                in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+                stdin: SymbolItem{symbol='stdin', type=Flow, value=StdInFlow{cacheFlow=ListFlow{, symbol='null', dataList=[], nextFlow=null}}}
                 stdout: SymbolItem{symbol='stdout', type=Flow, value=StdOutFlow{}}
                 tmp0: SymbolItem{symbol='tmp0', type=BlockSymbolTable, value=SymbolTable{
                 symbol='tmp0', parentSymbolTable=root, SymbolItemTreeMap=
-                |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{dataList=[], nextFlow=null, symbol='in'}}
-                |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{dataList=[], nextFlow=null, symbol='out'}}
+                |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
                 }}
                 }
-                """);
+                """, output.toString());
     }
 
     @Test
@@ -282,7 +282,7 @@ public class UnitTest {
 
         System.setOut(System.out);
 
-        assertEquals(output.toString(), """
+        assertEquals("""
                 stdout: SymbolData{type=Int, value=1, symbol='a'}
                 stdout: SymbolData{type=Int, value=2, symbol='b'}
                 stdout: SymbolData{type=Int, value=3, symbol='c'}
@@ -297,9 +297,9 @@ public class UnitTest {
                 b: SymbolItem{symbol='b', type=Data, value=SymbolData{type=null, value=null, symbol='b'}}
                 c: SymbolItem{symbol='c', type=Data, value=SymbolData{type=null, value=null, symbol='c'}}
                 d: SymbolItem{symbol='d', type=Data, value=SymbolData{type=null, value=null, symbol='d'}}
-                in: SymbolItem{symbol='in', type=Flow, value=ListFlow{dataList=[], nextFlow=null, symbol='in'}}
-                out: SymbolItem{symbol='out', type=Flow, value=ListFlow{dataList=[], nextFlow=null, symbol='out'}}
-                stdin: SymbolItem{symbol='stdin', type=Flow, value=StdInFlow{cacheFlow=ListFlow{dataList=[], nextFlow=null, symbol='null'}}}
+                in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+                stdin: SymbolItem{symbol='stdin', type=Flow, value=StdInFlow{cacheFlow=ListFlow{, symbol='null', dataList=[], nextFlow=null}}}
                 stdout: SymbolItem{symbol='stdout', type=Flow, value=StdOutFlow{}}
                 tmp0: SymbolItem{symbol='tmp0', type=BlockSymbolTable, value=SymbolTable{
                 symbol='tmp0', parentSymbolTable=root, SymbolItemTreeMap=
@@ -307,17 +307,60 @@ public class UnitTest {
                 |-- b: SymbolItem{symbol='b', type=Data, value=SymbolData{type=Int, value=2, symbol='b'}}
                 |-- c: SymbolItem{symbol='c', type=Data, value=SymbolData{type=Int, value=3, symbol='c'}}
                 |-- d: SymbolItem{symbol='d', type=Data, value=SymbolData{type=Int, value=4, symbol='d'}}
-                |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{dataList=[], nextFlow=null, symbol='in'}}
-                |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{dataList=[], nextFlow=null, symbol='out'}}
+                |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
                 }}
                 }
-                """);
+                """, output.toString());
+    }
+
+    @Test
+    public void TestBlockExample3() {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+
+        try {
+            SymbolTable.Clear();
+            FldwCompiler.parse("""
+                    import std.Std
+                    [1, 2, 3, 4] | sym | {
+                        in | [a, b, c] | out
+                    } | stdout
+                    """);
+            System.out.println(SymbolTable.CurrentSymbolTable());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        System.setOut(System.out);
+
+        assertEquals("""
+                stdout: SymbolData{type=Int, value=1, symbol='a'}
+                stdout: SymbolData{type=Int, value=2, symbol='b'}
+                stdout: SymbolData{type=Int, value=3, symbol='c'}
+                SymbolTable{
+                symbol='root', parentSymbolTable=, SymbolItemTreeMap=
+                in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+                stdin: SymbolItem{symbol='stdin', type=Flow, value=StdInFlow{cacheFlow=ListFlow{, symbol='null', dataList=[], nextFlow=null}}}
+                stdout: SymbolItem{symbol='stdout', type=Flow, value=StdOutFlow{}}
+                sym: SymbolItem{symbol='sym', type=Flow, value=ListFlow{, symbol='sym', dataList=[], nextFlow=BlockFlow{, inFlow=ListFlow{, symbol='in', dataList=[TerminalData{type=Int, value=1}, TerminalData{type=Int, value=2}, TerminalData{type=Int, value=3}, TerminalData{type=Int, value=4}], nextFlow=ListFlow{, symbol='null', dataList=[], nextFlow=ListFlow{, symbol='out', dataList=[], nextFlow=StdOutFlow{}}}}, outFlow=ListFlow{, symbol='out', dataList=[], nextFlow=StdOutFlow{}}, flowList=[ListFlow{, symbol='in', dataList=[TerminalData{type=Int, value=1}, TerminalData{type=Int, value=2}, TerminalData{type=Int, value=3}, TerminalData{type=Int, value=4}], nextFlow=ListFlow{, symbol='null', dataList=[], nextFlow=ListFlow{, symbol='out', dataList=[], nextFlow=StdOutFlow{}}}}]}}}
+                tmp0: SymbolItem{symbol='tmp0', type=BlockSymbolTable, value=SymbolTable{
+                symbol='tmp0', parentSymbolTable=root, SymbolItemTreeMap=
+                |-- a: SymbolItem{symbol='a', type=Data, value=SymbolData{type=Int, value=1, symbol='a'}}
+                |-- b: SymbolItem{symbol='b', type=Data, value=SymbolData{type=Int, value=2, symbol='b'}}
+                |-- c: SymbolItem{symbol='c', type=Data, value=SymbolData{type=Int, value=3, symbol='c'}}
+                |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[TerminalData{type=Int, value=1}, TerminalData{type=Int, value=2}, TerminalData{type=Int, value=3}, TerminalData{type=Int, value=4}], nextFlow=ListFlow{, symbol='null', dataList=[], nextFlow=ListFlow{, symbol='out', dataList=[], nextFlow=StdOutFlow{}}}}}
+                |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=StdOutFlow{}}}
+                }}
+                }
+                """, output.toString());
     }
 
     public static void main(String[] args) throws ParseException {
         Result result = JUnitCore.runClasses(UnitTest.class);
         for (Failure failure : result.getFailures()) {
-            System.err.println(failure.getTrace());
+            System.err.println("Fail: " + failure.getTestHeader());
         }
         if (result.wasSuccessful()) {
             System.err.println("Tests Pass!");

@@ -2,6 +2,8 @@ package core;
 
 // 支持的流所提供的接口
 public interface Flowable {
+    int GetIdentity();// 获取内存地址
+
     String GetSymbol();// 获取流的符号
 
     boolean Push(Datable data); // 流入一个元素，返回是否成功
