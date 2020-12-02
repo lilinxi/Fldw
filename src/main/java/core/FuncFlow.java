@@ -11,53 +11,86 @@ public class FuncFlow extends Flow {
         this.blockFlow = blockFlow;
     }
 
+    public FuncFlow(FuncFlow funcFlow, ListFlow paramFlow) {
+        this.symbol = funcFlow.symbol;
+        this.paramFlow = funcFlow.paramFlow;
+        this.blockFlow = funcFlow.blockFlow;
+        paramFlow.SetNext(this.paramFlow);
+        paramFlow.Flowing();
+    }
+
+    @Override
+    public int GetIdentity() {
+        return -1;
+    }
+
     @Override
     public String GetSymbol() {
-        return null;
+        return this.symbol;
     }
 
     @Override
     public boolean Push(Datable data) {
-        return false;
+        return this.blockFlow.Push(data);
     }
 
     @Override
     public boolean Push(Flowable flow) {
-        return false;
+        return this.blockFlow.Push(flow);
+    }
+
+    @Override
+    public boolean Push(int index, Datable data) {
+        return this.blockFlow.Push(index,data);
     }
 
     @Override
     public Datable Pop() {
-        return null;
+        return this.blockFlow.Pop();
     }
 
     @Override
     public int inLen() {
-        return 0;
+        return this.blockFlow.inLen();
     }
 
     @Override
-    public void SetNext(Flowable flow) {
+    public int outLen() {
+        return this.blockFlow.outLen();
+    }
 
+    @Override
+    public Datable Get(int index) {
+        return this.blockFlow.Get(index);
+    }
+
+
+    @Override
+    public void SetNext(Flowable flow) {
+        this.blockFlow.SetNext(flow);
     }
 
     @Override
     public Flowable Next() {
-        return null;
+        return this.blockFlow.Next();
     }
 
     @Override
     public boolean HasNext() {
-        return false;
+        return this.blockFlow.HasNext();
     }
 
     @Override
     public boolean Flowing() {
-        return false;
+        return this.blockFlow.Flowing();
     }
 
     @Override
     public String toString() {
-        return "FuncFlow{}";
+        return "FuncFlow{" +
+                "symbol='" + symbol + '\'' +
+                ", paramFlow=" + paramFlow +
+                ", blockFlow=" + blockFlow +
+                '}';
     }
 }

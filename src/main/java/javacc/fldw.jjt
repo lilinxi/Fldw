@@ -291,14 +291,17 @@ WhileFlow while_flow() :
     }
 }
 
-Flowable func_flow() :
+FuncFlow func_flow() :
 {
-    Token func_symbol;
+    Token funcSymbol;
+    ListFlow paramFlow;
+    FuncFlow funcFlow;
 }
 {
-    func_symbol = < SYMBOL > < LBR > < RBR >
+    func_symbol = < SYMBOL > < LBR > [ paramFlow = list_flow()] < RBR >
     {
-        return SymbolTable.CurrentSymbolTable().GetSymbol(func_symbol.image).assertGetFlowable();
+        funcFlow = SymbolTable.CurrentSymbolTable().GetSymbol(funcSymbol.image).assertGetFuncFlow();
+        return new FuncFlow(funcFlow, paramFlow);
     }
 }
 

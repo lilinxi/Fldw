@@ -57,12 +57,12 @@ public class SymbolTable {
             return (SymbolData) this.getValue();
         }
 
-//        public ListFlow assertGetListFlow() {
-//            if (this.getType() != SymbolType.Flow) {
-//                throw new RuntimeException("assert type mismatch");
-//            }
-//            return (ListFlow) this.getValue();
-//        }
+        public FuncFlow assertGetFuncFlow() {
+            if (this.getType() != SymbolType.Flow) {
+                throw new RuntimeException("assert type mismatch");
+            }
+            return (FuncFlow) this.getValue();
+        }
 
         public Flowable assertGetFlowable() {
             if (this.getType() != SymbolType.Flow) {

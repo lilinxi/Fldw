@@ -16,6 +16,18 @@ import static org.junit.Assert.*;
 public class UnitTest {
     public final static boolean UnitTest = true;
 
+    public static void main(String[] args) throws ParseException {
+        Result result = JUnitCore.runClasses(UnitTest.class);
+        for (Failure failure : result.getFailures()) {
+            System.err.println("Fail: " + failure.getTestHeader());
+        }
+        if (result.wasSuccessful()) {
+            System.err.println("Tests Pass!");
+        } else {
+            System.err.println("Some Tests Fail!");
+        }
+    }
+
     @Test
     public void TestFlowExample1() {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -574,17 +586,5 @@ public class UnitTest {
                 }}
                 }
                 """, output.toString());
-    }
-
-    public static void main(String[] args) throws ParseException {
-        Result result = JUnitCore.runClasses(UnitTest.class);
-        for (Failure failure : result.getFailures()) {
-            System.err.println("Fail: " + failure.getTestHeader());
-        }
-        if (result.wasSuccessful()) {
-            System.err.println("Tests Pass!");
-        } else {
-            System.err.println("Some Tests Fail!");
-        }
     }
 }

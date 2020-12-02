@@ -20,6 +20,8 @@ public class ListFlow extends Flow {
         this.symbol = symbol;
     }
 
+
+
     @Override
     public int GetIdentity() {
         return this.identity;
