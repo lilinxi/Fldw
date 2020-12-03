@@ -88,13 +88,14 @@ TOKEN : // Keywords and punctuation
 //    |   < RETURN : "return" >
 //    |   < STRING : "string" >
     |   < WHILE : "while" >
+    |   < FOR : "for" >
 
     |   < FUNC : "function" >
 //    |   < FUNC_IN : "in" >
 //    |   < FUNC_OUT : "out" >
 
-    |   < FLOW : "|" >
-    |   < ITER : "->" >
+    |   < FLOWING : "|" >
+    |   < MATCHING : "->" >
 
 //    |   < STDIN : "stdin" >
 //    |   < STDOUT : "stdout" >
@@ -150,9 +151,9 @@ TOKEN : // anything not recognised so far
 /*****************************************************************/
 TerminalData terminal_data() :
 {
+    Token terminalToken;
     Datable.DataType type;
     TerminalData terminalData;
-    Token terminalToken;
 }
 {
     // 语法：terminal_data() = < INT_VALUE > | < DOUBLE_VALUE > | < BOOL_VALUE > | < STRING_VALUE >
@@ -182,19 +183,25 @@ TerminalData terminal_data() :
 
 SymbolData symbol_data() :
 {
-    Token symbol;
+    Token symbolToken;
+    SymbolData symbolData;
 }
 {
-    // 语法：symbol_data() = < SYMBOL>
-    symbol = < SYMBOL>
+    // 语法：symbol_data() = < SYMBOL>  | < SYMBOL> < EXLM >
+    (symbolToken = < SYMBOL>)
     {
-        return SymbolTable.CurrentSymbolTable().PutOrGetSymbol(symbol.image, SymbolTable.SymbolType.Data).assertGetSymbolData();
+        symbolData = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(symbolToken.image, SymbolTable.SymbolType.Data).assertGetSymbolData();
+        symbolData.addToken(symbolToken.image);
+        return symbolData;
     }
 }
 
 // TODO：tmp
 ExprData expr_data() :
 {
+    Token leftDataToken;
+    Token rightDataToken;
+    Token opToken;
     ExprData exprData = new ExprData();
     Datable leftData, rightData;
 }
@@ -244,7 +251,7 @@ ListFlow list_flow() :
     {
         listFlow.Push(data);
     }
-    ( < COMMA > data = data()
+    ( [< COMMA >] data = data()
         {
             listFlow.Push(data);
         }
@@ -294,6 +301,22 @@ WhileFlow while_flow() :
     }
 }
 
+ForFlow for_flow() :
+{
+    Flowable iterFlow;
+    SymbolData iterSymbolData;
+    BlockFlow forBlockFlow;
+    ForFlow forFlow;
+}
+{
+    // 语法：for_flow() = < FOR > < LBR > flow() < FLOWING > symbol_data() < RBR > block_flow()
+    < FOR > < LBR > iterFlow = flow() < FLOWING > iterSymbolData = symbol_data() < RBR > forBlockFlow = block_flow()
+    {
+        forFlow = new ForFlow(iterFlow, iterSymbolData, forBlockFlow);
+        return forFlow;
+    }
+}
+
 FuncFlow func_flow() :
 {
     Token funcSymbol;
@@ -303,9 +326,10 @@ FuncFlow func_flow() :
 {
     funcSymbol = < SYMBOL > < LBR > [ paramFlow = list_flow()] < RBR >
     {
-    funcFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(funcSymbol.image).assertGetFuncFlow();
-    return new FuncFlow(funcFlow, paramFlow);
-}
+        funcFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(funcSymbol.image).assertGetFuncFlow();
+        funcFlow.setParamFlow(paramFlow);
+        return funcFlow;
+    }
 }
 
 HeadTailFlow head_tail_flow() :
@@ -369,6 +393,7 @@ Flowable flow() :
     |   flow = if_else_flow()
     |   flow = while_flow()
     |   flow = block_flow()
+    |   flow = for_flow()
     )
     {
         return flow;
@@ -382,12 +407,12 @@ Flowable flowing() :
     Flowable rightFlow = new ListFlow();
 }
 {
-    // 语法：match_flow() = flow() < FLOW > flow()
+    // 语法：match_flow() = flow() < FLOWING > flow()
     topFlow = flow()
     {
         leftFlow = topFlow;
     }
-    (< FLOW >
+    (< FLOWING >
     rightFlow = flow()
     {
         leftFlow.SetNext(rightFlow);
@@ -412,21 +437,76 @@ Flowable flowing() :
     }
 }
 
+void matching() :
+{
+    Flowable leftFlow = new ListFlow();
+    Flowable rightFlow = new ListFlow();
+}
+{
+    // 语法：match_flow() = flow() < MATCHING > flow()
+    leftFlow = flow()
+    < MATCHING >
+    rightFlow = flow()
+    {
+        leftFlow.SetNext(rightFlow);
+    }
+    {
+        leftFlow.Matching();
+    }
+}
+
 void def_func_stmt() : // 函数就是一个有参数和符号关联的 Block
 {
-    Token func_symbol;
+    Token funcSymbol;
+    int count = 0;
+    Token curToken;
+    StringBuffer funcBuf = new StringBuffer();
+}
+{
+    // 语法：def_func_stmt() = < FUNC > < SYMBOL > < LBR > [ list_flow() ] < RBR > block_flow()
+    < FUNC > funcSymbol = < SYMBOL >
+    {
+        do{
+            curToken = token_source.getNextToken();
+            funcBuf.append(curToken);
+            funcBuf.append(" ");
+        } while (curToken.image!= ")");
+        curToken = token_source.getNextToken();
+        if (curToken.image=="{"){
+            funcBuf.append(curToken);
+            funcBuf.append(" ");
+            count++;
+            do{
+                curToken = token_source.getNextToken();
+                funcBuf.append(curToken);
+                funcBuf.append(" ");
+                if (curToken.image=="{") {
+                    count++;
+                } else if (curToken.image=="}") {
+                    count--;
+                }
+            }while (count!=0);
+        }
+    }
+    {
+//        System.err.println(funcBuf);
+        SymbolTable.CurrentSymbolTable().PutSymbol(funcSymbol.image, SymbolTable.SymbolType.Function, funcBuf.toString());
+    }
+}
+
+FuncFlow make_func_flow() : // 函数就是一个有参数和符号关联的 Block
+{
     ListFlow param_flow = null;
     BlockFlow block_flow;
 }
 {
-    // 语法：def_func_stmt() = < FUNC > < SYMBOL > < LBR > [ list_flow() ] < RBR > block_stmt()
-    < FUNC > func_symbol = < SYMBOL >
-    < LBR > { SymbolTable.EnterBlock(func_symbol.image + FuncFlow.FuncSymbolTableSuffix); }
+    // 语法：def_func_stmt() = < FUNC > < SYMBOL > < LBR > [ list_flow() ] < RBR > block_flow()
+    < LBR > { SymbolTable.EnterBlock(null); }
     [ param_flow = list_flow() ]
     < RBR >
     block_flow = block_flow() { SymbolTable.ExitBlock(); }
     {
-        SymbolTable.CurrentSymbolTable().PutSymbol(func_symbol.image, SymbolTable.SymbolType.Flow, new FuncFlow(func_symbol.image, param_flow, block_flow));
+        return new FuncFlow(param_flow, block_flow);
     }
 }
 

@@ -1,5 +1,9 @@
 package core;
 
+import javacc.FldwCompiler;
+import javacc.ParseException;
+
+import java.io.StringReader;
 import java.util.*;
 
 // 符号表
@@ -61,11 +65,11 @@ public class SymbolTable {
             return (SymbolData) this.getValue();
         }
 
-        public FuncFlow assertGetFuncFlow() {
-            if (this.getType() != SymbolType.Flow) {
+        public FuncFlow assertGetFuncFlow() throws ParseException {
+            if (this.getType() != SymbolType.Function) {
                 throw new RuntimeException("assert type mismatch");
             }
-            return (FuncFlow) this.getValue();
+            return new FldwCompiler(new StringReader(this.getValue().toString())).make_func_flow();
         }
 
         public Flowable assertGetFlowable() {

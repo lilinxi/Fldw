@@ -66,4 +66,9 @@ public class Flow extends TokenList implements Flowable {
     public boolean Flowing() {
         return true;
     }
+
+    @Override
+    public boolean Matching() {
+        return true;
+    }
 }

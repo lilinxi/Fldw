@@ -7,6 +7,13 @@ public class FuncFlow extends Flow {
     private ListFlow paramFlow;
     private BlockFlow blockFlow;
 
+    private SymbolData tmpData;
+
+    public FuncFlow(ListFlow paramFlow, BlockFlow blockFlow) {
+        this.paramFlow = paramFlow;
+        this.blockFlow = blockFlow;
+    }
+
     public FuncFlow(String symbol, ListFlow paramFlow, BlockFlow blockFlow) {
         this.symbol = symbol;
         this.paramFlow = paramFlow;
@@ -17,6 +24,11 @@ public class FuncFlow extends Flow {
         this.symbol = funcFlow.symbol;
         this.paramFlow = funcFlow.paramFlow;
         this.blockFlow = funcFlow.blockFlow;
+        paramFlow.SetNext(this.paramFlow);
+        paramFlow.Flowing();
+    }
+
+    public void setParamFlow(ListFlow paramFlow) {
         paramFlow.SetNext(this.paramFlow);
         paramFlow.Flowing();
     }
