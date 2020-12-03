@@ -22,6 +22,7 @@ public class FldwCompiler implements FldwCompilerConstants {
     }
 
     public static void parse(String src) throws ParseException {
+        SymbolTable.Clear();
         Reader reader = new StringReader(src);
 //        Object ret = new FldwCompiler(reader).expr_data();
 //        System.out.println(ret);
