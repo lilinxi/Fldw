@@ -1,7 +1,12 @@
 package core;
 
 // Datable 默认实现类
-public class Data implements Datable {
+public class Data extends TokenList implements Datable {
+//    @Override
+//    public int GetIdentity() {
+//        return System.identityHashCode(this);
+//    }
+
     @Override
     public boolean Push(Datable data) {
         throw new RuntimeException("no impl, wrong call");

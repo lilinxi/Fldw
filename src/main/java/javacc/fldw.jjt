@@ -151,29 +151,32 @@ TOKEN : // anything not recognised so far
 TerminalData terminal_data() :
 {
     Datable.DataType type;
-    Token x;
+    TerminalData terminalData;
+    Token terminalToken;
 }
 {
     // 语法：terminal_data() = < INT_VALUE > | < DOUBLE_VALUE > | < BOOL_VALUE > | < STRING_VALUE >
-    (   x = < INT_VALUE >
+    (   terminalToken = < INT_VALUE >
         {
             type = Datable.DataType.Int;
         }
-    |   x = < DOUBLE_VALUE >
+    |   terminalToken = < DOUBLE_VALUE >
         {
             type = Datable.DataType.Double;
         }
-    |   x = < BOOL_VALUE >
+    |   terminalToken = < BOOL_VALUE >
         {
             type = Datable.DataType.Bool;
         }
-    |   x = < STRING_VALUE >
+    |   terminalToken = < STRING_VALUE >
         {
             type = Datable.DataType.String;
         }
     )
     {
-        return new TerminalData(type, x.image);
+        terminalData =  new TerminalData(type, terminalToken.image);
+        terminalData.addToken(terminalToken.image);
+        return terminalData;
     }
 }
 

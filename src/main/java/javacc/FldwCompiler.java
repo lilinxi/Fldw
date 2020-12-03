@@ -22,7 +22,6 @@ public class FldwCompiler implements FldwCompilerConstants {
     }
 
     public static void parse(String src) throws ParseException {
-        SymbolTable.Clear();
         Reader reader = new StringReader(src);
 //        Object ret = new FldwCompiler(reader).expr_data();
 //        System.out.println(ret);
@@ -33,25 +32,26 @@ public class FldwCompiler implements FldwCompilerConstants {
 /***************************语法分析*******************************/
 /*****************************************************************/
   final public TerminalData terminal_data() throws ParseException {Datable.DataType type;
-    Token x;
+    TerminalData terminalData;
+    Token terminalToken;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case INT_VALUE:{
-      x = jj_consume_token(INT_VALUE);
+      terminalToken = jj_consume_token(INT_VALUE);
 type = Datable.DataType.Int;
       break;
       }
     case DOUBLE_VALUE:{
-      x = jj_consume_token(DOUBLE_VALUE);
+      terminalToken = jj_consume_token(DOUBLE_VALUE);
 type = Datable.DataType.Double;
       break;
       }
     case BOOL_VALUE:{
-      x = jj_consume_token(BOOL_VALUE);
+      terminalToken = jj_consume_token(BOOL_VALUE);
 type = Datable.DataType.Bool;
       break;
       }
     case STRING_VALUE:{
-      x = jj_consume_token(STRING_VALUE);
+      terminalToken = jj_consume_token(STRING_VALUE);
 type = Datable.DataType.String;
       break;
       }
@@ -60,7 +60,9 @@ type = Datable.DataType.String;
       jj_consume_token(-1);
       throw new ParseException();
     }
-{if ("" != null) return new TerminalData(type, x.image);}
+terminalData =  new TerminalData(type, terminalToken.image);
+        terminalData.addToken(terminalToken.image);
+        {if ("" != null) return terminalData;}
     throw new Error("Missing return statement in function");
 }
 
@@ -447,36 +449,36 @@ try {
     finally { jj_save(1, xla); }
   }
 
-  private boolean jj_3R_func_flow_301_5_5()
- {
-    if (jj_scan_token(SYMBOL)) return true;
-    if (jj_scan_token(LBR)) return true;
-    return false;
-  }
-
   private boolean jj_3_2()
  {
-    if (jj_3R_head_tail_flow_317_5_6()) return true;
+    if (jj_3R_head_tail_flow_320_5_6()) return true;
     return false;
   }
 
   private boolean jj_3_1()
  {
-    if (jj_3R_func_flow_301_5_5()) return true;
+    if (jj_3R_func_flow_304_5_5()) return true;
     return false;
   }
 
-  private boolean jj_3R_symbol_data_186_5_7()
+  private boolean jj_3R_symbol_data_189_5_7()
  {
     if (jj_scan_token(SYMBOL)) return true;
     return false;
   }
 
-  private boolean jj_3R_head_tail_flow_317_5_6()
+  private boolean jj_3R_head_tail_flow_320_5_6()
  {
     if (jj_scan_token(LSBR)) return true;
-    if (jj_3R_symbol_data_186_5_7()) return true;
+    if (jj_3R_symbol_data_189_5_7()) return true;
     if (jj_scan_token(SEMIC)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_func_flow_304_5_5()
+ {
+    if (jj_scan_token(SYMBOL)) return true;
+    if (jj_scan_token(LBR)) return true;
     return false;
   }
 

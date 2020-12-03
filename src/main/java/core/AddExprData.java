@@ -1,6 +1,6 @@
 package core;
 
-public class AddExprData implements Datable {
+public class AddExprData extends Data {
     private Datable leftChild, rightChild;
 
     @Override

@@ -9,6 +9,10 @@ public class TokenList {
         this.tokenList = new ArrayList<>();
     }
 
+    public int GetIdentity() {
+        return System.identityHashCode(this);
+    }
+
     public void addToken(String token) {
         this.tokenList.add(token);
     }
