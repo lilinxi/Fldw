@@ -565,7 +565,7 @@ Flowable flowing() :
         leftFlow = topFlow;
     }
     (
-        ( // TODO Why lookahead
+        LOOKAHEAD(1) ( // TODO Why lookahead
             < MATCHING > { leftFlow.SetFlowOp(Flowable.FlowOp.Matching);}
         |   < FLOWING >  { leftFlow.SetFlowOp(Flowable.FlowOp.Pushing);}
         )
