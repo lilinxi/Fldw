@@ -1,15 +1,14 @@
 package core;
 
 public class Core {
-    private static boolean EagerFlowing = true;
+    private static boolean Eager = true;
 
-    public static boolean isEagerFlowing() {
-        return Core.EagerFlowing;
+    public static boolean isEager() {
+        return Core.Eager;
     }
 
-    public static void setEagerFlowing(boolean eagerFlowing) {
-//        System.out.println("set eager flow: " + eagerFlowing);
-        Core.EagerFlowing = eagerFlowing;
+    public static void setEager(boolean eager) {
+        Core.Eager = eager;
     }
 
     public final static String ModuleLoadFunc = "Load";

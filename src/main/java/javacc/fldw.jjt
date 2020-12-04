@@ -232,11 +232,11 @@ ExprData expr_data_tmp() :
     }
 }
 
-ExprData expr_data() :
+Datable expr_data() :
 {
     ExprData topExprData = new ExprData();
-    ExprData leftExprData = new ExprData();
-    ExprData rightExprData = new ExprData();
+    Datable leftExprData = new ExprData();
+    Datable rightExprData = new ExprData();
 }
 {
     leftExprData = expr1_data()
@@ -254,48 +254,125 @@ ExprData expr_data() :
     }
 }
 
-ExprData expr1_data() :
+Datable expr1_data() :
 {
+    ExprData topExprData = new ExprData();
+    Datable leftExprData = new ExprData();
+    Datable rightExprData = new ExprData();
 }
 {
+    leftExprData = expr2_data()
+    (
+        < LOGIC_AND> { topExprData.setOp(ExprData.ExprOp.LogicAndOp); }
+        rightExprData = expr2_data()
+        {
+            topExprData.setLeftData(leftExprData);
+            topExprData.setRightData(rightExprData);
+            leftExprData = topExprData;
+        }
+    )*
     {
-        return null;
+        return topExprData;
     }
 }
 
-ExprData expr2_data() :
+Datable expr2_data() :
 {
+    ExprData topExprData = new ExprData();
+    Datable leftExprData = new ExprData();
+    Datable rightExprData = new ExprData();
 }
 {
+    leftExprData = expr3_data()
+    (
+        (   < LEFT > { topExprData.setOp(ExprData.ExprOp.LeftOp); }
+        |   < RIGHT > { topExprData.setOp(ExprData.ExprOp.RightOp); }
+        |   < LEFT_EQUAL > { topExprData.setOp(ExprData.ExprOp.LeftEqualOp); }
+        |   < RIGHT_EQUAL > { topExprData.setOp(ExprData.ExprOp.RightEqualOp); }
+        |   < LOGIC_EQUAL > { topExprData.setOp(ExprData.ExprOp.LogicEqualOp);}
+        |   < LOGIC_NOT > { topExprData.setOp(ExprData.ExprOp.LogicNotOp);}
+         )
+        rightExprData = expr3_data()
+        {
+            topExprData.setLeftData(leftExprData);
+            topExprData.setRightData(rightExprData);
+            leftExprData = topExprData;
+        }
+    )*
     {
-        return null;
+        return topExprData;
     }
 }
 
-ExprData expr3_data() :
+Datable expr3_data() :
 {
+    ExprData topExprData = new ExprData();
+    Datable leftExprData;
+    Datable rightExprData = null;
 }
 {
+    leftExprData = expr4_data()
+    (
+        (   < PLUS > { topExprData.setOp(ExprData.ExprOp.AddOp); }
+        |   < MINUS > { topExprData.setOp(ExprData.ExprOp.SubOp); }
+        )
+        rightExprData = expr4_data()
+        {
+            topExprData.setLeftData(leftExprData);
+            topExprData.setRightData(rightExprData);
+            leftExprData = new SymbolData();
+            leftExprData.Push(topExprData);
+        }
+    )*
     {
-        return null;
+        if (rightExprData != null) {
+            return topExprData;
+        } else {
+            return leftExprData;
+        }
     }
 }
 
-ExprData expr4_data() :
+Datable expr4_data() :
 {
+    ExprData topExprData = new ExprData();
+    Datable leftExprData;
+    Datable rightExprData = null;
 }
 {
+    leftExprData = term()
+    (
+        (   < MULT > { topExprData.setOp(ExprData.ExprOp.MulOp); }
+        |   < DIV > { topExprData.setOp(ExprData.ExprOp.DivOp); }
+        )
+        rightExprData = term()
+        {
+            topExprData.setLeftData(leftExprData);
+            topExprData.setRightData(rightExprData);
+            leftExprData = new SymbolData();
+            leftExprData.Push(topExprData);
+        }
+    )*
     {
-        return null;
+        if (rightExprData != null) {
+            return topExprData;
+        } else {
+            return leftExprData;
+        }
     }
 }
 
-ExprData term() :
+Datable term() :
 {
+    Datable data;
 }
 {
+    (    data = terminal_data()
+    |    data = symbol_data()
+    |    < LBR > data = expr_data() < RBR >
+    )
     {
-        return null;
+        return data;
     }
 }
 
@@ -433,13 +510,14 @@ BlockFlow block_flow() : // block 不能嵌套
 }
 {
     // 语法：block() = < LCBR > (flowing)* < RCBR > [ < EXLM > ]
-    < LCBR > { Core.setEagerFlowing(false); SymbolTable.EnterBlock(null); blockFlow = new BlockFlow();}
+    < LCBR > { Core.setEager(false); SymbolTable.EnterBlock(null); blockFlow = new BlockFlow();}
 //    ( import_stmt() )*
     (
-        topFlow = flowing() { blockFlow.addFlow(topFlow); }
+        LOOKAHEAD(3) topFlow = flowing() { blockFlow.addFlow(topFlow); }
+    |   topFlow = matching() { blockFlow.addFlow(topFlow); }
     )*
 //    stmts()
-    < RCBR > { Core.setEagerFlowing(true); SymbolTable.ExitBlock(); }
+    < RCBR > { Core.setEager(true); SymbolTable.ExitBlock(); }
 //    [ < EXLM > { blockFlow.Flowing(); } ]
     {
 //        System.err.println("blcokFlow: "+blockFlow);
@@ -500,7 +578,7 @@ Flowable flowing() :
     {
 //        System.out.println("Root Symbol Table: " + SymbolTable.CurrentSymbolTable());
 //        System.out.println("before flowing: " + topFlow);
-        if (Core.isEagerFlowing()) {
+        if (Core.isEager()) {
 //            System.out.println("eager! flowing");
             topFlow.Flowing();
         }
@@ -511,21 +589,30 @@ Flowable flowing() :
     }
 }
 
-void matching() :
+Flowable matching() :
 {
+    Flowable topFlow = new ListFlow();
     Flowable leftFlow = new ListFlow();
     Flowable rightFlow = new ListFlow();
 }
 {
-    // 语法：match_flow() = flow() < MATCHING > flow()
-    leftFlow = flow()
-    < MATCHING >
+    // 语法：matching() = flow() < rightFlow > flow()
+    topFlow = flow()
+    {
+        leftFlow = topFlow;
+    }
+    (< MATCHING >
     rightFlow = flow()
     {
         leftFlow.SetNext(rightFlow);
+        leftFlow = rightFlow;
     }
+    )*
     {
-        leftFlow.Matching();
+        if (Core.isEager()) {
+            topFlow.Matching();
+        }
+        return topFlow;
     }
 }
 
@@ -610,7 +697,7 @@ void stmt() :
 {
 }
 {
-    flowing() | def_func_stmt() | import_stmt() //| block_flow()
+    LOOKAHEAD(3) flowing() | matching() | def_func_stmt() | import_stmt() //| block_flow()
     {
         return;
     }

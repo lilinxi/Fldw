@@ -8,7 +8,14 @@ public class SymbolData extends Data {
     private Object value;
     private String symbol;
 
+    public SymbolData() {
+        this.type = null;
+        this.value = null;
+        this.symbol = null;
+    }
+
     public SymbolData(String symbol) {
+        super();
         this.symbol = symbol;
     }
 
