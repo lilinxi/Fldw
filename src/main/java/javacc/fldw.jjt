@@ -221,6 +221,7 @@ ExprData expr_data_tmp() :
         |   < RIGHT > { exprData.setOp(ExprData.ExprOp.RightOp); }
         |   < LEFT_EQUAL >
         |   < RIGHT_EQUAL >
+        |   < LOGIC_EQUAL > { exprData.setOp(ExprData.ExprOp.LogicEqualOp); }
         |   < LOGIC_NOT > { exprData.setOp(ExprData.ExprOp.LogicNotOp); }
     )
     rightData = data()
@@ -471,14 +472,16 @@ ForFlow for_flow() :
 FuncFlow func_flow() :
 {
     Token funcSymbol;
-    ListFlow paramFlow = new ListFlow();
+    ListFlow paramFlow = null;
     FuncFlow funcFlow;
 }
 {
     funcSymbol = < SYMBOL > < LBR > [ paramFlow = list_flow()] < RBR >
     {
         funcFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(funcSymbol.image).assertGetFuncFlow();
-        funcFlow.setParamFlow(paramFlow);
+        if (paramFlow != null) {
+            funcFlow.setParamFlow(paramFlow);
+        }
         return funcFlow;
     }
 }
@@ -510,14 +513,14 @@ BlockFlow block_flow() : // block 不能嵌套
 }
 {
     // 语法：block() = < LCBR > (flowing)* < RCBR > [ < EXLM > ]
-    < LCBR > { Core.setEager(false); SymbolTable.EnterBlock(null); blockFlow = new BlockFlow();}
+    < LCBR > { Core.AddEager(); SymbolTable.EnterBlock(null); blockFlow = new BlockFlow();}
 //    ( import_stmt() )*
     (
 //        LOOKAHEAD(3) topFlow = flowing() { blockFlow.addFlow(topFlow); }
        topFlow = flowing() { blockFlow.addFlow(topFlow); }
     )*
 //    stmts()
-    < RCBR > { Core.setEager(true); SymbolTable.ExitBlock(); }
+    < RCBR > { Core.SubEager(); SymbolTable.ExitBlock(); }
 //    [ < EXLM > { blockFlow.Flowing(); } ]
     {
 //        System.err.println("blcokFlow: "+blockFlow);
@@ -582,7 +585,7 @@ Flowable flowing() :
     {
 //        System.out.println("Root Symbol Table: " + SymbolTable.CurrentSymbolTable());
 //        System.out.println("before flowing: " + topFlow);
-        if (Core.isEager()) {
+        if (Core.IsEager()) {
 //            System.out.println("eager! flowing");
             topFlow.Flowing();
         }
@@ -614,7 +617,7 @@ Flowable matching() :
     }
     )*
     {
-        if (Core.isEager()) {
+        if (Core.IsEager()) {
             topFlow.Matching();
         }
         return topFlow;
@@ -672,7 +675,8 @@ FuncFlow make_func_flow() : // 函数就是一个有参数和符号关联的 Blo
     < RBR >
     block_flow = block_flow() { SymbolTable.ExitBlock(); }
     {
-        return new FuncFlow(param_flow, block_flow);
+        FuncFlow f = new FuncFlow(param_flow, block_flow);
+        return f;
     }
 }
 

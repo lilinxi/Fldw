@@ -1288,6 +1288,8 @@ public class UnitTest {
                     import std.Std
                     function sort() {
                         in | [head;tail]
+                        [head] | stdout
+                        tail | stdout
                         if ( head != null ) { 
                             ["head != null is true"] | stdout
                         } else {
@@ -1299,9 +1301,10 @@ public class UnitTest {
                             ["head == null is false"] | stdout
                         }
                     }
-                    [1,2,3] | sort()
+                    [5, 6, 3, 2, 7, 8] | sort()
+                    [5] | sort()
+                    [] | sort()
                     """);
-            System.out.println(SymbolTable.CurrentSymbolTable());
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -1309,24 +1312,268 @@ public class UnitTest {
         System.setOut(System.out);
 
         assertEquals("""
-                stdout: SymbolData{type=Int, value=1, symbol='a'}
-                stdout: SymbolData{type=Int, value=2, symbol='b'}
-                stdout: SymbolData{type=null, value=null, symbol='c'}
-                stdout: SymbolData{type=Int, value=1, symbol='a'}
-                stdout: SymbolData{type=Int, value=2, symbol='b'}
-                stdout: SymbolData{type=Int, value=3, symbol='c'}
-                stdout: SymbolData{type=null, value=null, symbol='a'}
-                stdout: SymbolData{type=null, value=null, symbol='b'}
-                stdout: SymbolData{type=null, value=null, symbol='c'}
+                stdout: SymbolData{type=Int, value=5, symbol='head'}
+                stdout: TerminalData{type=Int, value=6}
+                stdout: TerminalData{type=Int, value=3}
+                stdout: TerminalData{type=Int, value=2}
+                stdout: TerminalData{type=Int, value=7}
+                stdout: TerminalData{type=Int, value=8}
+                stdout: TerminalData{type=String, value="head != null is true"}
+                stdout: TerminalData{type=String, value="head == null is false"}
+                stdout: SymbolData{type=Int, value=5, symbol='head'}
+                stdout: TerminalData{type=String, value="head != null is true"}
+                stdout: TerminalData{type=String, value="head == null is false"}
+                stdout: SymbolData{type=null, value=null, symbol='head'}
+                stdout: TerminalData{type=String, value="head != null is false"}
+                stdout: TerminalData{type=String, value="head == null is true"}
                 """, output.toString());
         assertEquals("""
                         SymbolTable{
                         symbol='root', parentSymbolTable=, SymbolItemTreeMap=
                         in: SymbolItem{symbol='in', type=Flow, value=ListFlow{symbol='in', dataList=[], nextFlow=null}}
                         out: SymbolItem{symbol='out', type=Flow, value=ListFlow{symbol='out', dataList=[], nextFlow=null}}
+                        sort: SymbolItem{symbol='sort', type=Function, value=( ) { in | [ head ; tail ] [ head ] | stdout tail | stdout if ( head != null ) { [ "head != null is true" ] | stdout } else { [ "head != null is false" ] | stdout } if ( head == null ) { [ "head == null is true" ] | stdout } else { [ "head == null is false" ] | stdout } } }
                         stdin: SymbolItem{symbol='stdin', type=Flow, value=StdInFlow{cacheFlow=ListFlow{symbol='null', dataList=[], nextFlow=null}}}
                         stdout: SymbolItem{symbol='stdout', type=Flow, value=StdOutFlow{}}
+                        tmp0: SymbolItem{symbol='tmp0', type=BlockSymbolTable, value=SymbolTable{
+                        symbol='tmp0', parentSymbolTable=root, SymbolItemTreeMap=
+                        |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{symbol='in', dataList=[], nextFlow=null}}
+                        |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{symbol='out', dataList=[], nextFlow=null}}
+                        |-- tmp1: SymbolItem{symbol='tmp1', type=BlockSymbolTable, value=SymbolTable{
+                        symbol='tmp1', parentSymbolTable=tmp0, SymbolItemTreeMap=
+                        |-- head: SymbolItem{symbol='head', type=Data, value=SymbolData{type=Int, value=5, symbol='head'}}
+                        |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{symbol='in', dataList=[TerminalData{type=Int, value=5}, TerminalData{type=Int, value=6}, TerminalData{type=Int, value=3}, TerminalData{type=Int, value=2}, TerminalData{type=Int, value=7}, TerminalData{type=Int, value=8}], nextFlow=HeadTailFlow{headData=SymbolData{type=Int, value=5, symbol='head'}, tailDataList=ListFlow{symbol='tail', dataList=[TerminalData{type=Int, value=6}, TerminalData{type=Int, value=3}, TerminalData{type=Int, value=2}, TerminalData{type=Int, value=7}, TerminalData{type=Int, value=8}], nextFlow=StdOutFlow{}}, setHead=false}}}
+                        |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{symbol='out', dataList=[], nextFlow=null}}
+                        |-- tail: SymbolItem{symbol='tail', type=Flow, value=ListFlow{symbol='tail', dataList=[TerminalData{type=Int, value=6}, TerminalData{type=Int, value=3}, TerminalData{type=Int, value=2}, TerminalData{type=Int, value=7}, TerminalData{type=Int, value=8}], nextFlow=StdOutFlow{}}}
+                        |-- tmp2: SymbolItem{symbol='tmp2', type=BlockSymbolTable, value=SymbolTable{
+                        symbol='tmp2', parentSymbolTable=tmp1, SymbolItemTreeMap=
+                        |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{symbol='in', dataList=[], nextFlow=null}}
+                        |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{symbol='out', dataList=[], nextFlow=null}}
                         }
+                        }
+                        |-- tmp3: SymbolItem{symbol='tmp3', type=BlockSymbolTable, value=SymbolTable{
+                        symbol='tmp3', parentSymbolTable=tmp1, SymbolItemTreeMap=
+                        |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{symbol='in', dataList=[], nextFlow=null}}
+                        |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{symbol='out', dataList=[], nextFlow=null}}
+                        }
+                        }
+                        |-- tmp4: SymbolItem{symbol='tmp4', type=BlockSymbolTable, value=SymbolTable{
+                        symbol='tmp4', parentSymbolTable=tmp1, SymbolItemTreeMap=
+                        |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{symbol='in', dataList=[], nextFlow=null}}
+                        |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{symbol='out', dataList=[], nextFlow=null}}
+                        }
+                        }
+                        |-- tmp5: SymbolItem{symbol='tmp5', type=BlockSymbolTable, value=SymbolTable{
+                        symbol='tmp5', parentSymbolTable=tmp1, SymbolItemTreeMap=
+                        |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{symbol='in', dataList=[], nextFlow=null}}
+                        |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{symbol='out', dataList=[], nextFlow=null}}
+                        }
+                        }
+                        }
+                        }
+                        }
+                        }
+                        tmp12: SymbolItem{symbol='tmp12', type=BlockSymbolTable, value=SymbolTable{
+                        symbol='tmp12', parentSymbolTable=root, SymbolItemTreeMap=
+                        |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{symbol='in', dataList=[], nextFlow=null}}
+                        |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{symbol='out', dataList=[], nextFlow=null}}
+                        |-- tmp13: SymbolItem{symbol='tmp13', type=BlockSymbolTable, value=SymbolTable{
+                        symbol='tmp13', parentSymbolTable=tmp12, SymbolItemTreeMap=
+                        |-- head: SymbolItem{symbol='head', type=Data, value=SymbolData{type=null, value=null, symbol='head'}}
+                        |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{symbol='in', dataList=[], nextFlow=HeadTailFlow{headData=SymbolData{type=null, value=null, symbol='head'}, tailDataList=ListFlow{symbol='tail', dataList=[], nextFlow=StdOutFlow{}}, setHead=true}}}
+                        |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{symbol='out', dataList=[], nextFlow=null}}
+                        |-- tail: SymbolItem{symbol='tail', type=Flow, value=ListFlow{symbol='tail', dataList=[], nextFlow=StdOutFlow{}}}
+                        |-- tmp14: SymbolItem{symbol='tmp14', type=BlockSymbolTable, value=SymbolTable{
+                        symbol='tmp14', parentSymbolTable=tmp13, SymbolItemTreeMap=
+                        |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{symbol='in', dataList=[], nextFlow=null}}
+                        |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{symbol='out', dataList=[], nextFlow=null}}
+                        }
+                        }
+                        |-- tmp15: SymbolItem{symbol='tmp15', type=BlockSymbolTable, value=SymbolTable{
+                        symbol='tmp15', parentSymbolTable=tmp13, SymbolItemTreeMap=
+                        |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{symbol='in', dataList=[], nextFlow=null}}
+                        |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{symbol='out', dataList=[], nextFlow=null}}
+                        }
+                        }
+                        |-- tmp16: SymbolItem{symbol='tmp16', type=BlockSymbolTable, value=SymbolTable{
+                        symbol='tmp16', parentSymbolTable=tmp13, SymbolItemTreeMap=
+                        |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{symbol='in', dataList=[], nextFlow=null}}
+                        |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{symbol='out', dataList=[], nextFlow=null}}
+                        }
+                        }
+                        |-- tmp17: SymbolItem{symbol='tmp17', type=BlockSymbolTable, value=SymbolTable{
+                        symbol='tmp17', parentSymbolTable=tmp13, SymbolItemTreeMap=
+                        |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{symbol='in', dataList=[], nextFlow=null}}
+                        |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{symbol='out', dataList=[], nextFlow=null}}
+                        }
+                        }
+                        }
+                        }
+                        }
+                        }
+                        tmp6: SymbolItem{symbol='tmp6', type=BlockSymbolTable, value=SymbolTable{
+                        symbol='tmp6', parentSymbolTable=root, SymbolItemTreeMap=
+                        |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{symbol='in', dataList=[], nextFlow=null}}
+                        |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{symbol='out', dataList=[], nextFlow=null}}
+                        |-- tmp7: SymbolItem{symbol='tmp7', type=BlockSymbolTable, value=SymbolTable{
+                        symbol='tmp7', parentSymbolTable=tmp6, SymbolItemTreeMap=
+                        |-- head: SymbolItem{symbol='head', type=Data, value=SymbolData{type=Int, value=5, symbol='head'}}
+                        |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{symbol='in', dataList=[TerminalData{type=Int, value=5}], nextFlow=HeadTailFlow{headData=SymbolData{type=Int, value=5, symbol='head'}, tailDataList=ListFlow{symbol='tail', dataList=[], nextFlow=StdOutFlow{}}, setHead=false}}}
+                        |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{symbol='out', dataList=[], nextFlow=null}}
+                        |-- tail: SymbolItem{symbol='tail', type=Flow, value=ListFlow{symbol='tail', dataList=[], nextFlow=StdOutFlow{}}}
+                        |-- tmp10: SymbolItem{symbol='tmp10', type=BlockSymbolTable, value=SymbolTable{
+                        symbol='tmp10', parentSymbolTable=tmp7, SymbolItemTreeMap=
+                        |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{symbol='in', dataList=[], nextFlow=null}}
+                        |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{symbol='out', dataList=[], nextFlow=null}}
+                        }
+                        }
+                        |-- tmp11: SymbolItem{symbol='tmp11', type=BlockSymbolTable, value=SymbolTable{
+                        symbol='tmp11', parentSymbolTable=tmp7, SymbolItemTreeMap=
+                        |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{symbol='in', dataList=[], nextFlow=null}}
+                        |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{symbol='out', dataList=[], nextFlow=null}}
+                        }
+                        }
+                        |-- tmp8: SymbolItem{symbol='tmp8', type=BlockSymbolTable, value=SymbolTable{
+                        symbol='tmp8', parentSymbolTable=tmp7, SymbolItemTreeMap=
+                        |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{symbol='in', dataList=[], nextFlow=null}}
+                        |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{symbol='out', dataList=[], nextFlow=null}}
+                        }
+                        }
+                        |-- tmp9: SymbolItem{symbol='tmp9', type=BlockSymbolTable, value=SymbolTable{
+                        symbol='tmp9', parentSymbolTable=tmp7, SymbolItemTreeMap=
+                        |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{symbol='in', dataList=[], nextFlow=null}}
+                        |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{symbol='out', dataList=[], nextFlow=null}}
+                        }
+                        }
+                        }
+                        }
+                        }
+                        }
+                        }
+                        """,
+                SymbolTable.CurrentSymbolTable().toString());
+    }
+
+    @Test
+    public void TestQuickSortExample2() {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+
+        try {
+            SymbolTable.Clear();
+            FldwCompiler.parse("""
+                    import std.Std
+                    function sort() {
+                        in | [head;tail]
+                        if ( head != null ) { 
+                            for ( tail -> tmp) {
+                                [tmp] | stdout
+                            }
+                        }
+                    }
+                    [5, 6, 3, 2, 7, 8] | sort()
+                    """);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        System.setOut(System.out);
+
+        assertEquals("""
+                stdout: SymbolData{type=Int, value=6, symbol='tmp'}
+                stdout: SymbolData{type=Int, value=3, symbol='tmp'}
+                stdout: SymbolData{type=Int, value=2, symbol='tmp'}
+                stdout: SymbolData{type=Int, value=7, symbol='tmp'}
+                stdout: SymbolData{type=Int, value=8, symbol='tmp'}
+                """, output.toString());
+        assertEquals("""
+                        SymbolTable{
+                        symbol='root', parentSymbolTable=, SymbolItemTreeMap=
+                        in: SymbolItem{symbol='in', type=Flow, value=ListFlow{symbol='in', dataList=[], nextFlow=null}}
+                        out: SymbolItem{symbol='out', type=Flow, value=ListFlow{symbol='out', dataList=[], nextFlow=null}}
+                        sort: SymbolItem{symbol='sort', type=Function, value=( ) { in | [ head ; tail ] if ( head != null ) { for ( tail -> tmp ) { [ tmp ] | stdout } } } }
+                        stdin: SymbolItem{symbol='stdin', type=Flow, value=StdInFlow{cacheFlow=ListFlow{symbol='null', dataList=[], nextFlow=null}}}
+                        stdout: SymbolItem{symbol='stdout', type=Flow, value=StdOutFlow{}}
+                        tmp0: SymbolItem{symbol='tmp0', type=BlockSymbolTable, value=SymbolTable{
+                        symbol='tmp0', parentSymbolTable=root, SymbolItemTreeMap=
+                        |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{symbol='in', dataList=[], nextFlow=null}}
+                        |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{symbol='out', dataList=[], nextFlow=null}}
+                        |-- tmp1: SymbolItem{symbol='tmp1', type=BlockSymbolTable, value=SymbolTable{
+                        symbol='tmp1', parentSymbolTable=tmp0, SymbolItemTreeMap=
+                        |-- head: SymbolItem{symbol='head', type=Data, value=SymbolData{type=Int, value=5, symbol='head'}}
+                        |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{symbol='in', dataList=[TerminalData{type=Int, value=5}, TerminalData{type=Int, value=6}, TerminalData{type=Int, value=3}, TerminalData{type=Int, value=2}, TerminalData{type=Int, value=7}, TerminalData{type=Int, value=8}], nextFlow=HeadTailFlow{headData=SymbolData{type=Int, value=5, symbol='head'}, tailDataList=ListFlow{symbol='tail', dataList=[], nextFlow=null}, setHead=false}}}
+                        |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{symbol='out', dataList=[], nextFlow=null}}
+                        |-- tail: SymbolItem{symbol='tail', type=Flow, value=ListFlow{symbol='tail', dataList=[], nextFlow=null}}
+                        |-- tmp2: SymbolItem{symbol='tmp2', type=BlockSymbolTable, value=SymbolTable{
+                        symbol='tmp2', parentSymbolTable=tmp1, SymbolItemTreeMap=
+                        |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{symbol='in', dataList=[], nextFlow=null}}
+                        |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{symbol='out', dataList=[], nextFlow=null}}
+                        |-- tmp: SymbolItem{symbol='tmp', type=Data, value=SymbolData{type=Int, value=8, symbol='tmp'}}
+                        |-- tmp3: SymbolItem{symbol='tmp3', type=BlockSymbolTable, value=SymbolTable{
+                        symbol='tmp3', parentSymbolTable=tmp2, SymbolItemTreeMap=
+                        |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{symbol='in', dataList=[], nextFlow=null}}
+                        |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{symbol='out', dataList=[], nextFlow=null}}
+                        }
+                        }
+                        }
+                        }
+                        }
+                        }
+                        }
+                        }
+                        }
+                        """,
+                SymbolTable.CurrentSymbolTable().toString());
+    }
+
+    @Test
+    public void TestQuickSortExample3() {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+
+        try {
+            SymbolTable.Clear();
+            FldwCompiler.parse("""
+                    import std.Std
+                    function sort() {
+                        in | [head;tail]
+                        if ( head != null ) { 
+                            [] | leftHead
+                            [] | rightHead
+                            tail | stdout
+                            for ( tail -> tmp) {
+                                [tmp] | stdout
+//                                if ( tmp < head ) {
+//                                    [tmp] | leftHead
+//                                    ["if"] | stdout
+//                                } else {
+//                                    [tmp] | rightHead
+//                                    ["else"] | stdout
+//                                }
+                            }
+//                            leftHead | stdout
+//                            ["==="] | stdout
+//                            rightHead | stdout
+                        }
+                    }
+                    [5, 6, 3, 2, 7, 8] | sort()
+                    """);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        System.setOut(System.out);
+
+        System.err.println(SymbolTable.CurrentSymbolTable());
+
+        assertEquals("""
+                stdout: SymbolData{type=Int, value=6, symbol='tmp'}
+                stdout: SymbolData{type=Int, value=3, symbol='tmp'}
+                stdout: SymbolData{type=Int, value=2, symbol='tmp'}
+                stdout: SymbolData{type=Int, value=7, symbol='tmp'}
+                stdout: SymbolData{type=Int, value=8, symbol='tmp'}
+                """, output.toString());
+        assertEquals("""
                         """,
                 SymbolTable.CurrentSymbolTable().toString());
     }

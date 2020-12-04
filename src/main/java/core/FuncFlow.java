@@ -10,29 +10,33 @@ public class FuncFlow extends Flow {
     private SymbolData tmpData;
 
     public FuncFlow(ListFlow paramFlow, BlockFlow blockFlow) {
+//        System.err.println("1");
         this.paramFlow = paramFlow;
         this.blockFlow = blockFlow;
     }
 
-    public FuncFlow(String symbol, ListFlow paramFlow, BlockFlow blockFlow) {
-        this.symbol = symbol;
-        this.paramFlow = paramFlow;
-        this.blockFlow = blockFlow;
-    }
-
-    public FuncFlow(FuncFlow funcFlow, ListFlow paramFlow) {
-        this.symbol = funcFlow.symbol;
-        this.paramFlow = funcFlow.paramFlow;
-        this.blockFlow = funcFlow.blockFlow;
-        paramFlow.SetNextFlowing(this.paramFlow);
-        paramFlow.SetFlowOp(FlowOp.Matching);
-        paramFlow.Flowing();
-    }
+//    public FuncFlow(String symbol, ListFlow paramFlow, BlockFlow blockFlow) {
+//        System.err.println("2");
+//        this.symbol = symbol;
+//        this.paramFlow = paramFlow;
+//        this.blockFlow = blockFlow;
+//    }
+//
+//    public FuncFlow(FuncFlow funcFlow, ListFlow paramFlow) {
+//        System.err.println("3");
+//        this.symbol = funcFlow.symbol;
+//        this.paramFlow = funcFlow.paramFlow;
+//        this.blockFlow = funcFlow.blockFlow;
+//        paramFlow.SetNextFlowing(this.paramFlow);
+//        paramFlow.SetFlowOp(FlowOp.Matching);
+//        paramFlow.Flowing();
+//    }
 
     public void setParamFlow(ListFlow paramFlow) {
-        paramFlow.SetNextFlowing(this.paramFlow);
-        paramFlow.SetFlowOp(FlowOp.Matching);
-        paramFlow.Flowing();
+        if (!paramFlow.Match(this.paramFlow)) {
+            throw new RuntimeException();
+        }
+//        System.out.println("===");
     }
 
     @Override
@@ -98,6 +102,7 @@ public class FuncFlow extends Flow {
 
     @Override
     public boolean Flowing() {
+//        System.out.println("begin func=====");
 //        System.err.println("this: "+this);
 //        System.err.println("flowing: "+this.blockFlow);
         return this.blockFlow.Flowing();

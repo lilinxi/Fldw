@@ -31,6 +31,12 @@ public class ListFlow extends Flow {
 
     @Override
     public boolean Push(Datable data) {
+//        SymbolData tmp = new SymbolData();
+//        tmp.Push(data);
+//        System.err.println("---");
+//        System.err.println(data);
+//        System.err.println(tmp);
+//        System.err.println("---");
         return dataList.add(data);
     }
 
@@ -47,6 +53,16 @@ public class ListFlow extends Flow {
     @Override
     public boolean Push(int index, Datable data) {
         return this.Get(index).Push(data);
+    }
+
+    @Override
+    public boolean Match(Flowable flow) {
+        int minSize = Math.min(this.inLen(), flow.inLen());
+        for (int i = 0; i < minSize; i++) {
+            boolean success = flow.Push(i, this.Get(i));
+            if (!success) return false;
+        }
+        return true;
     }
 
     @Override

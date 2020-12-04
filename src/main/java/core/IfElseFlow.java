@@ -107,11 +107,13 @@ public class IfElseFlow extends Flow {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new RuntimeException("type mismatch");
         }
+        boolean ret;
         if (conditionData.GetValue().equals(true)) {
-            return this.trueFlow.Flowing();
+            ret= this.trueFlow.Flowing();
         } else {
-            return this.falseFlow.Flowing();
+            ret= this.falseFlow.Flowing();
         }
+        return ret;
     }
 
     @Override

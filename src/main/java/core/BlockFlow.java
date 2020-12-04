@@ -71,8 +71,11 @@ public class BlockFlow extends Flow {
 
     @Override
     public boolean Flowing() {
+//        System.out.println(this.flowList);
         for (Flowable flow : this.flowList) {
+//            System.out.println("flow: " + flow);
             boolean success = flow.Flowing();
+//            System.out.println("end flow: " + flow.GetSymbol());
             if (!success) return false;
         }
         return true;

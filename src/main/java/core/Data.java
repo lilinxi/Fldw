@@ -36,4 +36,15 @@ public class Data extends TokenList implements Datable {
     public boolean SetValue(Object value) {
         throw new RuntimeException("no impl, wrong call");
     }
+
+    @Override
+    public boolean equals(Datable data) {
+        if (this.GetType() == null && data.GetType() == null) {
+            return true;
+        } else if (this.GetType() == data.GetType() && this.GetValue() == data.GetValue()) {
+            return true;
+        }else {
+            return false;
+        }
+    }
 }

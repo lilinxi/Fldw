@@ -33,6 +33,11 @@ public class Flow extends TokenList implements Flowable {
     }
 
     @Override
+    public boolean Match(Flowable flow) {
+        throw new RuntimeException("no impl, wrong call");
+    }
+
+    @Override
     public Datable Pop() {
         throw new RuntimeException("no impl, wrong call");
     }

@@ -107,6 +107,11 @@ exprData.setOp(ExprData.ExprOp.RightOp);
       jj_consume_token(RIGHT_EQUAL);
       break;
       }
+    case LOGIC_EQUAL:{
+      jj_consume_token(LOGIC_EQUAL);
+exprData.setOp(ExprData.ExprOp.LogicEqualOp);
+      break;
+      }
     case LOGIC_NOT:{
       jj_consume_token(LOGIC_NOT);
 exprData.setOp(ExprData.ExprOp.LogicNotOp);
@@ -483,7 +488,7 @@ forFlow = new ForFlow(iterFlow, iterSymbolData, forBlockFlow);
 }
 
   final public FuncFlow func_flow() throws ParseException {Token funcSymbol;
-    ListFlow paramFlow = new ListFlow();
+    ListFlow paramFlow = null;
     FuncFlow funcFlow;
     funcSymbol = jj_consume_token(SYMBOL);
     jj_consume_token(LBR);
@@ -498,7 +503,9 @@ forFlow = new ForFlow(iterFlow, iterSymbolData, forBlockFlow);
     }
     jj_consume_token(RBR);
 funcFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(funcSymbol.image).assertGetFuncFlow();
-        funcFlow.setParamFlow(paramFlow);
+        if (paramFlow != null) {
+            funcFlow.setParamFlow(paramFlow);
+        }
         {if ("" != null) return funcFlow;}
     throw new Error("Missing return statement in function");
 }
@@ -520,7 +527,7 @@ tailListFlow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(tailListFlowSymbo
   final public BlockFlow block_flow() throws ParseException {BlockFlow blockFlow;
     Flowable topFlow;
     jj_consume_token(LCBR);
-Core.setEager(false); SymbolTable.EnterBlock(null); blockFlow = new BlockFlow();
+Core.AddEager(); SymbolTable.EnterBlock(null); blockFlow = new BlockFlow();
     label_7:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -542,7 +549,7 @@ Core.setEager(false); SymbolTable.EnterBlock(null); blockFlow = new BlockFlow();
 blockFlow.addFlow(topFlow);
     }
     jj_consume_token(RCBR);
-Core.setEager(true); SymbolTable.ExitBlock();
+Core.SubEager(); SymbolTable.ExitBlock();
 //        System.err.println("blcokFlow: "+blockFlow);
         {if ("" != null) return blockFlow;}
     throw new Error("Missing return statement in function");
@@ -635,7 +642,7 @@ leftFlow.SetNextFlowing(rightFlow);
     }
 //        System.out.println("Root Symbol Table: " + SymbolTable.CurrentSymbolTable());
 //        System.out.println("before flowing: " + topFlow);
-        if (Core.isEager()) {
+        if (Core.IsEager()) {
 //            System.out.println("eager! flowing");
             topFlow.Flowing();
         }
@@ -669,7 +676,7 @@ leftFlow.SetNextFlowing(rightFlow);
 leftFlow.SetNextMatching(rightFlow);
         leftFlow = rightFlow;
     }
-if (Core.isEager()) {
+if (Core.IsEager()) {
             topFlow.Matching();
         }
         {if ("" != null) return topFlow;}
@@ -723,7 +730,8 @@ SymbolTable.EnterBlock(null);
     jj_consume_token(RBR);
     block_flow = block_flow();
 SymbolTable.ExitBlock();
-{if ("" != null) return new FuncFlow(param_flow, block_flow);}
+FuncFlow f = new FuncFlow(param_flow, block_flow);
+        {if ("" != null) return f;}
     throw new Error("Missing return statement in function");
 }
 
@@ -815,26 +823,7 @@ try {
     finally { jj_save(1, xla); }
   }
 
-  private boolean jj_3R_func_flow_478_5_11()
- {
-    if (jj_scan_token(SYMBOL)) return true;
-    if (jj_scan_token(LBR)) return true;
-    return false;
-  }
-
-  private boolean jj_3_2()
- {
-    if (jj_3R_head_tail_flow_495_5_12()) return true;
-    return false;
-  }
-
-  private boolean jj_3_1()
- {
-    if (jj_3R_func_flow_478_5_11()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_head_tail_flow_495_5_12()
+  private boolean jj_3R_head_tail_flow_498_5_12()
  {
     if (jj_scan_token(LSBR)) return true;
     if (jj_3R_symbol_data_197_5_13()) return true;
@@ -845,6 +834,25 @@ try {
   private boolean jj_3R_symbol_data_197_5_13()
  {
     if (jj_scan_token(SYMBOL)) return true;
+    return false;
+  }
+
+  private boolean jj_3_2()
+ {
+    if (jj_3R_head_tail_flow_498_5_12()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_func_flow_479_5_11()
+ {
+    if (jj_scan_token(SYMBOL)) return true;
+    if (jj_scan_token(LBR)) return true;
+    return false;
+  }
+
+  private boolean jj_3_1()
+ {
+    if (jj_3R_func_flow_479_5_11()) return true;
     return false;
   }
 
@@ -867,7 +875,7 @@ try {
 	   jj_la1_init_1();
 	}
 	private static void jj_la1_init_0() {
-	   jj_la1_0 = new int[] {0x0,0x79000000,0x4000000,0x2000000,0x79800000,0x79800000,0x30000,0x30000,0xc0000,0xc0000,0x200,0x0,0x100,0x100,0x0,0x4000,0x80005000,0x80005000,0x0,0x0,0x0,0x4000,0x80005000,0x80005000,};
+	   jj_la1_0 = new int[] {0x0,0x79800000,0x4000000,0x2000000,0x79800000,0x79800000,0x30000,0x30000,0xc0000,0xc0000,0x200,0x0,0x100,0x100,0x0,0x4000,0x80005000,0x80005000,0x0,0x0,0x0,0x4000,0x80005000,0x80005000,};
 	}
 	private static void jj_la1_init_1() {
 	   jj_la1_1 = new int[] {0x18700,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x38700,0x38700,0x38700,0x0,0x1,0x0,0x20006,0x20006,0x30,0x30,0x20,0x0,0x2004e,0x2004e,};

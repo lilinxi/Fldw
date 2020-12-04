@@ -63,13 +63,28 @@ public class ForFlow extends Flow {
 
     @Override
     public boolean Flowing() {
-        while (this.iterFlow.outLen() > 0) {
-//            System.err.println(this.iterFlow);
+        for (int i = 0; i < this.iterFlow.outLen(); i++) {
+            this.iterSymbolData.Push(this.iterFlow.Get(i));
+//            System.err.println("1");
+//            System.err.println(this.iterFlow.Get(i));
+//            System.err.println(this.iterSymbolData);
 //            System.err.println(this.forBlockFlow);
-            this.iterSymbolData.Push(this.iterFlow.Pop());
             boolean success = this.forBlockFlow.Flowing();
+//            System.err.println("2");
             if (!success) return false;
+//            boolean success = this.nextFlowing.Push(this.Get(i));
+//            if (!success) return false;
         }
+//        while (this.iterFlow.outLen() > 0) {
+////            System.err.println(this.iterFlow);
+////            System.err.println(this.forBlockFlow);
+//            System.err.println("1");
+//            System.err.println(this.forBlockFlow);
+//            this.iterSymbolData.Push(this.iterFlow.Pop());
+//            boolean success = this.forBlockFlow.Flowing();
+//            System.err.println("2");
+//            if (!success) return false;
+//        }
         return true;
     }
 
