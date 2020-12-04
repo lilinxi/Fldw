@@ -4,7 +4,7 @@ package core;
  * 终结符，创建时指定了类型和值，不可以修改
  */
 public class TerminalData extends Data {
-    private DataType type;
+    private final DataType type;
     private final Object value;
 
     public TerminalData(DataType type, Object value) {

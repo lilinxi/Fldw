@@ -1,15 +1,15 @@
 package core;
 
 // Flowable 默认实现类
-public class Flow implements Flowable {
-    @Override
-    public int GetIdentity() {
-        return -1;
-    }
+public class Flow extends TokenList implements Flowable {
+//    @Override
+//    public int GetIdentity() {
+//        return System.identityHashCode(this);
+//    }
 
     @Override
     public String GetSymbol() {
-       return null;
+        return null;
     }
 
     @Override
@@ -64,6 +64,11 @@ public class Flow implements Flowable {
 
     @Override
     public boolean Flowing() {
+        return true;
+    }
+
+    @Override
+    public boolean Matching() {
         return true;
     }
 }

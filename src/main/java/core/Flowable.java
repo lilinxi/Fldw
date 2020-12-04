@@ -2,7 +2,7 @@ package core;
 
 // 支持的流所提供的接口
 public interface Flowable {
-    int GetIdentity();// 获取内存地址
+//    int GetIdentity();// 获取内存地址
 
     String GetSymbol();// 获取流的符号
 
@@ -27,4 +27,6 @@ public interface Flowable {
     boolean HasNext(); // 是否有下一个流
 
     boolean Flowing(); // 解释执行：开始元素的流动
+
+    boolean Matching(); // 解释执行：开始元素的匹配
 }

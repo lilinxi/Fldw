@@ -1,5 +1,9 @@
 package core;
 
+import javacc.FldwCompiler;
+import javacc.ParseException;
+
+import java.io.StringReader;
 import java.util.*;
 
 // 符号表
@@ -27,6 +31,10 @@ public class SymbolTable {
         private String symbol;
         private SymbolType type;
         private Object value;
+
+//        public SymbolItem(String symbol) {
+//            this.symbol = symbol;
+//        }
 
         public SymbolItem(String symbol, SymbolType type, Object value) {
             this.symbol = symbol;
@@ -57,12 +65,12 @@ public class SymbolTable {
             return (SymbolData) this.getValue();
         }
 
-//        public ListFlow assertGetListFlow() {
-//            if (this.getType() != SymbolType.Flow) {
-//                throw new RuntimeException("assert type mismatch");
-//            }
-//            return (ListFlow) this.getValue();
-//        }
+        public FuncFlow assertGetFuncFlow() throws ParseException {
+            if (this.getType() != SymbolType.Function) {
+                throw new RuntimeException("assert type mismatch");
+            }
+            return new FldwCompiler(new StringReader(this.getValue().toString())).make_func_flow();
+        }
 
         public Flowable assertGetFlowable() {
             if (this.getType() != SymbolType.Flow) {
@@ -130,16 +138,26 @@ public class SymbolTable {
     }
 
     //    递归查找符号表
-    public SymbolItem GetSymbol(String symbol) {
+    public SymbolItem RecurseGetSymbol(String symbol) {
         SymbolItem value = this.SymbolItemTreeMap.get(symbol);
         if (value != null) {
             return value;
         } else if (this.parentSymbolTable != null) {
-            return this.parentSymbolTable.GetSymbol(symbol);
+            return this.parentSymbolTable.RecurseGetSymbol(symbol);
         } else {
             return null; // 未定义符号不报错，只有使用未定义符号的时候会报错
         }
     }
+
+    //    不递归，只查找当前符号表
+    public SymbolItem GetSymbol(String symbol) {
+        return this.SymbolItemTreeMap.get(symbol);
+    }
+
+//    //    新增符号，没有类型，强制终止递归查找符号表，PutOrGetSymbol() 操作会覆盖已有值
+//    public SymbolItem PutSymbol(String symbol) {
+//        return this.;
+//    }
 
     //    新增符号，新增默认的空符号，返回新增的符号项
     public SymbolItem PutSymbol(String symbol, SymbolType type) {
@@ -163,7 +181,7 @@ public class SymbolTable {
 
     //    遇见一个符号，不确定是已有的还是新增的，若有则返回，没有则新增
     public SymbolItem PutOrGetSymbol(String symbol, SymbolType type) {
-        SymbolItem symbolItem = this.GetSymbol(symbol);
+        SymbolItem symbolItem = this.RecurseGetSymbol(symbol);
 //        System.err.println("At: " + this);
 //        System.err.println("At: " + this.symbol);
 //        System.err.println("Get: " + symbolItem);
@@ -172,7 +190,7 @@ public class SymbolTable {
             if (symbolItem.getType() == type) {
                 return symbolItem;
             } else {
-                throw new RuntimeException("duplicate symbol:" + symbolItem.getType() + ", " + type); // 符号重复
+                throw new RuntimeException("duplicate symbol:" + symbol + ", " + symbolItem.getType() + ", " + type); // 符号重复
             }
         } else {
             return this.PutSymbol(symbol, type);

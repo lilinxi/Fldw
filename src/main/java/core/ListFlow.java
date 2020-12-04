@@ -20,6 +20,8 @@ public class ListFlow extends Flow {
         this.symbol = symbol;
     }
 
+
+
     @Override
     public int GetIdentity() {
         return this.identity;
@@ -92,9 +94,14 @@ public class ListFlow extends Flow {
         if (this.nextFlow == null) {
             return true;
         } else if (this.nextFlow.inLen() == 0) {
-            boolean success = this.nextFlow.Push(this);
-            if (!success) return false;
+            for (int i = 0; i < this.outLen(); i++) {
+                boolean success = this.nextFlow.Push(this.Get(i));
+                if (!success) return false;
+            }
             return this.nextFlow.Flowing();
+//            boolean success = this.nextFlow.Push(this);
+//            if (!success) return false;
+//            return this.nextFlow.Flowing();
         } else {
             int minSize = Math.min(this.inLen(), this.nextFlow.inLen());
             for (int i = 0; i < minSize; i++) {

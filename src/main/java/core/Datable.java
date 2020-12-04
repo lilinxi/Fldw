@@ -6,6 +6,8 @@ public interface Datable {
         Int, Double, Bool, String
     }
 
+//    int GetIdentity(); // 获取内存地址
+
     boolean Push(Datable data); // 数据的类型和值流向数据，先赋值类型后赋值值，返回是否设置成功
 
     DataType GetType(); // 获取类型

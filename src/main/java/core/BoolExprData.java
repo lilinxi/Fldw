@@ -1,6 +1,6 @@
 package core;
 
-public class BoolExprData implements Datable {
+public class BoolExprData extends Data {
     public boolean GetBoolValue() {
         return Boolean.getBoolean(this.GetValue().toString());
     }
