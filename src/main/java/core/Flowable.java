@@ -12,6 +12,7 @@ public interface Flowable {
 
     boolean Push(int index, Datable data); // 将一个元素的类型和值流入到一个元素的符号中，返回是否成功
 
+    @Deprecated
     Datable Pop(); // 流出一个元素，若无元素则流出 null
 
     int inLen(); // 当前流输出长度，如果不为 0，则流入操作将转化为匹配操作

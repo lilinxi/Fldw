@@ -213,6 +213,7 @@ public class SymbolTable {
             stringBuilder.append("\n");
         }
         stringBuilder.append('}');
+        stringBuilder.append('\n');
         return stringBuilder.toString();
     }
 
@@ -233,6 +234,10 @@ public class SymbolTable {
 
 //        SymbolTable.CurrentSymbolTable().PutSymbol(Std.StdInFlowSymbol, SymbolTable.SymbolType.Flow, StdInFlow.GetInstance());
 //        SymbolTable.CurrentSymbolTable().PutSymbol(Std.StdOutFlowSymbol, SymbolTable.SymbolType.Flow, StdOutFlow.GetInstance());
+    }
+
+    static {
+        Clear();
     }
 
     //    获取当前符号表，即栈顶符号表

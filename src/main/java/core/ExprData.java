@@ -9,8 +9,11 @@ public class ExprData extends Data {
         DivOp,
         LeftOp,
         RightOp,
+        LeftEqualOp,
+        RightEqualOp,
         LogicEqualOp,
         LogicNotOp,
+        LogicAndOp,
         LogicOrOp,
     }
 
@@ -78,7 +81,7 @@ public class ExprData extends Data {
 
     @Override
     public boolean Push(Datable data) {
-        return false;
+        throw new RuntimeException("unexpected call");
     }
 
     @Override
@@ -104,6 +107,12 @@ public class ExprData extends Data {
             case LogicNotOp -> {
                 return !this.leftData.GetValue().toString().equals(this.rightData.GetValue().toString()) ||
                         !this.leftData.GetType().toString().equals(this.rightData.GetType().toString());
+            }
+            case MulOp -> {
+                return Integer.parseInt(this.leftData.GetValue().toString()) * Integer.parseInt(this.rightData.GetValue().toString());
+            }
+            case AddOp -> {
+                return Integer.parseInt(this.leftData.GetValue().toString()) + Integer.parseInt(this.rightData.GetValue().toString());
             }
             default -> {
                 throw new RuntimeException("TODO");
