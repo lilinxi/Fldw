@@ -136,6 +136,11 @@ MORE : // value: string
     < STRING_VALUE : "\"" > : DEFAULT
 }
 
+TOKEN : // value: null
+{
+    < NULL_VALUE : "null" >
+}
+
 TOKEN : // symbol
 {
     < SYMBOL : ["a"-"z", "A"-"Z", "_"] (["a"-"z", "A"-"Z", "_", "0"-"9"])* >
@@ -173,6 +178,7 @@ TerminalData terminal_data() :
         {
             type = Datable.DataType.String;
         }
+    |   terminalToken = < NULL_VALUE > { type = null; }
     )
     {
         terminalData =  new TerminalData(type, terminalToken.image);
@@ -215,6 +221,7 @@ ExprData expr_data() :
         |   < RIGHT > { exprData.setOp(ExprData.ExprOp.RightOp); }
         |   < LEFT_EQUAL >
         |   < RIGHT_EQUAL >
+        |   < LOGIC_NOT > { exprData.setOp(ExprData.ExprOp.LogicNotOp); }
     )
     rightData = data()
     {
@@ -247,10 +254,10 @@ ListFlow list_flow() :
 {
     // 语法：list_flow() = < LSBR  > data() ( < COMMA > data() )* < RSBR >
     < LSBR  >
-    data = data()
-    {
-        listFlow.Push(data);
-    }
+//    data = data()
+//    {
+//        listFlow.Push(data);
+//    }
     ( [< COMMA >] data = data()
         {
             listFlow.Push(data);

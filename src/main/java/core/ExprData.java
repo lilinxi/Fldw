@@ -10,6 +10,7 @@ public class ExprData extends Data {
         LeftOp,
         RightOp,
         LogicEqualOp,
+        LogicNotOp,
     }
 
     // 检查两元的类型和运算符是否匹配，并返回表达式的类型
@@ -40,10 +41,13 @@ public class ExprData extends Data {
 //            需要类型强匹配，否则报错
             case LogicEqualOp -> {
                 if (leftType == rightType) {
-                    return leftType;
+                    return DataType.Bool;
                 } else {
                     throw new RuntimeException("expr type mismatch with " + leftType + " " + op + " " + rightType);
                 }
+            }
+            case LogicNotOp -> { // 只要不为 LogicEqual，就为 LogicNot
+                return DataType.Bool;
             }
             default -> {
                 throw new RuntimeException("unexpected op");
@@ -95,6 +99,10 @@ public class ExprData extends Data {
             }
             case RightOp -> {
                 return Double.parseDouble(this.leftData.GetValue().toString()) > Double.parseDouble(this.rightData.GetValue().toString());
+            }
+            case LogicNotOp -> {
+                return !this.leftData.GetValue().toString().equals(this.rightData.GetValue().toString()) ||
+                        !this.leftData.GetType().toString().equals(this.rightData.GetType().toString());
             }
             default -> {
                 throw new RuntimeException("TODO");

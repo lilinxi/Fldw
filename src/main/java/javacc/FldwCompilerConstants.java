@@ -89,9 +89,11 @@ public interface FldwCompilerConstants {
   /** RegularExpression Id. */
   int STRING_VALUE = 48;
   /** RegularExpression Id. */
-  int SYMBOL = 49;
+  int NULL_VALUE = 49;
   /** RegularExpression Id. */
-  int OTHER = 50;
+  int SYMBOL = 50;
+  /** RegularExpression Id. */
+  int OTHER = 51;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -149,6 +151,7 @@ public interface FldwCompilerConstants {
     "<token of kind 46>",
     "<token of kind 47>",
     "\"\\\"\"",
+    "\"null\"",
     "<SYMBOL>",
     "<OTHER>",
   };

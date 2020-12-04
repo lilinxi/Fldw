@@ -929,4 +929,97 @@ public class UnitTest {
                 }
                 """, output.toString());
     }
+
+//    @Test
+    public void TestQuickSortExample() {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+
+        try {
+            SymbolTable.Clear();
+            FldwCompiler.parse("""
+                    import std.Std
+                    function sort() {
+                        in | [head;tail]
+             	        if ( head != null ) { 
+             	            for (tail | x) {
+             	                if ( x < head ) {
+             			            [x] | a
+             		            } else {
+             			            [x] | b
+             		            }
+             	            }
+             	            a | sort() | stdout
+             		        head | stdout
+             		        b | sort() | stdout
+             	        }
+                    }
+                    [5, 6, 3, 2, 7, 8] | sort()
+                    """);
+            System.out.println(SymbolTable.CurrentSymbolTable());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        System.setOut(System.out);
+
+        assertEquals("""
+                stdout: SymbolData{type=Int, value=1, symbol='a'}
+                stdout: SymbolData{type=Int, value=2, symbol='b'}
+                stdout: SymbolData{type=null, value=null, symbol='c'}
+                stdout: SymbolData{type=Int, value=1, symbol='a'}
+                stdout: SymbolData{type=Int, value=2, symbol='b'}
+                stdout: SymbolData{type=Int, value=3, symbol='c'}
+                stdout: SymbolData{type=null, value=null, symbol='a'}
+                stdout: SymbolData{type=null, value=null, symbol='b'}
+                stdout: SymbolData{type=null, value=null, symbol='c'}
+                SymbolTable{
+                symbol='root', parentSymbolTable=, SymbolItemTreeMap=
+                func: SymbolItem{symbol='func', type=Function, value=( [ a , b , c ] ) { [ a , b , c ] | stdout } }
+                in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+                stdin: SymbolItem{symbol='stdin', type=Flow, value=StdInFlow{cacheFlow=ListFlow{, symbol='null', dataList=[], nextFlow=null}}}
+                stdout: SymbolItem{symbol='stdout', type=Flow, value=StdOutFlow{}}
+                tmp0: SymbolItem{symbol='tmp0', type=BlockSymbolTable, value=SymbolTable{
+                symbol='tmp0', parentSymbolTable=root, SymbolItemTreeMap=
+                |-- a: SymbolItem{symbol='a', type=Data, value=SymbolData{type=Int, value=1, symbol='a'}}
+                |-- b: SymbolItem{symbol='b', type=Data, value=SymbolData{type=Int, value=2, symbol='b'}}
+                |-- c: SymbolItem{symbol='c', type=Data, value=SymbolData{type=null, value=null, symbol='c'}}
+                |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+                |-- tmp1: SymbolItem{symbol='tmp1', type=BlockSymbolTable, value=SymbolTable{
+                symbol='tmp1', parentSymbolTable=tmp0, SymbolItemTreeMap=
+                |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+                }}
+                }}
+                tmp2: SymbolItem{symbol='tmp2', type=BlockSymbolTable, value=SymbolTable{
+                symbol='tmp2', parentSymbolTable=root, SymbolItemTreeMap=
+                |-- a: SymbolItem{symbol='a', type=Data, value=SymbolData{type=Int, value=1, symbol='a'}}
+                |-- b: SymbolItem{symbol='b', type=Data, value=SymbolData{type=Int, value=2, symbol='b'}}
+                |-- c: SymbolItem{symbol='c', type=Data, value=SymbolData{type=Int, value=3, symbol='c'}}
+                |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+                |-- tmp3: SymbolItem{symbol='tmp3', type=BlockSymbolTable, value=SymbolTable{
+                symbol='tmp3', parentSymbolTable=tmp2, SymbolItemTreeMap=
+                |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+                }}
+                }}
+                tmp4: SymbolItem{symbol='tmp4', type=BlockSymbolTable, value=SymbolTable{
+                symbol='tmp4', parentSymbolTable=root, SymbolItemTreeMap=
+                |-- a: SymbolItem{symbol='a', type=Data, value=SymbolData{type=null, value=null, symbol='a'}}
+                |-- b: SymbolItem{symbol='b', type=Data, value=SymbolData{type=null, value=null, symbol='b'}}
+                |-- c: SymbolItem{symbol='c', type=Data, value=SymbolData{type=null, value=null, symbol='c'}}
+                |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+                |-- tmp5: SymbolItem{symbol='tmp5', type=BlockSymbolTable, value=SymbolTable{
+                symbol='tmp5', parentSymbolTable=tmp4, SymbolItemTreeMap=
+                |-- in: SymbolItem{symbol='in', type=Flow, value=ListFlow{, symbol='in', dataList=[], nextFlow=null}}
+                |-- out: SymbolItem{symbol='out', type=Flow, value=ListFlow{, symbol='out', dataList=[], nextFlow=null}}
+                }}
+                }}
+                }
+                """, output.toString());
+    }
 }

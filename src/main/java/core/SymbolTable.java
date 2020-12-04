@@ -190,7 +190,7 @@ public class SymbolTable {
             if (symbolItem.getType() == type) {
                 return symbolItem;
             } else {
-                throw new RuntimeException("duplicate symbol:" + symbolItem.getType() + ", " + type); // 符号重复
+                throw new RuntimeException("duplicate symbol:" + symbol + ", " + symbolItem.getType() + ", " + type); // 符号重复
             }
         } else {
             return this.PutSymbol(symbol, type);
