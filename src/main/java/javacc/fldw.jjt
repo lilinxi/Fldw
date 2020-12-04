@@ -26,7 +26,7 @@ public class FldwCompiler {
 
     public static void parse(String src) throws ParseException {
         Reader reader = new StringReader(src);
-//        Object ret = new FldwCompiler(reader).expr_data();
+//        Object ret = new FldwCompiler(reader).expr_data_tmp();
 //        System.out.println(ret);
         new FldwCompiler(reader).program();
     }
@@ -73,7 +73,7 @@ TOKEN : // Keywords and punctuation
     |   < INC : "++" >
     |   < DEC : "--" >
 
-    |   < EXLM : "!" >
+//    |   < EXLM : "!" >
     |   < LOGIC_EQUAL : "==" >
     |   < LOGIC_NOT : "!=" >
     |   < LOGIC_AND : "&&" >
@@ -203,7 +203,7 @@ SymbolData symbol_data() :
 }
 
 // TODO：tmp
-ExprData expr_data() :
+ExprData expr_data_tmp() :
 {
     Token leftDataToken;
     Token rightDataToken;
@@ -232,12 +232,79 @@ ExprData expr_data() :
     }
 }
 
+ExprData expr_data() :
+{
+    ExprData topExprData = new ExprData();
+    ExprData leftExprData = new ExprData();
+    ExprData rightExprData = new ExprData();
+}
+{
+    leftExprData = expr1_data()
+    (
+        < LOGIC_OR > { topExprData.setOp(ExprData.ExprOp.LogicOrOp); }
+        rightExprData = expr1_data()
+        {
+            topExprData.setLeftData(leftExprData);
+            topExprData.setRightData(rightExprData);
+            leftExprData = topExprData;
+        }
+    )*
+    {
+        return topExprData;
+    }
+}
+
+ExprData expr1_data() :
+{
+}
+{
+    {
+        return null;
+    }
+}
+
+ExprData expr2_data() :
+{
+}
+{
+    {
+        return null;
+    }
+}
+
+ExprData expr3_data() :
+{
+}
+{
+    {
+        return null;
+    }
+}
+
+ExprData expr4_data() :
+{
+}
+{
+    {
+        return null;
+    }
+}
+
+ExprData term() :
+{
+}
+{
+    {
+        return null;
+    }
+}
+
 Datable data() :
 {
     Datable data;
 }
 {
-    // 语法：data() = terminal_data() | symbol_data() | expr_data()
+    // 语法：data() = terminal_data() | symbol_data() | expr_data_tmp()
     (    data = terminal_data()
     |    data = symbol_data()
     )
@@ -298,8 +365,8 @@ IfElseFlow if_else_flow() :
     Flowable falseFlow = null;
 }
 {
-    // 语法：if_else_stmt() = < IF > < LBR > expr_data() < RBR > block() [ <ELSE > block() ]
-    < IF > < LBR > conditionData = expr_data() < RBR > trueFlow = block_flow() [ <ELSE > falseFlow = block_flow() ]
+    // 语法：if_else_stmt() = < IF > < LBR > expr_data_tmp() < RBR > block() [ <ELSE > block() ]
+    < IF > < LBR > conditionData = expr_data_tmp() < RBR > trueFlow = block_flow() [ <ELSE > falseFlow = block_flow() ]
     {
         return new IfElseFlow(conditionData, trueFlow, falseFlow);
     }
@@ -311,8 +378,8 @@ WhileFlow while_flow() :
     Flowable trueFlow;
 }
 {
-    // 语法：< WHILE > < LBR > expr_data() < RBR > block()
-    < WHILE > < LBR > conditionData = expr_data() < RBR > trueFlow = block_flow()
+    // 语法：< WHILE > < LBR > expr_data_tmp() < RBR > block()
+    < WHILE > < LBR > conditionData = expr_data_tmp() < RBR > trueFlow = block_flow()
     {
         return new WhileFlow(conditionData, trueFlow);
     }
