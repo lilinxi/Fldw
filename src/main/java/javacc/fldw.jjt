@@ -461,7 +461,7 @@ ForFlow for_flow() :
 }
 {
     // 语法：for_flow() = < FOR > < LBR > flow() < FLOWING > symbol_data() < RBR > block_flow()
-    < FOR > < LBR > iterFlow = flow() < FLOWING > iterSymbolData = symbol_data() < RBR > forBlockFlow = block_flow()
+    < FOR > < LBR > iterFlow = flow() < MATCHING > iterSymbolData = symbol_data() < RBR > forBlockFlow = block_flow()
     {
         forFlow = new ForFlow(iterFlow, iterSymbolData, forBlockFlow);
         return forFlow;
@@ -513,8 +513,8 @@ BlockFlow block_flow() : // block 不能嵌套
     < LCBR > { Core.setEager(false); SymbolTable.EnterBlock(null); blockFlow = new BlockFlow();}
 //    ( import_stmt() )*
     (
-        LOOKAHEAD(3) topFlow = flowing() { blockFlow.addFlow(topFlow); }
-    |   topFlow = matching() { blockFlow.addFlow(topFlow); }
+//        LOOKAHEAD(3) topFlow = flowing() { blockFlow.addFlow(topFlow); }
+       topFlow = flowing() { blockFlow.addFlow(topFlow); }
     )*
 //    stmts()
     < RCBR > { Core.setEager(true); SymbolTable.ExitBlock(); }
@@ -564,10 +564,14 @@ Flowable flowing() :
     {
         leftFlow = topFlow;
     }
-    (< FLOWING >
+    (
+        ( // TODO Why lookahead
+            < MATCHING > { leftFlow.SetFlowOp(Flowable.FlowOp.Matching);}
+        |   < FLOWING >  { leftFlow.SetFlowOp(Flowable.FlowOp.Pushing);}
+        )
     rightFlow = flow()
     {
-        leftFlow.SetNext(rightFlow);
+        leftFlow.SetNextFlowing(rightFlow);
 //                                        System.err.println(leftFlow.GetSymbol() +leftFlow.GetIdentity()+ "->"+rightFlow.GetSymbol()+rightFlow.GetIdentity());
 //                                        System.err.println("leftFlow:\n"+leftFlow);
 //                                        System.err.println("rightFlow:\n"+rightFlow);
@@ -597,14 +601,15 @@ Flowable matching() :
 }
 {
     // 语法：matching() = flow() < rightFlow > flow()
-    topFlow = flow()
+    topFlow = flowing()
     {
+//        System.err.println("matching");
         leftFlow = topFlow;
     }
     (< MATCHING >
-    rightFlow = flow()
+    rightFlow = flowing()
     {
-        leftFlow.SetNext(rightFlow);
+        leftFlow.SetNextMatching(rightFlow);
         leftFlow = rightFlow;
     }
     )*
@@ -697,7 +702,9 @@ void stmt() :
 {
 }
 {
-    LOOKAHEAD(3) flowing() | matching() | def_func_stmt() | import_stmt() //| block_flow()
+        flowing()
+    |   def_func_stmt()
+    |   import_stmt() //| block_flow()
     {
         return;
     }

@@ -37,18 +37,18 @@ public class StdInFlow extends Flow {
     }
 
     @Override
-    public void SetNext(Flowable flow) {
-        this.cacheFlow.SetNext(flow);
+    public void SetNextFlowing(Flowable flow) {
+        this.cacheFlow.SetNextFlowing(flow);
     }
 
     @Override
-    public Flowable Next() {
-        return this.cacheFlow.Next();
+    public Flowable NextFlowing() {
+        return this.cacheFlow.NextFlowing();
     }
 
     @Override
-    public boolean HasNext() {
-        return this.cacheFlow.HasNext();
+    public boolean HasNextFlowing() {
+        return this.cacheFlow.HasNextFlowing();
     }
 
     @Override

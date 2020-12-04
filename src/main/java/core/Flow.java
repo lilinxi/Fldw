@@ -2,10 +2,15 @@ package core;
 
 // Flowable 默认实现类
 public class Flow extends TokenList implements Flowable {
-//    @Override
+    //    @Override
 //    public int GetIdentity() {
 //        return System.identityHashCode(this);
 //    }
+    protected FlowOp flowOp;
+
+    public Flow() {
+        this.flowOp = FlowOp.Pushing;
+    }
 
     @Override
     public String GetSymbol() {
@@ -48,23 +53,44 @@ public class Flow extends TokenList implements Flowable {
     }
 
     @Override
-    public void SetNext(Flowable flow) {
+    public void SetFlowOp(FlowOp flowOp) {
+        this.flowOp = flowOp;
+    }
+
+
+    @Override
+    public void SetNextFlowing(Flowable flow) {
         throw new RuntimeException("no impl, wrong call");
     }
 
     @Override
-    public Flowable Next() {
+    public Flowable NextFlowing() {
         throw new RuntimeException("no impl, wrong call");
     }
 
     @Override
-    public boolean HasNext() {
+    public boolean HasNextFlowing() {
         return false;
     }
 
     @Override
     public boolean Flowing() {
         return true;
+    }
+
+    @Override
+    public void SetNextMatching(Flowable flow) {
+        throw new RuntimeException("no impl, wrong call");
+    }
+
+    @Override
+    public Flowable NextMatching() {
+        throw new RuntimeException("no impl, wrong call");
+    }
+
+    @Override
+    public boolean HasNextMatching() {
+        return false;
     }
 
     @Override

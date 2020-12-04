@@ -47,18 +47,18 @@ public class ForFlow extends Flow {
     }
 
     @Override
-    public void SetNext(Flowable flow) {
-        this.forBlockFlow.SetNext(flow);
+    public void SetNextFlowing(Flowable flow) {
+        this.forBlockFlow.SetNextFlowing(flow);
     }
 
     @Override
-    public Flowable Next() {
-        return this.forBlockFlow.Next();
+    public Flowable NextFlowing() {
+        return this.forBlockFlow.NextFlowing();
     }
 
     @Override
-    public boolean HasNext() {
-        return this.forBlockFlow.HasNext();
+    public boolean HasNextFlowing() {
+        return this.forBlockFlow.HasNextFlowing();
     }
 
     @Override

@@ -24,12 +24,14 @@ public class FuncFlow extends Flow {
         this.symbol = funcFlow.symbol;
         this.paramFlow = funcFlow.paramFlow;
         this.blockFlow = funcFlow.blockFlow;
-        paramFlow.SetNext(this.paramFlow);
+        paramFlow.SetNextFlowing(this.paramFlow);
+        paramFlow.SetFlowOp(FlowOp.Matching);
         paramFlow.Flowing();
     }
 
     public void setParamFlow(ListFlow paramFlow) {
-        paramFlow.SetNext(this.paramFlow);
+        paramFlow.SetNextFlowing(this.paramFlow);
+        paramFlow.SetFlowOp(FlowOp.Matching);
         paramFlow.Flowing();
     }
 
@@ -80,18 +82,18 @@ public class FuncFlow extends Flow {
 
 
     @Override
-    public void SetNext(Flowable flow) {
-        this.blockFlow.SetNext(flow);
+    public void SetNextFlowing(Flowable flow) {
+        this.blockFlow.SetNextFlowing(flow);
     }
 
     @Override
-    public Flowable Next() {
-        return this.blockFlow.Next();
+    public Flowable NextFlowing() {
+        return this.blockFlow.NextFlowing();
     }
 
     @Override
-    public boolean HasNext() {
-        return this.blockFlow.HasNext();
+    public boolean HasNextFlowing() {
+        return this.blockFlow.HasNextFlowing();
     }
 
     @Override
