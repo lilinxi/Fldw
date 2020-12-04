@@ -256,46 +256,111 @@ ExprData expr_data() :
 
 ExprData expr1_data() :
 {
+    ExprData topExprData = new ExprData();
+    ExprData leftExprData = new ExprData();
+    ExprData rightExprData = new ExprData();
 }
 {
+    leftExprData = expr2_data()
+    (
+        < LOGIC_AND> { topExprData.setOp(ExprData.ExprOp.LogicAndOp); }
+        rightExprData = expr2_data()
+        {
+            topExprData.setLeftData(leftExprData);
+            topExprData.setRightData(rightExprData);
+            leftExprData = topExprData;
+        }
+    )*
     {
-        return null;
+        return topExprData;
     }
 }
 
 ExprData expr2_data() :
 {
+    ExprData topExprData = new ExprData();
+    ExprData leftExprData = new ExprData();
+    ExprData rightExprData = new ExprData();
 }
 {
+    leftExprData = expr3_data()
+    (
+        (< LEFT> { topExprData.setOp(ExprData.ExprOp.LeftOp); }
+         |<RIGHT> { topExprData.setOp(ExprData.ExprOp.RightOp); }
+         |<LEFT_EQUAL> { topExprData.setOp(ExprData.ExprOp.LeftEqualOp); }
+         |<RIGHT_EQUAL> { topExprData.setOp(ExprData.ExprOp.RightEqualOp); }
+         |<LOGIC_EQUAL> { topExprData.setOp(ExprData.ExprOp.LogicEqualOp);}
+         |<LOGIC_NOT> { topExprData.setOp(ExprData.ExprOp.LogicNotOp);}
+         )
+        rightExprData = expr3_data()
+        {
+            topExprData.setLeftData(leftExprData);
+            topExprData.setRightData(rightExprData);
+            leftExprData = topExprData;
+        }
+    )*
     {
-        return null;
+        return topExprData;
     }
 }
 
 ExprData expr3_data() :
 {
+    ExprData topExprData = new ExprData();
+    ExprData leftExprData = new ExprData();
+    ExprData rightExprData = new ExprData();
 }
 {
+    leftExprData = expr4_data()
+    (
+        (< PLUS > { topExprData.setOp(ExprData.ExprOp.AddOp); }
+         |<MINUS> { topExprData.setOp(ExprData.ExprOp.SubOp); }
+         )
+        rightExprData = expr4_data()
+        {
+            topExprData.setLeftData(leftExprData);
+            topExprData.setRightData(rightExprData);
+            leftExprData = topExprData;
+        }
+    )*
     {
-        return null;
+        return topExprData;
     }
 }
 
 ExprData expr4_data() :
 {
+    ExprData topExprData = new ExprData();
+    ExprData leftExprData = new ExprData();
+    ExprData rightExprData = new ExprData();
 }
 {
+    leftExprData = term()
+    (
+        (< MULT > { topExprData.setOp(ExprData.ExprOp.MulOp); }
+         |<DIV> { topExprData.setOp(ExprData.ExprOp.DivOp); }
+         )
+        rightExprData = term()
+        {
+            topExprData.setLeftData(leftExprData);
+            topExprData.setRightData(rightExprData);
+            leftExprData = topExprData;
+        }
+    )*
     {
-        return null;
+        return topExprData;
     }
 }
 
-ExprData term() :
+Datable term() :
 {
+    Datable data;
 }
 {
-    {
-        return null;
+    data = terminal_data()
+    | data = symbol_data()
+    | data = <LBR> expr() <RBR>
+    {return data;
     }
 }
 
@@ -335,16 +400,6 @@ ListFlow list_flow() :
 //        System.out.println(listFlow);
         return listFlow;
     }
-}
-//expre
-Datable term():
-{
-    Datable data;
-}
-{
-    data = terminal_data()
-    | data = symbol_data()
-    | data = <LBR> expr() <RBR>
 }
 
 //SymbolFlow symbol_flow() :
