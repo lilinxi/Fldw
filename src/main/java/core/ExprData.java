@@ -11,6 +11,7 @@ public class ExprData extends Data {
         RightOp,
         LogicEqualOp,
         LogicNotOp,
+        LogicOrOp,
     }
 
     // 检查两元的类型和运算符是否匹配，并返回表达式的类型
