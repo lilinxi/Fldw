@@ -269,6 +269,16 @@ ListFlow list_flow() :
         return listFlow;
     }
 }
+//expre
+Datable term():
+{
+    Datable data;
+}
+{
+    data = terminal_data()
+    | data = symbol_data()
+    | data = <LBR> expr() <RBR>
+}
 
 //SymbolFlow symbol_flow() :
 //{
@@ -533,7 +543,7 @@ void import_stmt() :
              Class<?> clazz = Class.forName(package_name.image + "." + module_name.image);
              Method loadModule = clazz.getMethod(Core.ModuleLoadFunc);
              loadModule.invoke(null);
-        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
+        } catch (ClassNotFoundException ex) {
             throw new RuntimeException(ex.getMessage());
         }
     }
