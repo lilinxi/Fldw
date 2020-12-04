@@ -3,13 +3,11 @@ package core;
 import java.util.LinkedList;
 
 public class ListFlow extends Flow {
-    private int identity; // System.identityHashCode 返回对象的内存地址，不管该对象的类是否重写了 hashCode() 方法。
     private String symbol;
     private LinkedList<Datable> dataList;
     private Flowable nextFlow;
 
     public ListFlow() {
-        this.identity = System.identityHashCode(this);
         this.symbol = null;
         this.dataList = new LinkedList<>();
         this.nextFlow = null;
@@ -18,13 +16,6 @@ public class ListFlow extends Flow {
     public ListFlow(String symbol) {
         this();
         this.symbol = symbol;
-    }
-
-
-
-    @Override
-    public int GetIdentity() {
-        return this.identity;
     }
 
     @Override
@@ -93,15 +84,19 @@ public class ListFlow extends Flow {
     public boolean Flowing() {
         if (this.nextFlow == null) {
             return true;
-        } else if (this.nextFlow.inLen() == 0) {
+        } else {
             for (int i = 0; i < this.outLen(); i++) {
                 boolean success = this.nextFlow.Push(this.Get(i));
                 if (!success) return false;
             }
             return this.nextFlow.Flowing();
-//            boolean success = this.nextFlow.Push(this);
-//            if (!success) return false;
-//            return this.nextFlow.Flowing();
+        }
+    }
+
+    @Override
+    public boolean Matching() {
+        if (this.nextFlow == null) {
+            return true;
         } else {
             int minSize = Math.min(this.inLen(), this.nextFlow.inLen());
             for (int i = 0; i < minSize; i++) {
@@ -115,7 +110,7 @@ public class ListFlow extends Flow {
     @Override
     public String toString() {
         return "ListFlow{" +
-                ", symbol='" + symbol + '\'' +
+                "symbol='" + symbol + '\'' +
                 ", dataList=" + dataList +
                 ", nextFlow=" + nextFlow +
                 '}';

@@ -45,55 +45,53 @@ public interface FldwCompilerConstants {
   /** RegularExpression Id. */
   int DEC = 22;
   /** RegularExpression Id. */
-  int EXLM = 23;
+  int LOGIC_EQUAL = 23;
   /** RegularExpression Id. */
-  int LOGIC_EQUAL = 24;
+  int LOGIC_NOT = 24;
   /** RegularExpression Id. */
-  int LOGIC_NOT = 25;
+  int LOGIC_AND = 25;
   /** RegularExpression Id. */
-  int LOGIC_AND = 26;
+  int LOGIC_OR = 26;
   /** RegularExpression Id. */
-  int LOGIC_OR = 27;
+  int LEFT = 27;
   /** RegularExpression Id. */
-  int LEFT = 28;
+  int RIGHT = 28;
   /** RegularExpression Id. */
-  int RIGHT = 29;
+  int LEFT_EQUAL = 29;
   /** RegularExpression Id. */
-  int LEFT_EQUAL = 30;
+  int RIGHT_EQUAL = 30;
   /** RegularExpression Id. */
-  int RIGHT_EQUAL = 31;
+  int IF = 31;
   /** RegularExpression Id. */
-  int IF = 32;
+  int ELSE = 32;
   /** RegularExpression Id. */
-  int ELSE = 33;
+  int WHILE = 33;
   /** RegularExpression Id. */
-  int WHILE = 34;
+  int FOR = 34;
   /** RegularExpression Id. */
-  int FOR = 35;
+  int FUNC = 35;
   /** RegularExpression Id. */
-  int FUNC = 36;
+  int FLOWING = 36;
   /** RegularExpression Id. */
-  int FLOWING = 37;
+  int MATCHING = 37;
   /** RegularExpression Id. */
-  int MATCHING = 38;
+  int IMPORT = 38;
   /** RegularExpression Id. */
-  int IMPORT = 39;
+  int DOT = 39;
   /** RegularExpression Id. */
-  int DOT = 40;
+  int INT_VALUE = 40;
   /** RegularExpression Id. */
-  int INT_VALUE = 41;
+  int DOUBLE_VALUE = 41;
   /** RegularExpression Id. */
-  int DOUBLE_VALUE = 42;
+  int BOOL_VALUE = 42;
   /** RegularExpression Id. */
-  int BOOL_VALUE = 43;
+  int STRING_VALUE = 47;
   /** RegularExpression Id. */
-  int STRING_VALUE = 48;
+  int NULL_VALUE = 48;
   /** RegularExpression Id. */
-  int NULL_VALUE = 49;
+  int SYMBOL = 49;
   /** RegularExpression Id. */
-  int SYMBOL = 50;
-  /** RegularExpression Id. */
-  int OTHER = 51;
+  int OTHER = 50;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -125,7 +123,6 @@ public interface FldwCompilerConstants {
     "\"%\"",
     "\"++\"",
     "\"--\"",
-    "\"!\"",
     "\"==\"",
     "\"!=\"",
     "\"&&\"",
@@ -147,9 +144,9 @@ public interface FldwCompilerConstants {
     "<DOUBLE_VALUE>",
     "<BOOL_VALUE>",
     "\"\\\"\"",
+    "<token of kind 44>",
     "<token of kind 45>",
     "<token of kind 46>",
-    "<token of kind 47>",
     "\"\\\"\"",
     "\"null\"",
     "<SYMBOL>",
