@@ -1,6 +1,6 @@
 package core;
 
-public class SymbolFlow extends Flow {
+public class SymbolDataFlow extends Flow {
     private SymbolData symbolData; // 临时变量
     private Flowable next;
 
@@ -27,7 +27,7 @@ public class SymbolFlow extends Flow {
     }
 
     @Override
-    public int Len() {
+    public int inLen() {
         return 0;
     }
 

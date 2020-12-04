@@ -2,7 +2,8 @@
 package javacc;
 
 import java.io.*;
-import core.*;
+import java.lang.reflect.*;
+import core.*;import examples.Examples;
 
 public class FldwCompiler implements FldwCompilerConstants {
     public static void main(String[] args) {
@@ -10,8 +11,8 @@ public class FldwCompiler implements FldwCompilerConstants {
 //        for (String arg : tests) {
             try {
 //                            Class.forName("std.Std");
-//                evaluate(Examples.FlowingExample1);
-                evaluate(Examples.ExprDataExample5);
+              SymbolTable.Clear();
+                parse(Examples.ExprDataExample5);
 //                System.out.println(evaluate(arg));
 //                return(evaluate(arg));
             } catch (ParseException ex) {
@@ -20,7 +21,7 @@ public class FldwCompiler implements FldwCompilerConstants {
 //        }
     }
 
-    public static void evaluate(String src) throws ParseException {
+    public static void parse(String src) throws ParseException {
         Reader reader = new StringReader(src);
 //        Object ret = new FldwCompiler(reader).expr_data();
 //        System.out.println(ret);
@@ -28,7 +29,7 @@ public class FldwCompiler implements FldwCompilerConstants {
     }
 
 /*****************************************************************/
-/***************************璇硶鍒嗘瀽*******************************/
+/***************************语法分析*******************************/
 /*****************************************************************/
   final public TerminalData terminal_data() throws ParseException {
     Datable.DataType type;
@@ -62,13 +63,13 @@ public class FldwCompiler implements FldwCompilerConstants {
 
   final public SymbolData symbol_data() throws ParseException {
     Token symbol;
-    // 璇硶锛歴ymbol_data() = < SYMBOL>
+    // 语法：symbol_data() = < SYMBOL>
         symbol = jj_consume_token(SYMBOL);
         {if (true) return SymbolTable.CurrentSymbolTable().PutOrGetSymbol(symbol.image, SymbolTable.SymbolType.Data).assertGetSymbolData();}
     throw new Error("Missing return statement in function");
   }
 
-// TODO锛歵mp
+// TODO：tmp
   final public ExprData expr_data() throws ParseException {
     ExprData exprData = new ExprData();
     Datable leftData, rightData;
@@ -104,7 +105,7 @@ public class FldwCompiler implements FldwCompilerConstants {
   final public ExprData two_op() throws ParseException {
     ExprData res = new ExprData();;
     Datable leftData,rightData;
-    //璇硶锛歵wo_op = terminal_data()  (<MULT> | <DIV> | <PLUS> | <MINUS>) terminal_data()
+    //语法：two_op = terminal_data()  (<MULT> | <DIV> | <PLUS> | <MINUS>) terminal_data()
         leftData = terminal_data();
                                 res.setLeftData(leftData);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -163,7 +164,7 @@ public class FldwCompiler implements FldwCompilerConstants {
     throw new Error("Missing return statement in function");
   }
 
-// 璇硶锛歮atch_flow() = flow() < FLOW > flow()
+// 语法：match_flow() = flow() < FLOW > flow()
   final public Flowable expr_flowing() throws ParseException {
     Flowable topFlow = new ExprFlow();
     Flowable leftFlow = new ExprFlow();
@@ -245,68 +246,104 @@ public class FldwCompiler implements FldwCompilerConstants {
     throw new Error("Missing return statement in function");
   }
 
-  final public SymbolFlow symbol_flow() throws ParseException {
-//        System.out.println(new SymbolFlow());
-        {if (true) return new SymbolFlow();}
-    throw new Error("Missing return statement in function");
-  }
-
+//SymbolFlow symbol_flow() :
+//{
+//}
+//{
+//    // 语法：symbol_flow() = < ITER> <SYMBOL> stmt()
+//    {
+////        System.out.println(new SymbolFlow());
+//        return new SymbolDataFlow();
+//    }
+//}
   final public IfElseFlow if_else_flow() throws ParseException {
+    ExprData conditionData;
+    Flowable trueFlow;
+    Flowable falseFlow = null;
     jj_consume_token(IF);
     jj_consume_token(LBR);
-    expr_data();
+    conditionData = expr_data();
     jj_consume_token(RBR);
-    block();
+    trueFlow = block_flow();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case ELSE:
       jj_consume_token(ELSE);
-      block();
+      falseFlow = block_flow();
       break;
     default:
       jj_la1[7] = jj_gen;
       ;
     }
-//        System.out.println(new IfElseFlow());
-        {if (true) return new IfElseFlow();}
+        {if (true) return new IfElseFlow(conditionData, trueFlow, falseFlow);}
     throw new Error("Missing return statement in function");
   }
 
-  final public IfElseFlow while_flow() throws ParseException {
+  final public WhileFlow while_flow() throws ParseException {
+    ExprData conditionData;
+    Flowable trueFlow;
     jj_consume_token(WHILE);
     jj_consume_token(LBR);
-    expr_data();
+    conditionData = expr_data();
     jj_consume_token(RBR);
-    block();
-//        System.out.println(new IfElseFlow());
-        {if (true) return new IfElseFlow();}
+    trueFlow = block_flow();
+        {if (true) return new WhileFlow(conditionData, trueFlow);}
     throw new Error("Missing return statement in function");
   }
 
-  final public FuncFlow func_flow() throws ParseException {
-    symbol_data();
+  final public Flowable func_flow() throws ParseException {
+    Token func_symbol;
+    func_symbol = jj_consume_token(SYMBOL);
     jj_consume_token(LBR);
     jj_consume_token(RBR);
-//        System.out.println(new FuncFlow());
-        {if (true) return new FuncFlow();}
+        {if (true) return SymbolTable.CurrentSymbolTable().GetSymbol(func_symbol.image).assertGetFlowable();}
     throw new Error("Missing return statement in function");
   }
 
   final public HeadTailFlow head_tail_flow() throws ParseException {
     SymbolData headData;
     Token tailListFlowSymbol;
-    ListFlow tailListFlow;
+    Flowable tailListFlow;
     HeadTailFlow headTailFlow;
     jj_consume_token(LSBR);
     headData = symbol_data();
     jj_consume_token(SEMIC);
     tailListFlowSymbol = jj_consume_token(SYMBOL);
-        tailListFlow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(tailListFlowSymbol.image, SymbolTable.SymbolType.Flow).assertGetListFlow();
+        tailListFlow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(tailListFlowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
     jj_consume_token(RSBR);
         {if (true) return new HeadTailFlow(headData, tailListFlow);}
     throw new Error("Missing return statement in function");
   }
 
-// 璇硶锛歠low() = list_flow() | symbol_flow() | func_flow() | expr_flow()
+// 语法：flow() = list_flow() | symbol_flow() | func_flow() | expr_flow()
+  final public BlockFlow block_flow() throws ParseException {
+    BlockFlow blockFlow;
+    Flowable topFlow;
+    jj_consume_token(LCBR);
+               Core.setEagerFlowing(false); SymbolTable.EnterBlock(null); blockFlow = new BlockFlow();
+    label_4:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case LCBR:
+      case LSBR:
+      case IF:
+      case WHILE:
+      case SYMBOL:
+        ;
+        break;
+      default:
+        jj_la1[8] = jj_gen;
+        break label_4;
+      }
+      topFlow = flowing();
+                              blockFlow.addFlow(topFlow);
+    }
+    jj_consume_token(RCBR);
+               Core.setEagerFlowing(true); SymbolTable.ExitBlock();
+//        System.err.println("blcokFlow: "+blockFlow);
+        {if (true) return blockFlow;}
+    throw new Error("Missing return statement in function");
+  }
+
   final public Flowable flow() throws ParseException {
     Flowable flow = new Flow();
     Token flowSymbol;
@@ -321,7 +358,7 @@ public class FldwCompiler implements FldwCompilerConstants {
             flow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
         break;
       default:
-        jj_la1[8] = jj_gen;
+        jj_la1[9] = jj_gen;
         if (jj_2_3(3)) {
           flow = list_flow();
         } else {
@@ -335,8 +372,11 @@ public class FldwCompiler implements FldwCompilerConstants {
           case LSBR:
             flow = expr_flow();
             break;
+          case LCBR:
+            flow = block_flow();
+            break;
           default:
-            jj_la1[9] = jj_gen;
+            jj_la1[10] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
           }
@@ -348,61 +388,66 @@ public class FldwCompiler implements FldwCompilerConstants {
     throw new Error("Missing return statement in function");
   }
 
-// 璇硶锛歮atch_flow() = flow() < FLOW > flow()
+// 语法：match_flow() = flow() < FLOW > flow()
   final public Flowable flowing() throws ParseException {
     Flowable topFlow = new Flow();
     Flowable leftFlow = new Flow();
     Flowable rightFlow = new Flow();
     topFlow = flow();
         leftFlow = topFlow;
-    label_4:
+    label_5:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case FLOW:
         ;
         break;
       default:
-        jj_la1[10] = jj_gen;
-        break label_4;
+        jj_la1[11] = jj_gen;
+        break label_5;
       }
       jj_consume_token(FLOW);
       rightFlow = flow();
         leftFlow.SetNext(rightFlow);
+//                                        System.err.println(leftFlow.GetSymbol() +leftFlow.GetIdentity()+ "->"+rightFlow.GetSymbol()+rightFlow.GetIdentity());
+//                                        System.err.println("leftFlow:\n"+leftFlow);
+//                                        System.err.println("rightFlow:\n"+rightFlow);
+//                                        System.err.println("symboltable:\n"+SymbolTable.CurrentSymbolTable());
         leftFlow = rightFlow;
     }
         System.out.println("=================\u5a34\u5b2d\u762fflowing==================");
         System.out.println("Root Symbol Table: " + SymbolTable.CurrentSymbolTable());
         System.out.println("before flowing: " + topFlow);
         if (Core.isEagerFlowing()) {
-            System.out.println("eager! flowing");
+//            System.out.println("eager! flowing");
             topFlow.Flowing();
         }
-        System.out.println("after flowing: " + topFlow);
+//        System.out.println("after flowing: " + topFlow);
+//                                        System.err.println("topFlow:\n"+topFlow);
+//                                                System.err.println("symboltable:\n"+SymbolTable.CurrentSymbolTable());
         {if (true) return topFlow;}
     throw new Error("Missing return statement in function");
   }
 
-  final public void block() throws ParseException {
-    jj_consume_token(LCBR);
-               Core.setEagerFlowing(false);
-    label_5:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case LSBR:
-      case IF:
-      case WHILE:
-      case SYMBOL:
-        ;
-        break;
-      default:
-        jj_la1[11] = jj_gen;
-        break label_5;
-      }
-      flowing();
+  final public void def_func_stmt() throws ParseException {
+    Token func_symbol;
+    ListFlow param_flow = null;
+    BlockFlow block_flow;
+    jj_consume_token(FUNC);
+    func_symbol = jj_consume_token(SYMBOL);
+    jj_consume_token(LBR);
+              SymbolTable.EnterBlock(func_symbol.image);
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case LSBR:
+      param_flow = list_flow();
+      break;
+    default:
+      jj_la1[12] = jj_gen;
+      ;
     }
-    jj_consume_token(RCBR);
-               Core.setEagerFlowing(true);
-        {if (true) return;}
+    jj_consume_token(RBR);
+    block_flow = block_flow();
+                                SymbolTable.ExitBlock();
+        SymbolTable.CurrentSymbolTable().PutSymbol(func_symbol.image, SymbolTable.SymbolType.Flow, new FuncFlow(func_symbol.image, param_flow, block_flow));
   }
 
   final public void import_stmt() throws ParseException {
@@ -412,65 +457,28 @@ public class FldwCompiler implements FldwCompilerConstants {
     package_name = jj_consume_token(SYMBOL);
     jj_consume_token(DOT);
     module_name = jj_consume_token(SYMBOL);
-        try {
-            Class.forName(package_name.image + "." + module_name.image);
-//        Std std=new Std();
-        } catch (ClassNotFoundException ex) {
-            {if (true) throw new RuntimeException(ex.getMessage());}
-        }
+
   }
 
-//void if_else_stmt() :
-//{
-//}
-//{
-//    // 璇硶锛歩f_else_stmt() = < IF > < LBR > expr_data() < RBR > block() [ <ELSE > block() ]
-//    < IF > < LBR > expr_data() < RBR > block() [ <ELSE > block() ]
-//    {
-//        return;
-//    }
-//}
-
-//void while_stmt() :
-//{
-//}
-//{
-//    // 璇硶锛?< WHILE > < LBR > expr_data() < RBR > block()
-//    < WHILE > < LBR > expr_data() < RBR > block()
-//    {
-//        return;
-//    }
-//}
-//
-//void def_func_stmt() :
-//{
-//}
-//{
-//    // 璇硶锛?< FUNC > symbol_data() < LBR > (symbol_data())* < RBR > block()
-//    < FUNC > symbol_data() < LBR > (symbol_data())* < RBR > block()
-//    {
-//        return;
-//    }
-//}
-//
   final public void stmt() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case LCBR:
     case LSBR:
     case IF:
     case WHILE:
     case SYMBOL:
       flowing();
       break;
+    case FUNC:
+      def_func_stmt();
+      break;
     case IMPORT:
       import_stmt();
-      break;
-    case LCBR:
-      block();
         System.out.println("=================\u5a34\u5b2d\u762fstmt==================");
         {if (true) return;}
       break;
     default:
-      jj_la1[12] = jj_gen;
+      jj_la1[13] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -484,12 +492,13 @@ public class FldwCompiler implements FldwCompilerConstants {
       case LSBR:
       case IF:
       case WHILE:
+      case FUNC:
       case IMPORT:
       case SYMBOL:
         ;
         break;
       default:
-        jj_la1[13] = jj_gen;
+        jj_la1[14] = jj_gen;
         break label_6;
       }
       stmt();
@@ -530,13 +539,14 @@ public class FldwCompiler implements FldwCompilerConstants {
     return false;
   }
 
-  private boolean jj_3R_14() {
-    if (jj_3R_10()) return true;
+  private boolean jj_3R_7() {
+    if (jj_scan_token(SYMBOL)) return true;
+    if (jj_scan_token(LBR)) return true;
     return false;
   }
 
-  private boolean jj_3R_13() {
-    if (jj_3R_15()) return true;
+  private boolean jj_3R_14() {
+    if (jj_3R_10()) return true;
     return false;
   }
 
@@ -545,14 +555,18 @@ public class FldwCompiler implements FldwCompilerConstants {
     return false;
   }
 
+  private boolean jj_3R_13() {
+    if (jj_3R_15()) return true;
+    return false;
+  }
+
   private boolean jj_3R_18() {
     if (jj_scan_token(BOOL_VALUE)) return true;
     return false;
   }
 
-  private boolean jj_3R_7() {
-    if (jj_3R_10()) return true;
-    if (jj_scan_token(LBR)) return true;
+  private boolean jj_3_2() {
+    if (jj_3R_8()) return true;
     return false;
   }
 
@@ -566,11 +580,6 @@ public class FldwCompiler implements FldwCompilerConstants {
     return false;
   }
 
-  private boolean jj_3_2() {
-    if (jj_3R_8()) return true;
-    return false;
-  }
-
   private boolean jj_3R_11() {
     Token xsp;
     xsp = jj_scanpos;
@@ -581,6 +590,13 @@ public class FldwCompiler implements FldwCompilerConstants {
     return false;
   }
 
+  private boolean jj_3R_8() {
+    if (jj_scan_token(LSBR)) return true;
+    if (jj_3R_10()) return true;
+    if (jj_scan_token(SEMIC)) return true;
+    return false;
+  }
+
   private boolean jj_3_1() {
     if (jj_3R_7()) return true;
     return false;
@@ -588,13 +604,6 @@ public class FldwCompiler implements FldwCompilerConstants {
 
   private boolean jj_3R_10() {
     if (jj_scan_token(SYMBOL)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_8() {
-    if (jj_scan_token(LSBR)) return true;
-    if (jj_3R_10()) return true;
-    if (jj_scan_token(SEMIC)) return true;
     return false;
   }
 
@@ -645,7 +654,7 @@ public class FldwCompiler implements FldwCompilerConstants {
   private boolean jj_lookingAhead = false;
   private boolean jj_semLA;
   private int jj_gen;
-  final private int[] jj_la1 = new int[14];
+  final private int[] jj_la1 = new int[15];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -653,10 +662,10 @@ public class FldwCompiler implements FldwCompilerConstants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x0,0xf0000000,0xf0000,0x100,0x0,0x0,0x100,0x0,0x0,0x4000,0x0,0x4000,0x5000,0x5000,};
+      jj_la1_0 = new int[] {0x0,0xf0000000,0xf0000,0x100,0x0,0x0,0x100,0x0,0x5000,0x0,0x5000,0x0,0x4000,0x5000,0x5000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x21c00,0x0,0x0,0x0,0x40,0x61c00,0x0,0x2,0x40000,0x5,0x40,0x40005,0x40105,0x40105,};
+      jj_la1_1 = new int[] {0x8700,0x0,0x0,0x0,0x10,0x18700,0x0,0x2,0x10005,0x10000,0x5,0x10,0x0,0x1004d,0x1004d,};
    }
   final private JJCalls[] jj_2_rtns = new JJCalls[3];
   private boolean jj_rescan = false;
@@ -673,7 +682,7 @@ public class FldwCompiler implements FldwCompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 15; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -688,7 +697,7 @@ public class FldwCompiler implements FldwCompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 15; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -699,7 +708,7 @@ public class FldwCompiler implements FldwCompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 15; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -710,7 +719,7 @@ public class FldwCompiler implements FldwCompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 15; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -720,7 +729,7 @@ public class FldwCompiler implements FldwCompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 15; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -730,7 +739,7 @@ public class FldwCompiler implements FldwCompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 15; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -845,12 +854,12 @@ public class FldwCompiler implements FldwCompilerConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[52];
+    boolean[] la1tokens = new boolean[50];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 14; i++) {
+    for (int i = 0; i < 15; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -862,7 +871,7 @@ public class FldwCompiler implements FldwCompilerConstants {
         }
       }
     }
-    for (int i = 0; i < 52; i++) {
+    for (int i = 0; i < 50; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

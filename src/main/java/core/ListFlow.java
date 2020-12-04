@@ -3,19 +3,26 @@ package core;
 import java.util.LinkedList;
 
 public class ListFlow extends Flow {
+    private int identity; // System.identityHashCode 返回对象的内存地址，不管该对象的类是否重写了 hashCode() 方法。
+    private String symbol;
     private LinkedList<Datable> dataList;
     private Flowable nextFlow;
-    private String symbol;
 
     public ListFlow() {
+        this.identity = System.identityHashCode(this);
+        this.symbol = null;
         this.dataList = new LinkedList<>();
         this.nextFlow = null;
-        this.symbol = null;
     }
 
     public ListFlow(String symbol) {
         this();
         this.symbol = symbol;
+    }
+
+    @Override
+    public int GetIdentity() {
+        return this.identity;
     }
 
     @Override
@@ -45,14 +52,14 @@ public class ListFlow extends Flow {
 
     @Override
     public Datable Pop() {
-        if (this.Len() > 0) {
+        if (this.inLen() > 0) {
             return dataList.pop();
         }
         return null;
     }
 
     @Override
-    public int Len() {
+    public int inLen() {
         return this.dataList.size();
     }
 
@@ -84,12 +91,12 @@ public class ListFlow extends Flow {
     public boolean Flowing() {
         if (this.nextFlow == null) {
             return true;
-        } else if (this.nextFlow.Len() == 0) {
+        } else if (this.nextFlow.inLen() == 0) {
             boolean success = this.nextFlow.Push(this);
             if (!success) return false;
             return this.nextFlow.Flowing();
         } else {
-            int minSize = Math.min(this.Len(), this.nextFlow.Len());
+            int minSize = Math.min(this.inLen(), this.nextFlow.inLen());
             for (int i = 0; i < minSize; i++) {
                 boolean success = this.nextFlow.Push(i, this.Get(i));
                 if (!success) return false;
@@ -101,9 +108,9 @@ public class ListFlow extends Flow {
     @Override
     public String toString() {
         return "ListFlow{" +
-                "dataList=" + dataList +
-                ", nextFlow=" + nextFlow +
                 ", symbol='" + symbol + '\'' +
+                ", dataList=" + dataList +
+                ", nextFlow=" + nextFlow +
                 '}';
     }
 }

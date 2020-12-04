@@ -1,8 +1,6 @@
 package core;
 
-import java.util.HashMap;
-import java.util.Stack;
-import java.util.UUID;
+import java.util.*;
 
 // 符号表
 public class SymbolTable {
@@ -14,11 +12,14 @@ public class SymbolTable {
         BlockSymbolTable        // 符号-Block 符号表
     }
 
+    private static int TmpSymbolIndex = 0;
+
     //    生成一个临时的符号，用于表示临时变量的符号
     //    目前仅用于表示 Block 符号表的符号
-    private static String getTmpSymbol() {
-        UUID uuid = UUID.randomUUID();
-        return uuid.toString();
+    private static String getTmpSymbol() { // 临时变量有序，不采用 UUID，便于测试
+//        UUID uuid = UUID.randomUUID();
+//        return uuid.toString();
+        return "tmp" + TmpSymbolIndex++;
     }
 
     //    符号表项
@@ -56,12 +57,12 @@ public class SymbolTable {
             return (SymbolData) this.getValue();
         }
 
-        public ListFlow assertGetListFlow() {
-            if (this.getType() != SymbolType.Flow) {
-                throw new RuntimeException("assert type mismatch");
-            }
-            return (ListFlow) this.getValue();
-        }
+//        public ListFlow assertGetListFlow() {
+//            if (this.getType() != SymbolType.Flow) {
+//                throw new RuntimeException("assert type mismatch");
+//            }
+//            return (ListFlow) this.getValue();
+//        }
 
         public Flowable assertGetFlowable() {
             if (this.getType() != SymbolType.Flow) {
@@ -93,13 +94,13 @@ public class SymbolTable {
 
     private String symbol;
     private SymbolTable parentSymbolTable;
-    private HashMap<String, SymbolItem> SymbolItemHashMap;
+    private TreeMap<String, SymbolItem> SymbolItemTreeMap; // TreeMap 有序，方便对符号表进行测试
 
     //    私有化构造函数，符号表只能通过两种方式构建：（1）根符号表；（2）Blocks 内符号表
     private SymbolTable(String symbol, SymbolTable parentSymbolTable) {
         this.symbol = symbol;
         this.parentSymbolTable = parentSymbolTable;
-        this.SymbolItemHashMap = new HashMap<>();
+        this.SymbolItemTreeMap = new TreeMap<>();
 
         //        每个符号表都内嵌了 in 和 out 两个符号流，表示都可以作为一个流调用，但是只有函数 Block 包含显示的名称，可以直接被用户调用
         //        TODO：未来或许可以进行多个程序的串联
@@ -130,7 +131,7 @@ public class SymbolTable {
 
     //    递归查找符号表
     public SymbolItem GetSymbol(String symbol) {
-        SymbolItem value = this.SymbolItemHashMap.get(symbol);
+        SymbolItem value = this.SymbolItemTreeMap.get(symbol);
         if (value != null) {
             return value;
         } else if (this.parentSymbolTable != null) {
@@ -150,12 +151,12 @@ public class SymbolTable {
     public SymbolItem PutSymbol(String symbol, SymbolType type, Object value) {
 //        Object value = this.NewSymbolValue(symbol, type);
 
-        if (this.SymbolItemHashMap.containsKey(symbol)) {
+        if (this.SymbolItemTreeMap.containsKey(symbol)) {
             throw new RuntimeException("duplicate symbol"); // 符号重复
         } else {
-//            java hashmap put 的返回值并不是插入的元素，而是 null 或者被重复 key 覆盖的元素
+//            java TreeMap put 的返回值并不是插入的元素，而是 null 或者被重复 key 覆盖的元素
             SymbolItem item = new SymbolItem(symbol, type, value);
-            this.SymbolItemHashMap.put(symbol, item);
+            this.SymbolItemTreeMap.put(symbol, item);
             return item;
         }
     }
@@ -163,11 +164,15 @@ public class SymbolTable {
     //    遇见一个符号，不确定是已有的还是新增的，若有则返回，没有则新增
     public SymbolItem PutOrGetSymbol(String symbol, SymbolType type) {
         SymbolItem symbolItem = this.GetSymbol(symbol);
+//        System.err.println("At: " + this);
+//        System.err.println("At: " + this.symbol);
+//        System.err.println("Get: " + symbolItem);
+
         if (symbolItem != null) {
             if (symbolItem.getType() == type) {
                 return symbolItem;
             } else {
-                throw new RuntimeException("duplicate symbol"); // 符号重复
+                throw new RuntimeException("duplicate symbol:" + symbolItem.getType() + ", " + type); // 符号重复
             }
         } else {
             return this.PutSymbol(symbol, type);
@@ -176,11 +181,21 @@ public class SymbolTable {
 
     @Override
     public String toString() {
-        return "SymbolTable{" +
+        StringBuilder stringBuilder = new StringBuilder("SymbolTable{\n" +
                 "symbol='" + symbol + '\'' +
-                ", parentSymbolTable=" + parentSymbolTable +
-                ", SymbolItemHashMap=" + SymbolItemHashMap +
-                '}';
+                ", parentSymbolTable=" + (parentSymbolTable == null ? "" : parentSymbolTable.symbol) + // 打印整个 parentSymbolTable 会导致递归栈溢出
+                ", SymbolItemTreeMap=\n");
+        for (Map.Entry<String, SymbolItem> entry : this.SymbolItemTreeMap.entrySet()) {
+            if (this.parentSymbolTable != null) {
+                stringBuilder.append("|-- ");
+            }
+            stringBuilder.append(entry.getKey());
+            stringBuilder.append(": ");
+            stringBuilder.append(entry.getValue());
+            stringBuilder.append("\n");
+        }
+        stringBuilder.append('}');
+        return stringBuilder.toString();
     }
 
     //    根符号表
@@ -189,9 +204,17 @@ public class SymbolTable {
     //    符号表栈
     private static final Stack<SymbolTable> SymbolTableStack = new Stack<>();
 
-    static {
+    public static void Clear() {
+        SymbolTable.RootSymbolTable.SymbolItemTreeMap.clear();
+        SymbolTable.SymbolTableStack.clear();
         //        符号表栈从根符号表开始
         SymbolTable.SymbolTableStack.push(SymbolTable.RootSymbolTable);
+        SymbolTable.RootSymbolTable.PutSymbol(SymbolTable.InSymbol, SymbolType.Flow);
+        SymbolTable.RootSymbolTable.PutSymbol(SymbolTable.OutSymbol, SymbolType.Flow);
+        SymbolTable.TmpSymbolIndex = 0;
+
+//        SymbolTable.CurrentSymbolTable().PutSymbol(Std.StdInFlowSymbol, SymbolTable.SymbolType.Flow, StdInFlow.GetInstance());
+//        SymbolTable.CurrentSymbolTable().PutSymbol(Std.StdOutFlowSymbol, SymbolTable.SymbolType.Flow, StdOutFlow.GetInstance());
     }
 
     //    获取当前符号表，即栈顶符号表
@@ -204,13 +227,16 @@ public class SymbolTable {
         if (name == null) {
             name = SymbolTable.getTmpSymbol();
         }
+//        System.err.println("Goto: " + name);
         SymbolTable.SymbolTableStack.push(
                 SymbolTable.CurrentSymbolTable().PutOrGetSymbol(name, SymbolType.BlockSymbolTable)
                         .assertGetSymbolTable());
+//        System.err.println("Goto: " + name + ", At: " + SymbolTable.CurrentSymbolTable().symbol);
         return SymbolTable.CurrentSymbolTable();
     }
 
     public static SymbolTable ExitBlock() {
+//        System.err.println("Go out");
         return SymbolTable.SymbolTableStack.pop();
     }
 

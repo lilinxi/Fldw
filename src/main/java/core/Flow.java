@@ -3,8 +3,13 @@ package core;
 // Flowable 默认实现类
 public class Flow implements Flowable {
     @Override
+    public int GetIdentity() {
+        return -1;
+    }
+
+    @Override
     public String GetSymbol() {
-        throw new RuntimeException("no impl, wrong call");
+       return null;
     }
 
     @Override
@@ -40,6 +45,16 @@ public class Flow implements Flowable {
     @Override
     public int Len() {
         return 0;
+    }
+
+    @Override
+    public int inLen() {
+        return 0;
+    }
+
+    @Override
+    public int outLen() { // 默认输出长度等于输入长度
+        return this.inLen();
     }
 
     @Override

@@ -2,6 +2,8 @@ package core;
 
 // 支持的流所提供的接口
 public interface Flowable {
+    int GetIdentity();// 获取内存地址
+
     String GetSymbol();// 获取流的符号
 
     boolean Push(Datable data); // 流入一个元素，返回是否成功
@@ -17,6 +19,9 @@ public interface Flowable {
     ExprData PopExpr();
 
     int Len(); // 当前流长度，如果不为 0，则流入操作将转化为匹配操作
+    int inLen(); // 当前流输出长度，如果不为 0，则流入操作将转化为匹配操作
+
+    int outLen(); // 当前流输入长度
 
     Datable Get(int index); // 获取某个位置上的元素
 
@@ -26,5 +31,5 @@ public interface Flowable {
 
     boolean HasNext(); // 是否有下一个流
 
-    boolean Flowing(); // 开始元素的流动
+    boolean Flowing(); // 解释执行：开始元素的流动
 }

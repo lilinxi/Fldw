@@ -10,17 +10,10 @@ import java.io.StringReader;
 import java.util.Scanner;
 
 public class StdInFlow extends Flow {
-    //    单例模式
-    private static StdInFlow Instance = new StdInFlow();
-
     private ListFlow cacheFlow;
 
-    private StdInFlow() {
+    public StdInFlow() {
         this.cacheFlow = new ListFlow();
-    }
-
-    public static StdInFlow GetInstance() {
-        return StdInFlow.Instance;
     }
 
     @Override
@@ -34,8 +27,8 @@ public class StdInFlow extends Flow {
     }
 
     @Override
-    public int Len() {
-        return this.cacheFlow.Len();
+    public int inLen() {
+        return this.cacheFlow.inLen();
     }
 
     @Override
@@ -66,7 +59,7 @@ public class StdInFlow extends Flow {
             if (!stdin.startsWith("[")) {
                 stdin = "[" + stdin + "]";
             }
-            System.out.println(stdin);
+//            System.out.println(stdin);
             try {
                 this.cacheFlow.Push(new javacc.FldwCompiler(new StringReader(stdin)).flowing());
             } catch (ParseException e) {
@@ -75,5 +68,12 @@ public class StdInFlow extends Flow {
         }
         sc.close();
         return this.cacheFlow.Flowing();
+    }
+
+    @Override
+    public String toString() {
+        return "StdInFlow{" +
+                "cacheFlow=" + cacheFlow +
+                '}';
     }
 }
