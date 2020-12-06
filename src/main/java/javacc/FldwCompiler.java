@@ -473,11 +473,11 @@ IfElseFlow if_else_flow() throws ParseException {ExprData conditionData;
     jj_consume_token(LBR);
     conditionData = expr_data_tmp();
     jj_consume_token(RBR);
-    trueFlow = block_flow();
+    trueFlow = block_flow("if");
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case ELSE:{
       jj_consume_token(ELSE);
-      falseFlow = block_flow();
+      falseFlow = block_flow("else");
       break;
       }
     default:
@@ -494,7 +494,7 @@ IfElseFlow if_else_flow() throws ParseException {ExprData conditionData;
     jj_consume_token(LBR);
     conditionData = expr_data_tmp();
     jj_consume_token(RBR);
-    trueFlow = block_flow();
+    trueFlow = block_flow("while");
 {if ("" != null) return new WhileFlow(conditionData, trueFlow);}
     throw new Error("Missing return statement in function");
 }
@@ -509,7 +509,7 @@ IfElseFlow if_else_flow() throws ParseException {ExprData conditionData;
     jj_consume_token(MATCHING);
     iterSymbolData = symbol_data();
     jj_consume_token(RBR);
-    forBlockFlow = block_flow();
+    forBlockFlow = block_flow("for");
 forFlow = new ForFlow(iterFlow, iterSymbolData, forBlockFlow);
         {if ("" != null) return forFlow;}
     throw new Error("Missing return statement in function");
@@ -568,10 +568,10 @@ if (partialSymbol) {
     throw new Error("Missing return statement in function");
 }
 
-  final public BlockFlow block_flow() throws ParseException {BlockFlow blockFlow;
+  final public BlockFlow block_flow(String blockName) throws ParseException {BlockFlow blockFlow;
     Flowable topFlow;
     jj_consume_token(LCBR);
-Core.AddEager(); SymbolTable.EnterBlock(null); blockFlow = new BlockFlow();
+Core.AddEager(); SymbolTable.EnterBlock(blockName); blockFlow = new BlockFlow();
     label_7:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -645,7 +645,7 @@ if (partialSymbol) {
         break;
         }
       case LCBR:{
-        flow = block_flow();
+        flow = block_flow("block");
         break;
         }
       case FOR:{
@@ -793,7 +793,7 @@ SymbolTable.EnterBlock(funcName);
       ;
     }
     jj_consume_token(RBR);
-    block_flow = block_flow();
+    block_flow = block_flow("func");
 SymbolTable.ExitBlock();
 FuncFlow f = new FuncFlow(param_flow, block_flow);
         {if ("" != null) return f;}

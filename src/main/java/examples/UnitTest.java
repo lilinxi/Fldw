@@ -1647,9 +1647,9 @@ public class UnitTest {
                                 }
                             }
                             leftHead | sort() | out
-                            [head] | stdout
+                            [head] | out
                             rightHead | sort() | out
-                        }
+                        } | out
                     }
                     [5, 6, 3, 2, 7, 8] | sort() | stdout
                     """);
@@ -1660,15 +1660,12 @@ public class UnitTest {
         System.setOut(System.out);
 
         assertEquals("""
-                stdout: SymbolData{type=Int, value=3, symbol='null'}
-                stdout: SymbolData{type=Int, value=2, symbol='null'}
-                stdout: TerminalData{type=String, value="==="}
-                stdout: SymbolData{type=Int, value=6, symbol='null'}
-                stdout: SymbolData{type=Int, value=7, symbol='null'}
-                stdout: SymbolData{type=Int, value=8, symbol='null'}
+                stdout: SymbolData{type=Int, value=2, symbol='head'}
+                stdout: SymbolData{type=Int, value=3, symbol='head'}
+                stdout: SymbolData{type=Int, value=5, symbol='head'}
+                stdout: SymbolData{type=Int, value=6, symbol='head'}
+                stdout: SymbolData{type=Int, value=7, symbol='head'}
+                stdout: SymbolData{type=Int, value=8, symbol='head'}
                 """, output.toString());
-        assertEquals("""
-                        """,
-                SymbolTable.CurrentSymbolTable().toString());
     }
 }

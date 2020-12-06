@@ -27,7 +27,7 @@ public class DelayFuncFlow extends Flow {
 
     public FuncFlow getFuncFlow() {
         if (this.funcFlow == null) {
-            try{
+            try {
                 this.funcFlow = new FldwCompiler(new StringReader(this.funcValue)).make_func_flow(this.symbol);
                 if (this.paramFlow != null) {
                     funcFlow.setParamFlow(paramFlow);
@@ -50,6 +50,16 @@ public class DelayFuncFlow extends Flow {
     @Override
     public void SetNextFlowing(Flowable flow) {
         this.nextFlow = flow;
+    }
+
+    @Override
+    public Flowable NextFlowing() {
+        return this.nextFlow;
+    }
+
+    @Override
+    public boolean HasNextFlowing() {
+        return this.nextFlow != null;
     }
 
     @Override

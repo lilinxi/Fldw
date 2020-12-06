@@ -112,7 +112,9 @@ public class FuncFlow extends Flow {
 //        System.out.println("begin func=====");
 //        System.err.println("this: "+this);
 //        System.err.println("flowing: "+this.blockFlow);
-        return this.blockFlow.Flowing();
+        boolean ret = this.blockFlow.Flowing();
+        SymbolTable sym = SymbolTable.CurrentSymbolTable();
+        return ret;
     }
 
     @Override

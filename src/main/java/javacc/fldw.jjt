@@ -441,7 +441,7 @@ IfElseFlow if_else_flow() :
 }
 {
     // 语法：if_else_stmt() = < IF > < LBR > expr_data_tmp() < RBR > block() [ <ELSE > block() ]
-    < IF > < LBR > conditionData = expr_data_tmp() < RBR > trueFlow = block_flow() [ <ELSE > falseFlow = block_flow() ]
+    < IF > < LBR > conditionData = expr_data_tmp() < RBR > trueFlow = block_flow("if") [ <ELSE > falseFlow = block_flow("else") ]
     {
         return new IfElseFlow(conditionData, trueFlow, falseFlow);
     }
@@ -454,7 +454,7 @@ WhileFlow while_flow() :
 }
 {
     // 语法：< WHILE > < LBR > expr_data_tmp() < RBR > block()
-    < WHILE > < LBR > conditionData = expr_data_tmp() < RBR > trueFlow = block_flow()
+    < WHILE > < LBR > conditionData = expr_data_tmp() < RBR > trueFlow = block_flow("while")
     {
         return new WhileFlow(conditionData, trueFlow);
     }
@@ -469,7 +469,7 @@ ForFlow for_flow() :
 }
 {
     // 语法：for_flow() = < FOR > < LBR > flow() < FLOWING > symbol_data() < RBR > block_flow()
-    < FOR > < LBR > iterFlow = flow() < MATCHING > iterSymbolData = symbol_data() < RBR > forBlockFlow = block_flow()
+    < FOR > < LBR > iterFlow = flow() < MATCHING > iterSymbolData = symbol_data() < RBR > forBlockFlow = block_flow("for")
     {
         forFlow = new ForFlow(iterFlow, iterSymbolData, forBlockFlow);
         return forFlow;
@@ -518,14 +518,14 @@ HeadTailFlow head_tail_flow() :
     }
 }
 
-BlockFlow block_flow() : // block 不能嵌套
+BlockFlow block_flow(String blockName) : // block 不能嵌套
 {
     BlockFlow blockFlow;
     Flowable topFlow;
 }
 {
     // 语法：block() = < LCBR > (flowing)* < RCBR > [ < EXLM > ]
-    < LCBR > { Core.AddEager(); SymbolTable.EnterBlock(null); blockFlow = new BlockFlow();}
+    < LCBR > { Core.AddEager(); SymbolTable.EnterBlock(blockName); blockFlow = new BlockFlow();}
 //    ( import_stmt() )*
     (
 //        LOOKAHEAD(3) topFlow = flowing() { blockFlow.addFlow(topFlow); }
@@ -569,7 +569,7 @@ Flowable flow() :
     |   flow = list_flow()
     |   flow = if_else_flow()
     |   flow = while_flow()
-    |   flow = block_flow()
+    |   flow = block_flow("block")
     |   flow = for_flow()
     )
     {
@@ -695,7 +695,7 @@ FuncFlow make_func_flow(String funcName) : // 函数就是一个有参数和符�
     < LBR > { SymbolTable.EnterBlock(funcName); }
     [ param_flow = list_flow() ]
     < RBR >
-    block_flow = block_flow() { SymbolTable.ExitBlock(); }
+    block_flow = block_flow("func") { SymbolTable.ExitBlock(); }
     {
         FuncFlow f = new FuncFlow(param_flow, block_flow);
         return f;
