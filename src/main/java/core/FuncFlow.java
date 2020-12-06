@@ -1,13 +1,19 @@
 package core;
 
 public class FuncFlow extends Flow {
-    public final static String FuncSymbolTableSuffix = "_funcSymbolTable";
+//    public final static String FuncSymbolTableSuffix = "_funcSymbolTable";
 
     private String symbol;
+    private String funcValue; // delay func make
     private ListFlow paramFlow;
     private BlockFlow blockFlow;
 
     private SymbolData tmpData;
+
+//    public FuncFlow(String symbol, String funcValue) {
+//        this.symbol = symbol;
+//        this.funcValue = funcValue;
+//    }
 
     public FuncFlow(ListFlow paramFlow, BlockFlow blockFlow) {
 //        System.err.println("1");
@@ -102,6 +108,7 @@ public class FuncFlow extends Flow {
 
     @Override
     public boolean Flowing() {
+//        new FldwCompiler(new StringReader(this.getValue().toString())).make_func_flow(this.getSymbol());
 //        System.out.println("begin func=====");
 //        System.err.println("this: "+this);
 //        System.err.println("flowing: "+this.blockFlow);

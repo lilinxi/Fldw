@@ -73,7 +73,7 @@ TOKEN : // Keywords and punctuation
     |   < INC : "++" >
     |   < DEC : "--" >
 
-//    |   < EXLM : "!" >
+    |   < EXLM : "!" >
     |   < LOGIC_EQUAL : "==" >
     |   < LOGIC_NOT : "!=" >
     |   < LOGIC_AND : "&&" >
@@ -193,15 +193,20 @@ SymbolData symbol_data() :
 {
     Token symbolToken;
     SymbolData symbolData;
+        boolean partialSymbol=false;
 }
 {
     // 语法：symbol_data() = < SYMBOL>  | < SYMBOL> < EXLM >
-    symbolToken = < SYMBOL>
+    [ < EXLM > {partialSymbol=true;} ] symbolToken = < SYMBOL>
     {
-    symbolData = SymbolTable.CurrentSymbolTable().PutOrRecurseGetSymbol(symbolToken.image, SymbolTable.SymbolType.Data).assertGetSymbolData();
-    symbolData.addToken(symbolToken.image);
-    return symbolData;
-}
+                if (partialSymbol) {
+                            symbolData = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(symbolToken.image, SymbolTable.SymbolType.Data).assertGetSymbolData();
+                } else {
+                            symbolData = SymbolTable.CurrentSymbolTable().PutOrRecurseGetSymbol(symbolToken.image, SymbolTable.SymbolType.Data).assertGetSymbolData();
+                }
+//        symbolData.addToken(symbolToken.image);
+        return symbolData;
+    }
 }
 
 // TODO：tmp
@@ -471,16 +476,16 @@ ForFlow for_flow() :
     }
 }
 
-FuncFlow func_flow() :
+DelayFuncFlow func_flow() :
 {
     Token funcSymbol;
     ListFlow paramFlow = null;
-    FuncFlow funcFlow;
+    DelayFuncFlow funcFlow;
 }
 {
     funcSymbol = < SYMBOL > < LBR > [ paramFlow = list_flow()] < RBR >
     {
-        funcFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(funcSymbol.image).assertGetFuncFlow();
+        funcFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(funcSymbol.image).assertGetDelayFuncFlow();
         if (paramFlow != null) {
             funcFlow.setParamFlow(paramFlow);
         }
@@ -494,14 +499,19 @@ HeadTailFlow head_tail_flow() :
     Token tailListFlowSymbol;
     Flowable tailListFlow;
     HeadTailFlow headTailFlow;
+        boolean partialSymbol=false;
 }
 {
     // 语法：head_tail_flow() = < LSBR  > symbol_data() < SEMIC > < SYMBOL> < RSBR >
     < LSBR  > headData = symbol_data() < SEMIC >
-    tailListFlowSymbol = < SYMBOL>
-    {
-        tailListFlow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(tailListFlowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
-    }
+    [ < EXLM > {partialSymbol=true;} ] tailListFlowSymbol = < SYMBOL>
+                {
+                    if (partialSymbol) {
+                        tailListFlow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(tailListFlowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
+                    } else {
+                        tailListFlow = SymbolTable.CurrentSymbolTable().PutOrRecurseGetSymbol(tailListFlowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
+                    }
+                }
     < RSBR >
     {
         return new HeadTailFlow(headData, tailListFlow);
@@ -535,6 +545,7 @@ Flowable flow() :
     Flowable flow = new ListFlow();
     Token flowSymbol;
     boolean gotoNext=true;
+    boolean partialSymbol=false;
 }
 {
     // 语法：flow() = list_flow() | symbol_flow() | func_flow()
@@ -545,9 +556,13 @@ Flowable flow() :
     |   LOOKAHEAD(3) flow = head_tail_flow() // 预读 < LSBR > < SYMBOL > <SEMIC >
     |   (
 //            [ < COLON > {gotoNext=true;}]
-            flowSymbol = < SYMBOL>
+            [ < EXLM > {partialSymbol=true;} ] flowSymbol = < SYMBOL>
             {
-                flow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
+                if (partialSymbol) {
+                    flow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
+                } else {
+                    flow = SymbolTable.CurrentSymbolTable().PutOrRecurseGetSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
+                }
             }
 //            [ LOOKAHEAD(2) < COLON > {gotoNext=false;}] {flow.SetGotoNext(gotoNext);System.err.println(gotoNext);}
         )
@@ -670,14 +685,14 @@ void def_func_stmt() : // 函数就是一个有参数和符号关联的 Block
     }
 }
 
-FuncFlow make_func_flow() : // 函数就是一个有参数和符号关联的 Block
+FuncFlow make_func_flow(String funcName) : // 函数就是一个有参数和符号关联的 Block
 {
     ListFlow param_flow = null;
     BlockFlow block_flow;
 }
 {
     // 语法：def_func_stmt() = < FUNC > < SYMBOL > < LBR > [ list_flow() ] < RBR > block_flow()
-    < LBR > { SymbolTable.EnterBlock(null); }
+    < LBR > { SymbolTable.EnterBlock(funcName); }
     [ param_flow = list_flow() ]
     < RBR >
     block_flow = block_flow() { SymbolTable.ExitBlock(); }

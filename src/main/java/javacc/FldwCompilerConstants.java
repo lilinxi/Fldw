@@ -45,57 +45,59 @@ public interface FldwCompilerConstants {
   /** RegularExpression Id. */
   int DEC = 22;
   /** RegularExpression Id. */
-  int LOGIC_EQUAL = 23;
+  int EXLM = 23;
   /** RegularExpression Id. */
-  int LOGIC_NOT = 24;
+  int LOGIC_EQUAL = 24;
   /** RegularExpression Id. */
-  int LOGIC_AND = 25;
+  int LOGIC_NOT = 25;
   /** RegularExpression Id. */
-  int LOGIC_OR = 26;
+  int LOGIC_AND = 26;
   /** RegularExpression Id. */
-  int LEFT = 27;
+  int LOGIC_OR = 27;
   /** RegularExpression Id. */
-  int RIGHT = 28;
+  int LEFT = 28;
   /** RegularExpression Id. */
-  int LEFT_EQUAL = 29;
+  int RIGHT = 29;
   /** RegularExpression Id. */
-  int RIGHT_EQUAL = 30;
+  int LEFT_EQUAL = 30;
   /** RegularExpression Id. */
-  int IF = 31;
+  int RIGHT_EQUAL = 31;
   /** RegularExpression Id. */
-  int ELSE = 32;
+  int IF = 32;
   /** RegularExpression Id. */
-  int WHILE = 33;
+  int ELSE = 33;
   /** RegularExpression Id. */
-  int FOR = 34;
+  int WHILE = 34;
   /** RegularExpression Id. */
-  int FUNC = 35;
+  int FOR = 35;
   /** RegularExpression Id. */
-  int FLOWING = 36;
+  int FUNC = 36;
   /** RegularExpression Id. */
-  int MATCHING = 37;
+  int FLOWING = 37;
   /** RegularExpression Id. */
-  int HASHTAG = 38;
+  int MATCHING = 38;
   /** RegularExpression Id. */
-  int COLON = 39;
+  int HASHTAG = 39;
   /** RegularExpression Id. */
-  int IMPORT = 40;
+  int COLON = 40;
   /** RegularExpression Id. */
-  int DOT = 41;
+  int IMPORT = 41;
   /** RegularExpression Id. */
-  int INT_VALUE = 42;
+  int DOT = 42;
   /** RegularExpression Id. */
-  int DOUBLE_VALUE = 43;
+  int INT_VALUE = 43;
   /** RegularExpression Id. */
-  int BOOL_VALUE = 44;
+  int DOUBLE_VALUE = 44;
   /** RegularExpression Id. */
-  int STRING_VALUE = 49;
+  int BOOL_VALUE = 45;
   /** RegularExpression Id. */
-  int NULL_VALUE = 50;
+  int STRING_VALUE = 50;
   /** RegularExpression Id. */
-  int SYMBOL = 51;
+  int NULL_VALUE = 51;
   /** RegularExpression Id. */
-  int OTHER = 52;
+  int SYMBOL = 52;
+  /** RegularExpression Id. */
+  int OTHER = 53;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -127,6 +129,7 @@ public interface FldwCompilerConstants {
     "\"%\"",
     "\"++\"",
     "\"--\"",
+    "\"!\"",
     "\"==\"",
     "\"!=\"",
     "\"&&\"",
@@ -150,9 +153,9 @@ public interface FldwCompilerConstants {
     "<DOUBLE_VALUE>",
     "<BOOL_VALUE>",
     "\"\\\"\"",
-    "<token of kind 46>",
     "<token of kind 47>",
     "<token of kind 48>",
+    "<token of kind 49>",
     "\"\\\"\"",
     "\"null\"",
     "<SYMBOL>",

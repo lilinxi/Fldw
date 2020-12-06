@@ -1535,28 +1535,27 @@ public class UnitTest {
         try {
             SymbolTable.Clear();
             FldwCompiler.parse("""
-                                        import std.Std
-                                        function sort() {
-                                            in | [head;tail]
-                                            if ( head != null ) { 
-                                                [] | leftHead
-                                                [] | rightHead
-                                                for ( tail -> tmp) {
-                                                    if ( tmp < head ) {
-                                                        #[tmp] | leftHead
-                                                    } 
-                                                    else {
-                                                        #[tmp] | rightHead
-                                                    }
-                                                }
-                                                leftHead | stdout
-                                                ["==="] | stdout
-                                                rightHead | stdout
-                    //                            [leftHead, head, rightHead] | out
-                                            }
-                                        }
-                                        [5, 6, 3, 2, 7, 8] | sort()
-                                        """);
+                    import std.Std
+                    function sort() {
+                        in | [head;tail]
+                        if ( head != null ) { 
+                            [] | leftHead
+                            [] | rightHead
+                            for ( tail -> tmp) {
+                                if ( tmp < head ) {
+                                    #[tmp] | leftHead
+                                } 
+                                else {
+                                    #[tmp] | rightHead
+                                }
+                            }
+                            leftHead | stdout
+                            ["==="] | stdout
+                            rightHead | stdout
+                        }
+                    }
+                    [5, 6, 3, 2, 7, 8] | sort()
+                    """);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -1623,5 +1622,53 @@ public class UnitTest {
 //                        }
 //                        """,
 //                SymbolTable.CurrentSymbolTable().toString());
+    }
+
+    @Test
+    public void TestQuickSortExample4() {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+
+        try {
+            SymbolTable.Clear();
+            FldwCompiler.parse("""
+                    import std.Std
+                    function sort() {
+                        in | [!head;!tail]
+                        if ( head != null ) { 
+                            [] | !leftHead
+                            [] | !rightHead
+                            for ( tail -> !tmp) {
+                                if ( tmp < head ) {
+                                    #[tmp] | leftHead
+                                } 
+                                else {
+                                    #[tmp] | rightHead
+                                }
+                            }
+                            leftHead | sort() | out
+                            [head] | stdout
+                            rightHead | sort() | out
+                        }
+                    }
+                    [5, 6, 3, 2, 7, 8] | sort() | stdout
+                    """);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        System.setOut(System.out);
+
+        assertEquals("""
+                stdout: SymbolData{type=Int, value=3, symbol='null'}
+                stdout: SymbolData{type=Int, value=2, symbol='null'}
+                stdout: TerminalData{type=String, value="==="}
+                stdout: SymbolData{type=Int, value=6, symbol='null'}
+                stdout: SymbolData{type=Int, value=7, symbol='null'}
+                stdout: SymbolData{type=Int, value=8, symbol='null'}
+                """, output.toString());
+        assertEquals("""
+                        """,
+                SymbolTable.CurrentSymbolTable().toString());
     }
 }
