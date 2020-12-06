@@ -1,36 +1,48 @@
 package core;
 
 public class FuncFlow extends Flow {
-    public final static String FuncSymbolTableSuffix = "_funcSymbolTable";
+//    public final static String FuncSymbolTableSuffix = "_funcSymbolTable";
 
     private String symbol;
+    private String funcValue; // delay func make
     private ListFlow paramFlow;
     private BlockFlow blockFlow;
 
     private SymbolData tmpData;
 
+//    public FuncFlow(String symbol, String funcValue) {
+//        this.symbol = symbol;
+//        this.funcValue = funcValue;
+//    }
+
     public FuncFlow(ListFlow paramFlow, BlockFlow blockFlow) {
+//        System.err.println("1");
         this.paramFlow = paramFlow;
         this.blockFlow = blockFlow;
     }
 
-    public FuncFlow(String symbol, ListFlow paramFlow, BlockFlow blockFlow) {
-        this.symbol = symbol;
-        this.paramFlow = paramFlow;
-        this.blockFlow = blockFlow;
-    }
-
-    public FuncFlow(FuncFlow funcFlow, ListFlow paramFlow) {
-        this.symbol = funcFlow.symbol;
-        this.paramFlow = funcFlow.paramFlow;
-        this.blockFlow = funcFlow.blockFlow;
-        paramFlow.SetNext(this.paramFlow);
-        paramFlow.Flowing();
-    }
+//    public FuncFlow(String symbol, ListFlow paramFlow, BlockFlow blockFlow) {
+//        System.err.println("2");
+//        this.symbol = symbol;
+//        this.paramFlow = paramFlow;
+//        this.blockFlow = blockFlow;
+//    }
+//
+//    public FuncFlow(FuncFlow funcFlow, ListFlow paramFlow) {
+//        System.err.println("3");
+//        this.symbol = funcFlow.symbol;
+//        this.paramFlow = funcFlow.paramFlow;
+//        this.blockFlow = funcFlow.blockFlow;
+//        paramFlow.SetNextFlowing(this.paramFlow);
+//        paramFlow.SetFlowOp(FlowOp.Matching);
+//        paramFlow.Flowing();
+//    }
 
     public void setParamFlow(ListFlow paramFlow) {
-        paramFlow.SetNext(this.paramFlow);
-        paramFlow.Flowing();
+        if (!paramFlow.Match(this.paramFlow)) {
+            throw new RuntimeException();
+        }
+//        System.out.println("===");
     }
 
     @Override
@@ -80,22 +92,24 @@ public class FuncFlow extends Flow {
 
 
     @Override
-    public void SetNext(Flowable flow) {
-        this.blockFlow.SetNext(flow);
+    public void SetNextFlowing(Flowable flow) {
+        this.blockFlow.SetNextFlowing(flow);
     }
 
     @Override
-    public Flowable Next() {
-        return this.blockFlow.Next();
+    public Flowable NextFlowing() {
+        return this.blockFlow.NextFlowing();
     }
 
     @Override
-    public boolean HasNext() {
-        return this.blockFlow.HasNext();
+    public boolean HasNextFlowing() {
+        return this.blockFlow.HasNextFlowing();
     }
 
     @Override
     public boolean Flowing() {
+//        new FldwCompiler(new StringReader(this.getValue().toString())).make_func_flow(this.getSymbol());
+//        System.out.println("begin func=====");
 //        System.err.println("this: "+this);
 //        System.err.println("flowing: "+this.blockFlow);
         return this.blockFlow.Flowing();

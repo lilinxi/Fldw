@@ -69,7 +69,14 @@ public class SymbolTable {
             if (this.getType() != SymbolType.Function) {
                 throw new RuntimeException("assert type mismatch");
             }
-            return new FldwCompiler(new StringReader(this.getValue().toString())).make_func_flow();
+            return new FldwCompiler(new StringReader(this.getValue().toString())).make_func_flow(this.getSymbol());
+        }
+
+        public DelayFuncFlow assertGetDelayFuncFlow() throws ParseException {
+            if (this.getType() != SymbolType.Function) {
+                throw new RuntimeException("assert type mismatch");
+            }
+            return new DelayFuncFlow(this.getSymbol(), this.getValue().toString());
         }
 
         public Flowable assertGetFlowable() {
@@ -78,6 +85,14 @@ public class SymbolTable {
             }
             return (Flowable) this.getValue();
         }
+
+//        @Deprecated
+//        public ListFlow assertGetListFlow() {
+//            if (this.getType() != SymbolType.Flow) {
+//                throw new RuntimeException("assert type mismatch");
+//            }
+//            return (ListFlow) this.getValue();
+//        }
 
         public SymbolTable assertGetSymbolTable() {
             if (this.getType() != SymbolType.BlockSymbolTable) {
@@ -116,6 +131,10 @@ public class SymbolTable {
         this.PutSymbol(SymbolTable.OutSymbol, SymbolType.Flow);
     }
 
+    public void setParentSymbolTable(SymbolTable parentSymbolTable) {
+        this.parentSymbolTable = parentSymbolTable;
+    }
+
     //    新增符号时，获取符号的默认值
     private Object NewSymbolValue(String symbol, SymbolType type) {
         switch (type) {
@@ -137,24 +156,34 @@ public class SymbolTable {
         }
     }
 
-    //    递归查找符号表
     public SymbolItem RecurseGetSymbol(String symbol) {
-        SymbolItem value = this.SymbolItemTreeMap.get(symbol);
+        return this.RecurseGetSymbol(symbol, false); // 默认为 false
+    }
+
+    //    递归查找符号表
+    public SymbolItem RecurseGetSymbol(String symbol, boolean delayCopy) {
+        SymbolItem value = this.GetSymbol(symbol, delayCopy);
         if (value != null) {
             return value;
         } else if (this.parentSymbolTable != null) {
-            return this.parentSymbolTable.RecurseGetSymbol(symbol);
+            return this.parentSymbolTable.RecurseGetSymbol(symbol, delayCopy);
         } else {
             return null; // 未定义符号不报错，只有使用未定义符号的时候会报错
         }
     }
 
     //    不递归，只查找当前符号表
-    public SymbolItem GetSymbol(String symbol) {
-        return this.SymbolItemTreeMap.get(symbol);
+    public SymbolItem GetSymbol(String symbol, boolean delayCopy) {
+        SymbolItem symbolItem = this.SymbolItemTreeMap.get(symbol);
+        if (delayCopy && symbolItem != null && symbolItem.getType() == SymbolType.Flow) {
+            SymbolItem ret = new SymbolItem(symbolItem.getSymbol(), symbolItem.getType(), new DelayFlow(symbolItem.assertGetFlowable()));
+//            System.err.println(ret.getValue());
+            return ret;
+        }
+        return symbolItem;
     }
 
-//    //    新增符号，没有类型，强制终止递归查找符号表，PutOrGetSymbol() 操作会覆盖已有值
+//    //    新增符号，没有类型，强制终止递归查找符号表，PutOrRecurseGetSymbol() 操作会覆盖已有值
 //    public SymbolItem PutSymbol(String symbol) {
 //        return this.;
 //    }
@@ -180,8 +209,26 @@ public class SymbolTable {
     }
 
     //    遇见一个符号，不确定是已有的还是新增的，若有则返回，没有则新增
+    public SymbolItem PutOrRecurseGetSymbol(String symbol, SymbolType type) {
+        SymbolItem symbolItem = this.RecurseGetSymbol(symbol, true); // 默认为 true
+//        System.err.println("At: " + this);
+//        System.err.println("At: " + this.symbol);
+//        System.err.println("Get: " + symbolItem);
+
+        if (symbolItem != null) {
+            if (symbolItem.getType() == type) {
+                return symbolItem;
+            } else {
+                throw new RuntimeException("duplicate symbol:" + symbol + ", " + symbolItem.getType() + ", " + type); // 符号重复
+            }
+        } else {
+            return this.PutSymbol(symbol, type);
+        }
+    }
+
+    //    遇见一个符号，不确定是已有的还是新增的，若有则返回，没有则新增
     public SymbolItem PutOrGetSymbol(String symbol, SymbolType type) {
-        SymbolItem symbolItem = this.RecurseGetSymbol(symbol);
+        SymbolItem symbolItem = this.GetSymbol(symbol, true); // 默认为 true
 //        System.err.println("At: " + this);
 //        System.err.println("At: " + this.symbol);
 //        System.err.println("Get: " + symbolItem);
@@ -249,10 +296,12 @@ public class SymbolTable {
         //        Block 表示为匿名的函数
         if (name == null) {
             name = SymbolTable.getTmpSymbol();
+        } else {
+            name += SymbolTable.getTmpSymbol();
         }
 //        System.err.println("Goto: " + name);
         SymbolTable.SymbolTableStack.push(
-                SymbolTable.CurrentSymbolTable().PutOrGetSymbol(name, SymbolType.BlockSymbolTable)
+                SymbolTable.CurrentSymbolTable().PutOrRecurseGetSymbol(name, SymbolType.BlockSymbolTable)
                         .assertGetSymbolTable());
 //        System.err.println("Goto: " + name + ", At: " + SymbolTable.CurrentSymbolTable().symbol);
         return SymbolTable.CurrentSymbolTable();
@@ -263,8 +312,23 @@ public class SymbolTable {
         return SymbolTable.SymbolTableStack.pop();
     }
 
+    @Deprecated
+    public static SymbolTable EnterBlockIndependent(String name) {
+        SymbolTable.SymbolTableStack.push(new SymbolTable("independent", null));
+        return SymbolTable.EnterBlock(name);
+    }
+
+    @Deprecated
+    public static SymbolTable ExitBlockIndependent() {
+        SymbolTable peekSymbolTable = SymbolTable.SymbolTableStack.pop();
+        SymbolTable.SymbolTableStack.pop();
+        peekSymbolTable.setParentSymbolTable(SymbolTable.CurrentSymbolTable());
+        return peekSymbolTable;
+    }
+
+
     //    遇见一个符号，不确定是已有的还是新增的，若有则返回，没有则新增
-//    public static SymbolItem PutOrGetSymbol(String symbol, SymbolType type) {
+//    public static SymbolItem PutOrRecurseGetSymbol(String symbol, SymbolType type) {
 //        SymbolTable curSymbolTable = SymbolTable.CurrentSymbolTable();
 //
 //        SymbolItem symbolItem = curSymbolTable.GetSymbol(symbol);

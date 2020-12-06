@@ -1,14 +1,18 @@
 package core;
 
 public class Core {
-    private static boolean Eager = true;
+    private static int EagerCount = 0; // 默认为立即执行
 
-    public static boolean isEager() {
-        return Core.Eager;
+    public static boolean IsEager() {
+        return Core.EagerCount == 0;
     }
 
-    public static void setEager(boolean eager) {
-        Core.Eager = eager;
+    public static void AddEager() {
+        Core.EagerCount++;
+    }
+
+    public static void SubEager() {
+        Core.EagerCount--;
     }
 
     public final static String ModuleLoadFunc = "Load";

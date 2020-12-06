@@ -20,9 +20,10 @@ public class IfElseFlow extends Flow {
         }
         if (conditionData.GetValue().equals(true)) {
             return this.trueFlow.Push(data);
-        } else {
+        } else if (this.falseFlow != null) {
             return this.falseFlow.Push(data);
         }
+        return true;
     }
 
     @Override
@@ -32,9 +33,10 @@ public class IfElseFlow extends Flow {
         }
         if (conditionData.GetValue().equals(true)) {
             return this.trueFlow.Push(flow);
-        } else {
+        } else if (this.falseFlow != null) {
             return this.falseFlow.Push(flow);
         }
+        return true;
     }
 
     @Override
@@ -44,9 +46,10 @@ public class IfElseFlow extends Flow {
         }
         if (conditionData.GetValue().equals(true)) {
             return this.trueFlow.Push(index, data);
-        } else {
+        } else if (this.falseFlow != null)  {
             return this.falseFlow.Push(index, data);
         }
+        return true;
     }
 
     @Override
@@ -56,9 +59,10 @@ public class IfElseFlow extends Flow {
         }
         if (conditionData.GetValue().equals(true)) {
             return this.trueFlow.Pop();
-        } else {
+        } else if (this.falseFlow != null) {
             return this.falseFlow.Pop();
         }
+        return null;
     }
 
     @Override
@@ -68,9 +72,10 @@ public class IfElseFlow extends Flow {
         }
         if (conditionData.GetValue().equals(true)) {
             return this.trueFlow.inLen();
-        } else {
+        } else if (this.falseFlow != null) {
             return this.falseFlow.outLen();
         }
+        return 0;
     }
 
     @Override
@@ -80,25 +85,26 @@ public class IfElseFlow extends Flow {
         }
         if (conditionData.GetValue().equals(true)) {
             return this.trueFlow.Get(index);
-        } else {
+        } else if (this.falseFlow != null) {
             return this.falseFlow.Get(index);
         }
+        return null;
     }
 
     @Override
-    public void SetNext(Flowable flow) { // 同时绑定 nextFlow
-        this.trueFlow.SetNext(flow);
-        this.falseFlow.SetNext(flow);
+    public void SetNextFlowing(Flowable flow) { // 同时绑定 nextFlow
+        this.trueFlow.SetNextFlowing(flow);
+        this.falseFlow.SetNextFlowing(flow);
         this.nextFlow = flow;
     }
 
     @Override
-    public Flowable Next() {
+    public Flowable NextFlowing() {
         return this.nextFlow;
     }
 
     @Override
-    public boolean HasNext() {
+    public boolean HasNextFlowing() {
         return this.nextFlow != null;
     }
 
@@ -107,11 +113,13 @@ public class IfElseFlow extends Flow {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new RuntimeException("type mismatch");
         }
+        boolean ret = true;
         if (conditionData.GetValue().equals(true)) {
-            return this.trueFlow.Flowing();
-        } else {
-            return this.falseFlow.Flowing();
+            ret = this.trueFlow.Flowing();
+        } else if (this.falseFlow != null) {
+            ret = this.falseFlow.Flowing();
         }
+        return ret;
     }
 
     @Override

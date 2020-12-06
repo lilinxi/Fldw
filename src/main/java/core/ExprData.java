@@ -1,5 +1,7 @@
 package core;
 
+import java.util.Objects;
+
 // 只实现简单的二元运算
 public class ExprData extends Data {
     public static enum ExprOp {
@@ -11,10 +13,10 @@ public class ExprData extends Data {
         RightOp,
         LeftEqualOp,
         RightEqualOp,
-        LogicEqualOp,
-        LogicNotOp,
         LogicAndOp,
         LogicOrOp,
+        LogicEqualOp,
+        LogicNotOp,
     }
 
     // 检查两元的类型和运算符是否匹配，并返回表达式的类型
@@ -42,15 +44,7 @@ public class ExprData extends Data {
                     return DataType.Bool;
                 }
             }
-//            需要类型强匹配，否则报错
-            case LogicEqualOp -> {
-                if (leftType == rightType) {
-                    return DataType.Bool;
-                } else {
-                    throw new RuntimeException("expr type mismatch with " + leftType + " " + op + " " + rightType);
-                }
-            }
-            case LogicNotOp -> { // 只要不为 LogicEqual，就为 LogicNot
+            case LogicEqualOp, LogicNotOp -> {
                 return DataType.Bool;
             }
             default -> {
@@ -104,15 +98,18 @@ public class ExprData extends Data {
             case RightOp -> {
                 return Double.parseDouble(this.leftData.GetValue().toString()) > Double.parseDouble(this.rightData.GetValue().toString());
             }
-            case LogicNotOp -> {
-                return !this.leftData.GetValue().toString().equals(this.rightData.GetValue().toString()) ||
-                        !this.leftData.GetType().toString().equals(this.rightData.GetType().toString());
-            }
             case MulOp -> {
                 return Integer.parseInt(this.leftData.GetValue().toString()) * Integer.parseInt(this.rightData.GetValue().toString());
             }
             case AddOp -> {
                 return Integer.parseInt(this.leftData.GetValue().toString()) + Integer.parseInt(this.rightData.GetValue().toString());
+            }
+
+            case LogicEqualOp -> {
+                return this.leftData.equals(this.rightData);
+            }
+            case LogicNotOp -> {
+                return !this.leftData.equals(this.rightData);
             }
             default -> {
                 throw new RuntimeException("TODO");

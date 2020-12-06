@@ -14,6 +14,11 @@ public class SymbolData extends Data {
         this.symbol = null;
     }
 
+    public SymbolData(Datable data) {
+        super();
+        this.Push(data);
+    }
+
     public SymbolData(String symbol) {
         super();
         this.symbol = symbol;

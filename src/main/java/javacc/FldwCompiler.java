@@ -73,9 +73,24 @@ terminalData =  new TerminalData(type, terminalToken.image);
 
   final public SymbolData symbol_data() throws ParseException {Token symbolToken;
     SymbolData symbolData;
+        boolean partialSymbol=false;
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case EXLM:{
+      jj_consume_token(EXLM);
+partialSymbol=true;
+      break;
+      }
+    default:
+      jj_la1[1] = jj_gen;
+      ;
+    }
     symbolToken = jj_consume_token(SYMBOL);
-symbolData = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(symbolToken.image, SymbolTable.SymbolType.Data).assertGetSymbolData();
-        symbolData.addToken(symbolToken.image);
+if (partialSymbol) {
+                            symbolData = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(symbolToken.image, SymbolTable.SymbolType.Data).assertGetSymbolData();
+                } else {
+                            symbolData = SymbolTable.CurrentSymbolTable().PutOrRecurseGetSymbol(symbolToken.image, SymbolTable.SymbolType.Data).assertGetSymbolData();
+                }
+//        symbolData.addToken(symbolToken.image);
         {if ("" != null) return symbolData;}
     throw new Error("Missing return statement in function");
 }
@@ -107,13 +122,18 @@ exprData.setOp(ExprData.ExprOp.RightOp);
       jj_consume_token(RIGHT_EQUAL);
       break;
       }
+    case LOGIC_EQUAL:{
+      jj_consume_token(LOGIC_EQUAL);
+exprData.setOp(ExprData.ExprOp.LogicEqualOp);
+      break;
+      }
     case LOGIC_NOT:{
       jj_consume_token(LOGIC_NOT);
 exprData.setOp(ExprData.ExprOp.LogicNotOp);
       break;
       }
     default:
-      jj_la1[1] = jj_gen;
+      jj_la1[2] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -135,7 +155,7 @@ exprData.setRightData(rightData);
         break;
         }
       default:
-        jj_la1[2] = jj_gen;
+        jj_la1[3] = jj_gen;
         break label_1;
       }
       jj_consume_token(LOGIC_OR);
@@ -161,7 +181,7 @@ topExprData.setLeftData(leftExprData);
         break;
         }
       default:
-        jj_la1[3] = jj_gen;
+        jj_la1[4] = jj_gen;
         break label_2;
       }
       jj_consume_token(LOGIC_AND);
@@ -192,7 +212,7 @@ topExprData.setLeftData(leftExprData);
         break;
         }
       default:
-        jj_la1[4] = jj_gen;
+        jj_la1[5] = jj_gen;
         break label_3;
       }
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -227,7 +247,7 @@ topExprData.setOp(ExprData.ExprOp.LogicNotOp);
         break;
         }
       default:
-        jj_la1[5] = jj_gen;
+        jj_la1[6] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -253,7 +273,7 @@ topExprData.setLeftData(leftExprData);
         break;
         }
       default:
-        jj_la1[6] = jj_gen;
+        jj_la1[7] = jj_gen;
         break label_4;
       }
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -268,7 +288,7 @@ topExprData.setOp(ExprData.ExprOp.SubOp);
         break;
         }
       default:
-        jj_la1[7] = jj_gen;
+        jj_la1[8] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -299,7 +319,7 @@ if (rightExprData != null) {
         break;
         }
       default:
-        jj_la1[8] = jj_gen;
+        jj_la1[9] = jj_gen;
         break label_5;
       }
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -314,7 +334,7 @@ topExprData.setOp(ExprData.ExprOp.DivOp);
         break;
         }
       default:
-        jj_la1[9] = jj_gen;
+        jj_la1[10] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -342,6 +362,7 @@ if (rightExprData != null) {
       data = terminal_data();
       break;
       }
+    case EXLM:
     case SYMBOL:{
       data = symbol_data();
       break;
@@ -353,7 +374,7 @@ if (rightExprData != null) {
       break;
       }
     default:
-      jj_la1[10] = jj_gen;
+      jj_la1[11] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -371,12 +392,13 @@ if (rightExprData != null) {
       data = terminal_data();
       break;
       }
+    case EXLM:
     case SYMBOL:{
       data = symbol_data();
       break;
       }
     default:
-      jj_la1[11] = jj_gen;
+      jj_la1[12] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -386,11 +408,22 @@ if (rightExprData != null) {
 
   final public ListFlow list_flow() throws ParseException {ListFlow listFlow = new ListFlow();
     Datable data;
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case HASHTAG:{
+      jj_consume_token(HASHTAG);
+listFlow.setCopyValue(true);
+      break;
+      }
+    default:
+      jj_la1[13] = jj_gen;
+      ;
+    }
     jj_consume_token(LSBR);
     label_6:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case COMMA:
+      case EXLM:
       case INT_VALUE:
       case DOUBLE_VALUE:
       case BOOL_VALUE:
@@ -401,7 +434,7 @@ if (rightExprData != null) {
         break;
         }
       default:
-        jj_la1[12] = jj_gen;
+        jj_la1[14] = jj_gen;
         break label_6;
       }
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -410,7 +443,7 @@ if (rightExprData != null) {
         break;
         }
       default:
-        jj_la1[13] = jj_gen;
+        jj_la1[15] = jj_gen;
         ;
       }
       data = data();
@@ -448,7 +481,7 @@ IfElseFlow if_else_flow() throws ParseException {ExprData conditionData;
       break;
       }
     default:
-      jj_la1[14] = jj_gen;
+      jj_la1[16] = jj_gen;
       ;
     }
 {if ("" != null) return new IfElseFlow(conditionData, trueFlow, falseFlow);}
@@ -473,7 +506,7 @@ IfElseFlow if_else_flow() throws ParseException {ExprData conditionData;
     jj_consume_token(FOR);
     jj_consume_token(LBR);
     iterFlow = flow();
-    jj_consume_token(FLOWING);
+    jj_consume_token(MATCHING);
     iterSymbolData = symbol_data();
     jj_consume_token(RBR);
     forBlockFlow = block_flow();
@@ -482,23 +515,26 @@ forFlow = new ForFlow(iterFlow, iterSymbolData, forBlockFlow);
     throw new Error("Missing return statement in function");
 }
 
-  final public FuncFlow func_flow() throws ParseException {Token funcSymbol;
-    ListFlow paramFlow = new ListFlow();
-    FuncFlow funcFlow;
+  final public DelayFuncFlow func_flow() throws ParseException {Token funcSymbol;
+    ListFlow paramFlow = null;
+    DelayFuncFlow funcFlow;
     funcSymbol = jj_consume_token(SYMBOL);
     jj_consume_token(LBR);
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-    case LSBR:{
+    case LSBR:
+    case HASHTAG:{
       paramFlow = list_flow();
       break;
       }
     default:
-      jj_la1[15] = jj_gen;
+      jj_la1[17] = jj_gen;
       ;
     }
     jj_consume_token(RBR);
-funcFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(funcSymbol.image).assertGetFuncFlow();
-        funcFlow.setParamFlow(paramFlow);
+funcFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(funcSymbol.image).assertGetDelayFuncFlow();
+        if (paramFlow != null) {
+            funcFlow.setParamFlow(paramFlow);
+        }
         {if ("" != null) return funcFlow;}
     throw new Error("Missing return statement in function");
 }
@@ -507,11 +543,26 @@ funcFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(funcSymbol.image).a
     Token tailListFlowSymbol;
     Flowable tailListFlow;
     HeadTailFlow headTailFlow;
+        boolean partialSymbol=false;
     jj_consume_token(LSBR);
     headData = symbol_data();
     jj_consume_token(SEMIC);
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case EXLM:{
+      jj_consume_token(EXLM);
+partialSymbol=true;
+      break;
+      }
+    default:
+      jj_la1[18] = jj_gen;
+      ;
+    }
     tailListFlowSymbol = jj_consume_token(SYMBOL);
-tailListFlow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(tailListFlowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
+if (partialSymbol) {
+                        tailListFlow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(tailListFlowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
+                    } else {
+                        tailListFlow = SymbolTable.CurrentSymbolTable().PutOrRecurseGetSymbol(tailListFlowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
+                    }
     jj_consume_token(RSBR);
 {if ("" != null) return new HeadTailFlow(headData, tailListFlow);}
     throw new Error("Missing return statement in function");
@@ -520,47 +571,31 @@ tailListFlow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(tailListFlowSymbo
   final public BlockFlow block_flow() throws ParseException {BlockFlow blockFlow;
     Flowable topFlow;
     jj_consume_token(LCBR);
-Core.setEager(false); SymbolTable.EnterBlock(null); blockFlow = new BlockFlow();
+Core.AddEager(); SymbolTable.EnterBlock(null); blockFlow = new BlockFlow();
     label_7:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case LCBR:
       case LSBR:
+      case EXLM:
       case IF:
       case WHILE:
       case FOR:
+      case HASHTAG:
       case SYMBOL:{
         ;
         break;
         }
       default:
-        jj_la1[16] = jj_gen;
+        jj_la1[19] = jj_gen;
         break label_7;
       }
-      if (jj_2_1(3)) {
-        topFlow = flowing();
+      //        LOOKAHEAD(3) topFlow = flowing() { blockFlow.addFlow(topFlow); }
+             topFlow = flowing();
 blockFlow.addFlow(topFlow);
-      } else {
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case LCBR:
-        case LSBR:
-        case IF:
-        case WHILE:
-        case FOR:
-        case SYMBOL:{
-          topFlow = matching();
-blockFlow.addFlow(topFlow);
-          break;
-          }
-        default:
-          jj_la1[17] = jj_gen;
-          jj_consume_token(-1);
-          throw new ParseException();
-        }
-      }
     }
     jj_consume_token(RCBR);
-Core.setEager(true); SymbolTable.ExitBlock();
+Core.SubEager(); SymbolTable.ExitBlock();
 //        System.err.println("blcokFlow: "+blockFlow);
         {if ("" != null) return blockFlow;}
     throw new Error("Missing return statement in function");
@@ -568,18 +603,36 @@ Core.setEager(true); SymbolTable.ExitBlock();
 
   final public Flowable flow() throws ParseException {Flowable flow = new ListFlow();
     Token flowSymbol;
-    if (jj_2_2(2)) {
+    boolean gotoNext=true;
+    boolean partialSymbol=false;
+    if (jj_2_1(2)) {
       flow = func_flow();
-    } else if (jj_2_3(3)) {
+    } else if (jj_2_2(3)) {
       flow = head_tail_flow();
     } else {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case EXLM:
       case SYMBOL:{
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+        case EXLM:{
+          jj_consume_token(EXLM);
+partialSymbol=true;
+          break;
+          }
+        default:
+          jj_la1[20] = jj_gen;
+          ;
+        }
         flowSymbol = jj_consume_token(SYMBOL);
-flow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
+if (partialSymbol) {
+                    flow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
+                } else {
+                    flow = SymbolTable.CurrentSymbolTable().PutOrRecurseGetSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
+                }
         break;
         }
-      case LSBR:{
+      case LSBR:
+      case HASHTAG:{
         flow = list_flow();
         break;
         }
@@ -600,7 +653,7 @@ flow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(flowSymbol.image, SymbolT
         break;
         }
       default:
-        jj_la1[18] = jj_gen;
+        jj_la1[21] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -618,17 +671,33 @@ leftFlow = topFlow;
     label_8:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case FLOWING:{
+      case FLOWING:
+      case MATCHING:{
         ;
         break;
         }
       default:
-        jj_la1[19] = jj_gen;
+        jj_la1[22] = jj_gen;
         break label_8;
       }
-      jj_consume_token(FLOWING);
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case MATCHING:{
+        jj_consume_token(MATCHING);
+leftFlow.SetFlowOp(Flowable.FlowOp.Matching);
+        break;
+        }
+      case FLOWING:{
+        jj_consume_token(FLOWING);
+leftFlow.SetFlowOp(Flowable.FlowOp.Pushing);
+        break;
+        }
+      default:
+        jj_la1[23] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
       rightFlow = flow();
-leftFlow.SetNext(rightFlow);
+leftFlow.SetNextFlowing(rightFlow);
 //                                        System.err.println(leftFlow.GetSymbol() +leftFlow.GetIdentity()+ "->"+rightFlow.GetSymbol()+rightFlow.GetIdentity());
 //                                        System.err.println("leftFlow:\n"+leftFlow);
 //                                        System.err.println("rightFlow:\n"+rightFlow);
@@ -637,7 +706,7 @@ leftFlow.SetNext(rightFlow);
     }
 //        System.out.println("Root Symbol Table: " + SymbolTable.CurrentSymbolTable());
 //        System.out.println("before flowing: " + topFlow);
-        if (Core.isEager()) {
+        if (Core.IsEager()) {
 //            System.out.println("eager! flowing");
             topFlow.Flowing();
         }
@@ -652,8 +721,9 @@ leftFlow.SetNext(rightFlow);
     Flowable leftFlow = new ListFlow();
     Flowable rightFlow = new ListFlow();
     // 语法：matching() = flow() < rightFlow > flow()
-        topFlow = flow();
-leftFlow = topFlow;
+        topFlow = flowing();
+//        System.err.println("matching");
+        leftFlow = topFlow;
     label_9:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -662,15 +732,15 @@ leftFlow = topFlow;
         break;
         }
       default:
-        jj_la1[20] = jj_gen;
+        jj_la1[24] = jj_gen;
         break label_9;
       }
       jj_consume_token(MATCHING);
-      rightFlow = flow();
-leftFlow.SetNext(rightFlow);
+      rightFlow = flowing();
+leftFlow.SetNextMatching(rightFlow);
         leftFlow = rightFlow;
     }
-if (Core.isEager()) {
+if (Core.IsEager()) {
             topFlow.Matching();
         }
         {if ("" != null) return topFlow;}
@@ -708,23 +778,25 @@ do{
         SymbolTable.CurrentSymbolTable().PutSymbol(funcSymbol.image, SymbolTable.SymbolType.Function, funcBuf.toString());
 }
 
-  final public FuncFlow make_func_flow() throws ParseException {ListFlow param_flow = null;
+  final public FuncFlow make_func_flow(String funcName) throws ParseException {ListFlow param_flow = null;
     BlockFlow block_flow;
     jj_consume_token(LBR);
-SymbolTable.EnterBlock(null);
+SymbolTable.EnterBlock(funcName);
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-    case LSBR:{
+    case LSBR:
+    case HASHTAG:{
       param_flow = list_flow();
       break;
       }
     default:
-      jj_la1[21] = jj_gen;
+      jj_la1[25] = jj_gen;
       ;
     }
     jj_consume_token(RBR);
     block_flow = block_flow();
 SymbolTable.ExitBlock();
-{if ("" != null) return new FuncFlow(param_flow, block_flow);}
+FuncFlow f = new FuncFlow(param_flow, block_flow);
+        {if ("" != null) return f;}
     throw new Error("Missing return statement in function");
 }
 
@@ -744,33 +816,31 @@ try {
 }
 
   final public void stmt() throws ParseException {
-    if (jj_2_4(3)) {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case LCBR:
+    case LSBR:
+    case EXLM:
+    case IF:
+    case WHILE:
+    case FOR:
+    case HASHTAG:
+    case SYMBOL:{
       flowing();
-    } else {
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case LCBR:
-      case LSBR:
-      case IF:
-      case WHILE:
-      case FOR:
-      case SYMBOL:{
-        matching();
-        break;
-        }
-      case FUNC:{
-        def_func_stmt();
-        break;
-        }
-      case IMPORT:{
-        import_stmt();
-{if ("" != null) return;}
-        break;
-        }
-      default:
-        jj_la1[22] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
+      break;
       }
+    case FUNC:{
+      def_func_stmt();
+      break;
+      }
+    case IMPORT:{
+      import_stmt();
+{if ("" != null) return;}
+      break;
+      }
+    default:
+      jj_la1[26] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
     }
 }
 
@@ -780,17 +850,19 @@ try {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case LCBR:
       case LSBR:
+      case EXLM:
       case IF:
       case WHILE:
       case FOR:
       case FUNC:
+      case HASHTAG:
       case IMPORT:
       case SYMBOL:{
         ;
         break;
         }
       default:
-        jj_la1[23] = jj_gen;
+        jj_la1[27] = jj_gen;
         break label_10;
       }
       stmt();
@@ -820,327 +892,45 @@ try {
     finally { jj_save(1, xla); }
   }
 
-  private boolean jj_2_3(int xla)
+  private boolean jj_3R_symbol_data_200_7_14()
  {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return (!jj_3_3()); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(2, xla); }
-  }
-
-  private boolean jj_2_4(int xla)
- {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return (!jj_3_4()); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(3, xla); }
-  }
-
-  private boolean jj_3R_flowing_563_5_11()
- {
-    if (jj_3R_flow_535_5_14()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_flowing_567_6_15()) { jj_scanpos = xsp; break; }
-    }
+    if (jj_scan_token(EXLM)) return true;
     return false;
   }
 
-  private boolean jj_3R_terminal_data_177_9_42()
- {
-    if (jj_scan_token(STRING_VALUE)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_for_flow_464_5_27()
- {
-    if (jj_scan_token(FOR)) return true;
-    if (jj_scan_token(LBR)) return true;
-    if (jj_3R_flow_535_5_14()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_terminal_data_173_9_41()
- {
-    if (jj_scan_token(BOOL_VALUE)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_terminal_data_169_9_40()
- {
-    if (jj_scan_token(DOUBLE_VALUE)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_flow_548_9_22()
- {
-    if (jj_3R_for_flow_464_5_27()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_flow_547_9_21()
- {
-    if (jj_3R_block_flow_513_5_26()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_flow_546_9_20()
- {
-    if (jj_3R_while_flow_449_5_25()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_terminal_data_165_9_39()
- {
-    if (jj_scan_token(INT_VALUE)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_flow_545_9_19()
- {
-    if (jj_3R_if_else_flow_436_5_24()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_flow_544_9_18()
- {
-    if (jj_3R_list_flow_400_5_23()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_terminal_data_165_5_37()
+  private boolean jj_3R_symbol_data_200_5_13()
  {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_terminal_data_165_9_39()) {
-    jj_scanpos = xsp;
-    if (jj_3R_terminal_data_169_9_40()) {
-    jj_scanpos = xsp;
-    if (jj_3R_terminal_data_173_9_41()) {
-    jj_scanpos = xsp;
-    if (jj_3R_terminal_data_177_9_42()) {
-    jj_scanpos = xsp;
-    if (jj_3R_terminal_data_181_9_43()) return true;
-    }
-    }
-    }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_while_flow_449_5_25()
- {
-    if (jj_scan_token(WHILE)) return true;
-    if (jj_scan_token(LBR)) return true;
-    if (jj_3R_expr_data_tmp_215_5_30()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_flow_540_9_17()
- {
+    if (jj_3R_symbol_data_200_7_14()) jj_scanpos = xsp;
     if (jj_scan_token(SYMBOL)) return true;
     return false;
   }
 
-  private boolean jj_3_3()
+  private boolean jj_3R_func_flow_486_5_11()
  {
-    if (jj_3R_head_tail_flow_495_5_13()) return true;
+    if (jj_scan_token(SYMBOL)) return true;
+    if (jj_scan_token(LBR)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_head_tail_flow_506_5_12()
+ {
+    if (jj_scan_token(LSBR)) return true;
+    if (jj_3R_symbol_data_200_5_13()) return true;
+    if (jj_scan_token(SEMIC)) return true;
     return false;
   }
 
   private boolean jj_3_2()
  {
-    if (jj_3R_func_flow_478_5_12()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_flow_535_5_14()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_2()) {
-    jj_scanpos = xsp;
-    if (jj_3_3()) {
-    jj_scanpos = xsp;
-    if (jj_3R_flow_540_9_17()) {
-    jj_scanpos = xsp;
-    if (jj_3R_flow_544_9_18()) {
-    jj_scanpos = xsp;
-    if (jj_3R_flow_545_9_19()) {
-    jj_scanpos = xsp;
-    if (jj_3R_flow_546_9_20()) {
-    jj_scanpos = xsp;
-    if (jj_3R_flow_547_9_21()) {
-    jj_scanpos = xsp;
-    if (jj_3R_flow_548_9_22()) return true;
-    }
-    }
-    }
-    }
-    }
-    }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_if_else_flow_436_5_24()
- {
-    if (jj_scan_token(IF)) return true;
-    if (jj_scan_token(LBR)) return true;
-    if (jj_3R_expr_data_tmp_215_5_30()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_block_flow_517_9_33()
- {
-    if (jj_3R_matching_600_5_36()) return true;
+    if (jj_3R_head_tail_flow_506_5_12()) return true;
     return false;
   }
 
   private boolean jj_3_1()
  {
-    if (jj_3R_flowing_563_5_11()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_block_flow_516_9_31()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_1()) {
-    jj_scanpos = xsp;
-    if (jj_3R_block_flow_517_9_33()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_block_flow_513_5_26()
- {
-    if (jj_scan_token(LCBR)) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_block_flow_516_9_31()) { jj_scanpos = xsp; break; }
-    }
-    if (jj_scan_token(RCBR)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_func_flow_478_39_28()
- {
-    if (jj_3R_list_flow_400_5_23()) return true;
-    return false;
-  }
-
-  private boolean jj_3_4()
- {
-    if (jj_3R_flowing_563_5_11()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_matching_604_6_38()
- {
-    if (jj_scan_token(MATCHING)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_matching_600_5_36()
- {
-    if (jj_3R_flow_535_5_14()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_matching_604_6_38()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_list_flow_405_7_29()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(8)) jj_scanpos = xsp;
-    if (jj_3R_data_385_5_32()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_expr_data_tmp_215_5_30()
- {
-    if (jj_3R_data_385_5_32()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_list_flow_400_5_23()
- {
-    if (jj_scan_token(LSBR)) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_list_flow_405_7_29()) { jj_scanpos = xsp; break; }
-    }
-    if (jj_scan_token(RSBR)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_head_tail_flow_495_5_13()
- {
-    if (jj_scan_token(LSBR)) return true;
-    if (jj_3R_symbol_data_197_5_16()) return true;
-    if (jj_scan_token(SEMIC)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_data_386_10_35()
- {
-    if (jj_3R_symbol_data_197_5_16()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_data_385_10_34()
- {
-    if (jj_3R_terminal_data_165_5_37()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_symbol_data_197_5_16()
- {
-    if (jj_scan_token(SYMBOL)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_data_385_5_32()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_data_385_10_34()) {
-    jj_scanpos = xsp;
-    if (jj_3R_data_386_10_35()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_func_flow_478_5_12()
- {
-    if (jj_scan_token(SYMBOL)) return true;
-    if (jj_scan_token(LBR)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_func_flow_478_39_28()) jj_scanpos = xsp;
-    if (jj_scan_token(RBR)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_flowing_567_6_15()
- {
-    if (jj_scan_token(FLOWING)) return true;
-    if (jj_3R_flow_535_5_14()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_terminal_data_181_9_43()
- {
-    if (jj_scan_token(NULL_VALUE)) return true;
+    if (jj_3R_func_flow_486_5_11()) return true;
     return false;
   }
 
@@ -1155,7 +945,7 @@ try {
   private Token jj_scanpos, jj_lastpos;
   private int jj_la;
   private int jj_gen;
-  final private int[] jj_la1 = new int[24];
+  final private int[] jj_la1 = new int[28];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -1163,12 +953,12 @@ try {
 	   jj_la1_init_1();
 	}
 	private static void jj_la1_init_0() {
-	   jj_la1_0 = new int[] {0x0,0x79000000,0x4000000,0x2000000,0x79800000,0x79800000,0x30000,0x30000,0xc0000,0xc0000,0x200,0x0,0x100,0x100,0x0,0x4000,0x80005000,0x80005000,0x80005000,0x0,0x0,0x4000,0x80005000,0x80005000,};
+	   jj_la1_0 = new int[] {0x0,0x800000,0xf3000000,0x8000000,0x4000000,0xf3000000,0xf3000000,0x30000,0x30000,0xc0000,0xc0000,0x800200,0x800000,0x0,0x800100,0x100,0x0,0x4000,0x800000,0x805000,0x800000,0x805000,0x0,0x0,0x0,0x4000,0x805000,0x805000,};
 	}
 	private static void jj_la1_init_1() {
-	   jj_la1_1 = new int[] {0x18700,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x38700,0x38700,0x38700,0x0,0x1,0x0,0x20006,0x20006,0x20006,0x10,0x20,0x0,0x2004e,0x2004e,};
+	   jj_la1_1 = new int[] {0xc3800,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1c3800,0x1c3800,0x80,0x1c3800,0x0,0x2,0x80,0x0,0x10008d,0x0,0x10008d,0x60,0x60,0x40,0x80,0x10029d,0x10029d,};
 	}
-  final private JJCalls[] jj_2_rtns = new JJCalls[4];
+  final private JJCalls[] jj_2_rtns = new JJCalls[2];
   private boolean jj_rescan = false;
   private int jj_gc = 0;
 
@@ -1183,7 +973,7 @@ try {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 24; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 28; i++) jj_la1[i] = -1;
 	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1198,7 +988,7 @@ try {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 24; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 28; i++) jj_la1[i] = -1;
 	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1209,7 +999,7 @@ try {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 24; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 28; i++) jj_la1[i] = -1;
 	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1228,7 +1018,7 @@ try {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 24; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 28; i++) jj_la1[i] = -1;
 	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1238,7 +1028,7 @@ try {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 24; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 28; i++) jj_la1[i] = -1;
 	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1248,7 +1038,7 @@ try {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 24; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 28; i++) jj_la1[i] = -1;
 	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1379,12 +1169,12 @@ try {
   /** Generate ParseException. */
   public ParseException generateParseException() {
 	 jj_expentries.clear();
-	 boolean[] la1tokens = new boolean[51];
+	 boolean[] la1tokens = new boolean[54];
 	 if (jj_kind >= 0) {
 	   la1tokens[jj_kind] = true;
 	   jj_kind = -1;
 	 }
-	 for (int i = 0; i < 24; i++) {
+	 for (int i = 0; i < 28; i++) {
 	   if (jj_la1[i] == jj_gen) {
 		 for (int j = 0; j < 32; j++) {
 		   if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -1396,7 +1186,7 @@ try {
 		 }
 	   }
 	 }
-	 for (int i = 0; i < 51; i++) {
+	 for (int i = 0; i < 54; i++) {
 	   if (la1tokens[i]) {
 		 jj_expentry = new int[1];
 		 jj_expentry[0] = i;
@@ -1430,7 +1220,7 @@ try {
 
   private void jj_rescan_token() {
 	 jj_rescan = true;
-	 for (int i = 0; i < 4; i++) {
+	 for (int i = 0; i < 2; i++) {
 	   try {
 		 JJCalls p = jj_2_rtns[i];
 
@@ -1440,8 +1230,6 @@ try {
 			 switch (i) {
 			   case 0: jj_3_1(); break;
 			   case 1: jj_3_2(); break;
-			   case 2: jj_3_3(); break;
-			   case 3: jj_3_4(); break;
 			 }
 		   }
 		   p = p.next;

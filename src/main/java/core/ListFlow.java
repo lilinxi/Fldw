@@ -5,17 +5,38 @@ import java.util.LinkedList;
 public class ListFlow extends Flow {
     private String symbol;
     private LinkedList<Datable> dataList;
-    private Flowable nextFlow;
+    private Flowable nextFlowing;
+    @Deprecated
+    private Flowable nextMatching;
+    @Deprecated
+    private boolean matching = false;
+    @Deprecated
+    private boolean copyValue = false;
+    @Deprecated
+    private boolean gotoNext = true;
 
     public ListFlow() {
         this.symbol = null;
         this.dataList = new LinkedList<>();
-        this.nextFlow = null;
+        this.nextFlowing = null;
     }
 
     public ListFlow(String symbol) {
         this();
         this.symbol = symbol;
+    }
+
+    public void setMatching(boolean matching) {
+        this.matching = matching;
+    }
+
+    public void setCopyValue(boolean copyValue) {
+        this.copyValue = copyValue;
+    }
+
+    @Override
+    public void SetGotoNext(boolean gotoNext) {
+        this.gotoNext = gotoNext;
     }
 
     @Override
@@ -25,7 +46,16 @@ public class ListFlow extends Flow {
 
     @Override
     public boolean Push(Datable data) {
-        return dataList.add(data);
+//        SymbolData tmp = new SymbolData();
+//        tmp.Push(data);
+//        System.err.println("---");
+//        System.err.println(data);
+//        System.err.println(tmp);
+        dataList.add(data);
+//        System.err.println(this);
+//        System.err.println("---");
+        return true;
+
     }
 
     @Override
@@ -44,6 +74,16 @@ public class ListFlow extends Flow {
     }
 
     @Override
+    public boolean Match(Flowable flow) {
+        int minSize = Math.min(this.inLen(), flow.inLen());
+        for (int i = 0; i < minSize; i++) {
+            boolean success = flow.Push(i, this.Get(i));
+            if (!success) return false;
+        }
+        return true;
+    }
+
+    @Override
     public Datable Pop() {
         if (this.inLen() > 0) {
             return dataList.pop();
@@ -59,60 +99,103 @@ public class ListFlow extends Flow {
     @Override
     public Datable Get(int index) {
         if (index >= 0 && index < this.dataList.size()) {
-            return this.dataList.get(index);
+            if (this.copyValue) {
+                SymbolData tmp = new SymbolData();
+                tmp.Push(this.dataList.get(index));
+                return tmp;
+            } else {
+                return this.dataList.get(index);
+            }
         } else {
             throw new RuntimeException("out of arrange");
         }
     }
 
     @Override
-    public void SetNext(Flowable flow) {
-        this.nextFlow = flow;
+    public void SetNextFlowing(Flowable flow) {
+        this.nextFlowing = flow;
     }
 
     @Override
-    public Flowable Next() {
-        return this.nextFlow;
+    public Flowable NextFlowing() {
+        return this.nextFlowing;
     }
 
     @Override
-    public boolean HasNext() {
-        return this.nextFlow != null;
+    public boolean HasNextFlowing() {
+        return this.nextFlowing != null;
     }
 
     @Override
     public boolean Flowing() {
-        if (this.nextFlow == null) {
+        if (this.nextFlowing == null) {
             return true;
-        } else {
-            for (int i = 0; i < this.outLen(); i++) {
-                boolean success = this.nextFlow.Push(this.Get(i));
-                if (!success) return false;
+        }
+        switch (this.flowOp) {
+            case Pushing -> {
+                for (int i = 0; i < this.outLen(); i++) {
+                    boolean success = this.nextFlowing.Push(this.Get(i));
+                    if (!success) return false;
+                }
+                if (this.gotoNext) {
+                    return this.nextFlowing.Flowing();
+                } else {
+                    return true;
+                }
             }
-            return this.nextFlow.Flowing();
+            case Matching -> {
+                int minSize = Math.min(this.inLen(), this.nextFlowing.inLen());
+                for (int i = 0; i < minSize; i++) {
+                    boolean success = this.nextFlowing.Push(i, this.Get(i));
+                    if (!success) return false;
+                }
+                if (this.gotoNext) {
+                    return this.nextFlowing.Flowing();
+                } else {
+                    return true;
+                }
+            }
+            default -> {
+                throw new RuntimeException();
+            }
         }
     }
 
-    @Override
-    public boolean Matching() {
-        if (this.nextFlow == null) {
-            return true;
-        } else {
-            int minSize = Math.min(this.inLen(), this.nextFlow.inLen());
-            for (int i = 0; i < minSize; i++) {
-                boolean success = this.nextFlow.Push(i, this.Get(i));
-                if (!success) return false;
-            }
-            return this.nextFlow.Flowing();
-        }
-    }
+//    @Override
+//    public void SetNextMatching(Flowable flow) {
+//        this.nextMatching = flow;
+//    }
+//
+//    @Override
+//    public Flowable NextMatching() {
+//        return this.nextMatching;
+//    }
+//
+//    @Override
+//    public boolean HasNextMatching() {
+//        return this.nextMatching != null;
+//    }
+
+//    @Override
+//    public boolean Matching() {
+//        if (this.nextMatching == null) {
+//            return true;
+//        } else {
+//            int minSize = Math.min(this.inLen(), this.nextMatching.inLen());
+//            for (int i = 0; i < minSize; i++) {
+//                boolean success = this.nextMatching.Push(i, this.Get(i));
+//                if (!success) return false;
+//            }
+//            return this.nextMatching.Matching();
+//        }
+//    }
 
     @Override
     public String toString() {
         return "ListFlow{" +
                 "symbol='" + symbol + '\'' +
                 ", dataList=" + dataList +
-                ", nextFlow=" + nextFlow +
+                ", nextFlow=" + nextFlowing +
                 '}';
     }
 }

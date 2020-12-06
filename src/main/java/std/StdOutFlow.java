@@ -36,7 +36,7 @@ public class StdOutFlow extends Flow {
     }
 
     @Override
-    public boolean HasNext() {
+    public boolean HasNextFlowing() {
         return false;
     }
 

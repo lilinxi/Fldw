@@ -48,17 +48,17 @@ public class HeadTailFlow extends Flow {
     }
 
     @Override
-    public void SetNext(Flowable flow) {
+    public void SetNextFlowing(Flowable flow) {
         throw new RuntimeException("can not set next");
     }
 
     @Override
-    public Flowable Next() {
+    public Flowable NextFlowing() {
         throw new RuntimeException("wrong call");
     }
 
     @Override
-    public boolean HasNext() {
+    public boolean HasNextFlowing() {
         return false;
     }
 

@@ -83,18 +83,18 @@ public class WhileFlow extends Flow {
     }
 
     @Override
-    public void SetNext(Flowable flow) { // 同时绑定 nextFlow
-        this.trueFlow.SetNext(flow);
+    public void SetNextFlowing(Flowable flow) { // 同时绑定 nextFlow
+        this.trueFlow.SetNextFlowing(flow);
         this.nextFlow = flow;
     }
 
     @Override
-    public Flowable Next() {
+    public Flowable NextFlowing() {
         return this.nextFlow;
     }
 
     @Override
-    public boolean HasNext() {
+    public boolean HasNextFlowing() {
         return this.nextFlow != null;
     }
 
