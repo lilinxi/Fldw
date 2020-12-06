@@ -96,6 +96,8 @@ TOKEN : // Keywords and punctuation
 
     |   < FLOWING : "|" >
     |   < MATCHING : "->" >
+    |   < HASHTAG : "#" > // 取值操作
+    |   < COLON : ":" > // 流的开始和停止
 
 //    |   < STDIN : "stdin" >
 //    |   < STDOUT : "stdout" >
@@ -194,12 +196,12 @@ SymbolData symbol_data() :
 }
 {
     // 语法：symbol_data() = < SYMBOL>  | < SYMBOL> < EXLM >
-    (symbolToken = < SYMBOL>)
+    symbolToken = < SYMBOL>
     {
-        symbolData = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(symbolToken.image, SymbolTable.SymbolType.Data).assertGetSymbolData();
-        symbolData.addToken(symbolToken.image);
-        return symbolData;
-    }
+    symbolData = SymbolTable.CurrentSymbolTable().PutOrRecurseGetSymbol(symbolToken.image, SymbolTable.SymbolType.Data).assertGetSymbolData();
+    symbolData.addToken(symbolToken.image);
+    return symbolData;
+}
 }
 
 // TODO：tmp
@@ -398,7 +400,7 @@ ListFlow list_flow() :
 }
 {
     // 语法：list_flow() = < LSBR  > data() ( < COMMA > data() )* < RSBR >
-    < LSBR  >
+    [ < HASHTAG > {listFlow.setCopyValue(true);} ] < LSBR  >
 //    data = data()
 //    {
 //        listFlow.Push(data);
@@ -532,6 +534,7 @@ Flowable flow() :
 {
     Flowable flow = new ListFlow();
     Token flowSymbol;
+    boolean gotoNext=true;
 }
 {
     // 语法：flow() = list_flow() | symbol_flow() | func_flow()
@@ -540,10 +543,14 @@ Flowable flow() :
 //        LOOKHEAD 的要放在最前面
         LOOKAHEAD(2) flow = func_flow() // 预读 < SYMBOL > < LBR >
     |   LOOKAHEAD(3) flow = head_tail_flow() // 预读 < LSBR > < SYMBOL > <SEMIC >
-    |   flowSymbol = < SYMBOL>
-        {
-            flow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
-        }
+    |   (
+//            [ < COLON > {gotoNext=true;}]
+            flowSymbol = < SYMBOL>
+            {
+                flow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
+            }
+//            [ LOOKAHEAD(2) < COLON > {gotoNext=false;}] {flow.SetGotoNext(gotoNext);System.err.println(gotoNext);}
+        )
     |   flow = list_flow()
     |   flow = if_else_flow()
     |   flow = while_flow()

@@ -75,23 +75,27 @@ public interface FldwCompilerConstants {
   /** RegularExpression Id. */
   int MATCHING = 37;
   /** RegularExpression Id. */
-  int IMPORT = 38;
+  int HASHTAG = 38;
   /** RegularExpression Id. */
-  int DOT = 39;
+  int COLON = 39;
   /** RegularExpression Id. */
-  int INT_VALUE = 40;
+  int IMPORT = 40;
   /** RegularExpression Id. */
-  int DOUBLE_VALUE = 41;
+  int DOT = 41;
   /** RegularExpression Id. */
-  int BOOL_VALUE = 42;
+  int INT_VALUE = 42;
   /** RegularExpression Id. */
-  int STRING_VALUE = 47;
+  int DOUBLE_VALUE = 43;
   /** RegularExpression Id. */
-  int NULL_VALUE = 48;
+  int BOOL_VALUE = 44;
   /** RegularExpression Id. */
-  int SYMBOL = 49;
+  int STRING_VALUE = 49;
   /** RegularExpression Id. */
-  int OTHER = 50;
+  int NULL_VALUE = 50;
+  /** RegularExpression Id. */
+  int SYMBOL = 51;
+  /** RegularExpression Id. */
+  int OTHER = 52;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -138,15 +142,17 @@ public interface FldwCompilerConstants {
     "\"function\"",
     "\"|\"",
     "\"->\"",
+    "\"#\"",
+    "\":\"",
     "\"import\"",
     "\".\"",
     "<INT_VALUE>",
     "<DOUBLE_VALUE>",
     "<BOOL_VALUE>",
     "\"\\\"\"",
-    "<token of kind 44>",
-    "<token of kind 45>",
     "<token of kind 46>",
+    "<token of kind 47>",
+    "<token of kind 48>",
     "\"\\\"\"",
     "\"null\"",
     "<SYMBOL>",

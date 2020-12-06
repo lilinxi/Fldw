@@ -6,8 +6,14 @@ public class ListFlow extends Flow {
     private String symbol;
     private LinkedList<Datable> dataList;
     private Flowable nextFlowing;
+    @Deprecated
     private Flowable nextMatching;
-    private boolean matching;
+    @Deprecated
+    private boolean matching = false;
+    @Deprecated
+    private boolean copyValue = false;
+    @Deprecated
+    private boolean gotoNext = true;
 
     public ListFlow() {
         this.symbol = null;
@@ -24,6 +30,15 @@ public class ListFlow extends Flow {
         this.matching = matching;
     }
 
+    public void setCopyValue(boolean copyValue) {
+        this.copyValue = copyValue;
+    }
+
+    @Override
+    public void SetGotoNext(boolean gotoNext) {
+        this.gotoNext = gotoNext;
+    }
+
     @Override
     public String GetSymbol() {
         return this.symbol;
@@ -36,8 +51,11 @@ public class ListFlow extends Flow {
 //        System.err.println("---");
 //        System.err.println(data);
 //        System.err.println(tmp);
+        dataList.add(data);
+//        System.err.println(this);
 //        System.err.println("---");
-        return dataList.add(data);
+        return true;
+
     }
 
     @Override
@@ -81,7 +99,13 @@ public class ListFlow extends Flow {
     @Override
     public Datable Get(int index) {
         if (index >= 0 && index < this.dataList.size()) {
-            return this.dataList.get(index);
+            if (this.copyValue) {
+                SymbolData tmp = new SymbolData();
+                tmp.Push(this.dataList.get(index));
+                return tmp;
+            } else {
+                return this.dataList.get(index);
+            }
         } else {
             throw new RuntimeException("out of arrange");
         }
@@ -113,7 +137,11 @@ public class ListFlow extends Flow {
                     boolean success = this.nextFlowing.Push(this.Get(i));
                     if (!success) return false;
                 }
-                return this.nextFlowing.Flowing();
+                if (this.gotoNext) {
+                    return this.nextFlowing.Flowing();
+                } else {
+                    return true;
+                }
             }
             case Matching -> {
                 int minSize = Math.min(this.inLen(), this.nextFlowing.inLen());
@@ -121,7 +149,11 @@ public class ListFlow extends Flow {
                     boolean success = this.nextFlowing.Push(i, this.Get(i));
                     if (!success) return false;
                 }
-                return this.nextFlowing.Flowing();
+                if (this.gotoNext) {
+                    return this.nextFlowing.Flowing();
+                } else {
+                    return true;
+                }
             }
             default -> {
                 throw new RuntimeException();

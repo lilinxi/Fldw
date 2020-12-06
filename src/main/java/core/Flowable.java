@@ -8,6 +8,9 @@ public interface Flowable {
     }
 //    int GetIdentity();// 获取内存地址
 
+    @Deprecated
+    void SetGotoNext(boolean gotoNext);
+
     String GetSymbol();// 获取流的符号
 
     boolean Push(Datable data); // 流入一个元素，返回是否成功
@@ -37,11 +40,18 @@ public interface Flowable {
 
     boolean Flowing(); // 解释执行：开始元素的流动
 
+    @Deprecated
+    boolean CurFlowing(); // 解释执行：开始元素的流动
+
+    @Deprecated
     void SetNextMatching(Flowable flow); // 设置下一个流
 
+    @Deprecated
     Flowable NextMatching(); // 下一个流
 
+    @Deprecated
     boolean HasNextMatching(); // 是否有下一个流
 
+    @Deprecated
     boolean Matching(); // 解释执行：开始元素的匹配
 }

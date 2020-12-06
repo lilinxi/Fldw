@@ -7,9 +7,16 @@ public class Flow extends TokenList implements Flowable {
 //        return System.identityHashCode(this);
 //    }
     protected FlowOp flowOp;
+    protected int id;
 
     public Flow() {
         this.flowOp = FlowOp.Pushing;
+        this.id=System.identityHashCode(this);
+    }
+
+    @Override
+    public void SetGotoNext(boolean gotoNext) {
+
     }
 
     @Override
@@ -81,6 +88,11 @@ public class Flow extends TokenList implements Flowable {
     @Override
     public boolean Flowing() {
         return true;
+    }
+
+    @Override
+    public boolean CurFlowing() {
+        return false;
     }
 
     @Override

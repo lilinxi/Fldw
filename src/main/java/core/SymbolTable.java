@@ -79,6 +79,14 @@ public class SymbolTable {
             return (Flowable) this.getValue();
         }
 
+//        @Deprecated
+//        public ListFlow assertGetListFlow() {
+//            if (this.getType() != SymbolType.Flow) {
+//                throw new RuntimeException("assert type mismatch");
+//            }
+//            return (ListFlow) this.getValue();
+//        }
+
         public SymbolTable assertGetSymbolTable() {
             if (this.getType() != SymbolType.BlockSymbolTable) {
                 throw new RuntimeException("assert type mismatch");
@@ -137,21 +145,31 @@ public class SymbolTable {
         }
     }
 
-    //    递归查找符号表
     public SymbolItem RecurseGetSymbol(String symbol) {
-        SymbolItem value = this.SymbolItemTreeMap.get(symbol);
+        return this.RecurseGetSymbol(symbol, false); // 默认为 false
+    }
+
+    //    递归查找符号表
+    public SymbolItem RecurseGetSymbol(String symbol, boolean delayCopy) {
+        SymbolItem value = this.GetSymbol(symbol, delayCopy);
         if (value != null) {
             return value;
         } else if (this.parentSymbolTable != null) {
-            return this.parentSymbolTable.RecurseGetSymbol(symbol);
+            return this.parentSymbolTable.RecurseGetSymbol(symbol, delayCopy);
         } else {
             return null; // 未定义符号不报错，只有使用未定义符号的时候会报错
         }
     }
 
     //    不递归，只查找当前符号表
-    public SymbolItem GetSymbol(String symbol) {
-        return this.SymbolItemTreeMap.get(symbol);
+    public SymbolItem GetSymbol(String symbol, boolean delayCopy) {
+        SymbolItem symbolItem = this.SymbolItemTreeMap.get(symbol);
+        if (delayCopy && symbolItem != null && symbolItem.getType() == SymbolType.Flow) {
+            SymbolItem ret = new SymbolItem(symbolItem.getSymbol(), symbolItem.getType(), new DelayFlow(symbolItem.assertGetFlowable()));
+//            System.err.println(ret.getValue());
+            return ret;
+        }
+        return symbolItem;
     }
 
 //    //    新增符号，没有类型，强制终止递归查找符号表，PutOrGetSymbol() 操作会覆盖已有值
@@ -180,8 +198,8 @@ public class SymbolTable {
     }
 
     //    遇见一个符号，不确定是已有的还是新增的，若有则返回，没有则新增
-    public SymbolItem PutOrGetSymbol(String symbol, SymbolType type) {
-        SymbolItem symbolItem = this.RecurseGetSymbol(symbol);
+    public SymbolItem PutOrRecurseGetSymbol(String symbol, SymbolType type) {
+        SymbolItem symbolItem = this.RecurseGetSymbol(symbol,true); // 默认为 true
 //        System.err.println("At: " + this);
 //        System.err.println("At: " + this.symbol);
 //        System.err.println("Get: " + symbolItem);
@@ -252,7 +270,7 @@ public class SymbolTable {
         }
 //        System.err.println("Goto: " + name);
         SymbolTable.SymbolTableStack.push(
-                SymbolTable.CurrentSymbolTable().PutOrGetSymbol(name, SymbolType.BlockSymbolTable)
+                SymbolTable.CurrentSymbolTable().PutOrRecurseGetSymbol(name, SymbolType.BlockSymbolTable)
                         .assertGetSymbolTable());
 //        System.err.println("Goto: " + name + ", At: " + SymbolTable.CurrentSymbolTable().symbol);
         return SymbolTable.CurrentSymbolTable();

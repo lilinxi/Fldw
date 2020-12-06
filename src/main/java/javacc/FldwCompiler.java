@@ -73,10 +73,11 @@ terminalData =  new TerminalData(type, terminalToken.image);
 
   final public SymbolData symbol_data() throws ParseException {Token symbolToken;
     SymbolData symbolData;
-    symbolToken = jj_consume_token(SYMBOL);
-symbolData = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(symbolToken.image, SymbolTable.SymbolType.Data).assertGetSymbolData();
-        symbolData.addToken(symbolToken.image);
-        {if ("" != null) return symbolData;}
+    // 语法：symbol_data() = < SYMBOL>  | < SYMBOL> < EXLM >
+        symbolToken = jj_consume_token(SYMBOL);
+symbolData = SymbolTable.CurrentSymbolTable().PutOrRecurseGetSymbol(symbolToken.image, SymbolTable.SymbolType.Data).assertGetSymbolData();
+    symbolData.addToken(symbolToken.image);
+    {if ("" != null) return symbolData;}
     throw new Error("Missing return statement in function");
 }
 
@@ -391,6 +392,16 @@ if (rightExprData != null) {
 
   final public ListFlow list_flow() throws ParseException {ListFlow listFlow = new ListFlow();
     Datable data;
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case HASHTAG:{
+      jj_consume_token(HASHTAG);
+listFlow.setCopyValue(true);
+      break;
+      }
+    default:
+      jj_la1[12] = jj_gen;
+      ;
+    }
     jj_consume_token(LSBR);
     label_6:
     while (true) {
@@ -406,7 +417,7 @@ if (rightExprData != null) {
         break;
         }
       default:
-        jj_la1[12] = jj_gen;
+        jj_la1[13] = jj_gen;
         break label_6;
       }
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -415,7 +426,7 @@ if (rightExprData != null) {
         break;
         }
       default:
-        jj_la1[13] = jj_gen;
+        jj_la1[14] = jj_gen;
         ;
       }
       data = data();
@@ -453,7 +464,7 @@ IfElseFlow if_else_flow() throws ParseException {ExprData conditionData;
       break;
       }
     default:
-      jj_la1[14] = jj_gen;
+      jj_la1[15] = jj_gen;
       ;
     }
 {if ("" != null) return new IfElseFlow(conditionData, trueFlow, falseFlow);}
@@ -493,12 +504,13 @@ forFlow = new ForFlow(iterFlow, iterSymbolData, forBlockFlow);
     funcSymbol = jj_consume_token(SYMBOL);
     jj_consume_token(LBR);
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-    case LSBR:{
+    case LSBR:
+    case HASHTAG:{
       paramFlow = list_flow();
       break;
       }
     default:
-      jj_la1[15] = jj_gen;
+      jj_la1[16] = jj_gen;
       ;
     }
     jj_consume_token(RBR);
@@ -536,12 +548,13 @@ Core.AddEager(); SymbolTable.EnterBlock(null); blockFlow = new BlockFlow();
       case IF:
       case WHILE:
       case FOR:
+      case HASHTAG:
       case SYMBOL:{
         ;
         break;
         }
       default:
-        jj_la1[16] = jj_gen;
+        jj_la1[17] = jj_gen;
         break label_7;
       }
       //        LOOKAHEAD(3) topFlow = flowing() { blockFlow.addFlow(topFlow); }
@@ -557,6 +570,7 @@ Core.SubEager(); SymbolTable.ExitBlock();
 
   final public Flowable flow() throws ParseException {Flowable flow = new ListFlow();
     Token flowSymbol;
+    boolean gotoNext=true;
     if (jj_2_1(2)) {
       flow = func_flow();
     } else if (jj_2_2(3)) {
@@ -564,11 +578,13 @@ Core.SubEager(); SymbolTable.ExitBlock();
     } else {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case SYMBOL:{
-        flowSymbol = jj_consume_token(SYMBOL);
+        //            [ < COLON > {gotoNext=true;}]
+                    flowSymbol = jj_consume_token(SYMBOL);
 flow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
         break;
         }
-      case LSBR:{
+      case LSBR:
+      case HASHTAG:{
         flow = list_flow();
         break;
         }
@@ -589,7 +605,7 @@ flow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(flowSymbol.image, SymbolT
         break;
         }
       default:
-        jj_la1[17] = jj_gen;
+        jj_la1[18] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -613,7 +629,7 @@ leftFlow = topFlow;
         break;
         }
       default:
-        jj_la1[18] = jj_gen;
+        jj_la1[19] = jj_gen;
         break label_8;
       }
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -628,7 +644,7 @@ leftFlow.SetFlowOp(Flowable.FlowOp.Pushing);
         break;
         }
       default:
-        jj_la1[19] = jj_gen;
+        jj_la1[20] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -668,7 +684,7 @@ leftFlow.SetNextFlowing(rightFlow);
         break;
         }
       default:
-        jj_la1[20] = jj_gen;
+        jj_la1[21] = jj_gen;
         break label_9;
       }
       jj_consume_token(MATCHING);
@@ -719,12 +735,13 @@ do{
     jj_consume_token(LBR);
 SymbolTable.EnterBlock(null);
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-    case LSBR:{
+    case LSBR:
+    case HASHTAG:{
       param_flow = list_flow();
       break;
       }
     default:
-      jj_la1[21] = jj_gen;
+      jj_la1[22] = jj_gen;
       ;
     }
     jj_consume_token(RBR);
@@ -757,6 +774,7 @@ try {
     case IF:
     case WHILE:
     case FOR:
+    case HASHTAG:
     case SYMBOL:{
       flowing();
       break;
@@ -771,7 +789,7 @@ try {
       break;
       }
     default:
-      jj_la1[22] = jj_gen;
+      jj_la1[23] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -787,13 +805,14 @@ try {
       case WHILE:
       case FOR:
       case FUNC:
+      case HASHTAG:
       case IMPORT:
       case SYMBOL:{
         ;
         break;
         }
       default:
-        jj_la1[23] = jj_gen;
+        jj_la1[24] = jj_gen;
         break label_10;
       }
       stmt();
@@ -823,15 +842,15 @@ try {
     finally { jj_save(1, xla); }
   }
 
-  private boolean jj_3R_head_tail_flow_498_5_12()
+  private boolean jj_3R_head_tail_flow_500_5_12()
  {
     if (jj_scan_token(LSBR)) return true;
-    if (jj_3R_symbol_data_197_5_13()) return true;
+    if (jj_3R_symbol_data_199_5_13()) return true;
     if (jj_scan_token(SEMIC)) return true;
     return false;
   }
 
-  private boolean jj_3R_symbol_data_197_5_13()
+  private boolean jj_3R_symbol_data_199_5_13()
  {
     if (jj_scan_token(SYMBOL)) return true;
     return false;
@@ -839,20 +858,20 @@ try {
 
   private boolean jj_3_2()
  {
-    if (jj_3R_head_tail_flow_498_5_12()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_func_flow_479_5_11()
- {
-    if (jj_scan_token(SYMBOL)) return true;
-    if (jj_scan_token(LBR)) return true;
+    if (jj_3R_head_tail_flow_500_5_12()) return true;
     return false;
   }
 
   private boolean jj_3_1()
  {
-    if (jj_3R_func_flow_479_5_11()) return true;
+    if (jj_3R_func_flow_481_5_11()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_func_flow_481_5_11()
+ {
+    if (jj_scan_token(SYMBOL)) return true;
+    if (jj_scan_token(LBR)) return true;
     return false;
   }
 
@@ -867,7 +886,7 @@ try {
   private Token jj_scanpos, jj_lastpos;
   private int jj_la;
   private int jj_gen;
-  final private int[] jj_la1 = new int[24];
+  final private int[] jj_la1 = new int[25];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -875,10 +894,10 @@ try {
 	   jj_la1_init_1();
 	}
 	private static void jj_la1_init_0() {
-	   jj_la1_0 = new int[] {0x0,0x79800000,0x4000000,0x2000000,0x79800000,0x79800000,0x30000,0x30000,0xc0000,0xc0000,0x200,0x0,0x100,0x100,0x0,0x4000,0x80005000,0x80005000,0x0,0x0,0x0,0x4000,0x80005000,0x80005000,};
+	   jj_la1_0 = new int[] {0x0,0x79800000,0x4000000,0x2000000,0x79800000,0x79800000,0x30000,0x30000,0xc0000,0xc0000,0x200,0x0,0x0,0x100,0x100,0x0,0x4000,0x80005000,0x80005000,0x0,0x0,0x0,0x4000,0x80005000,0x80005000,};
 	}
 	private static void jj_la1_init_1() {
-	   jj_la1_1 = new int[] {0x18700,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x38700,0x38700,0x38700,0x0,0x1,0x0,0x20006,0x20006,0x30,0x30,0x20,0x0,0x2004e,0x2004e,};
+	   jj_la1_1 = new int[] {0x61c00,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xe1c00,0xe1c00,0x40,0xe1c00,0x0,0x1,0x40,0x80046,0x80046,0x30,0x30,0x20,0x40,0x8014e,0x8014e,};
 	}
   final private JJCalls[] jj_2_rtns = new JJCalls[2];
   private boolean jj_rescan = false;
@@ -895,7 +914,7 @@ try {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 24; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 25; i++) jj_la1[i] = -1;
 	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -910,7 +929,7 @@ try {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 24; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 25; i++) jj_la1[i] = -1;
 	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -921,7 +940,7 @@ try {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 24; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 25; i++) jj_la1[i] = -1;
 	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -940,7 +959,7 @@ try {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 24; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 25; i++) jj_la1[i] = -1;
 	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -950,7 +969,7 @@ try {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 24; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 25; i++) jj_la1[i] = -1;
 	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -960,7 +979,7 @@ try {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 24; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 25; i++) jj_la1[i] = -1;
 	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1091,12 +1110,12 @@ try {
   /** Generate ParseException. */
   public ParseException generateParseException() {
 	 jj_expentries.clear();
-	 boolean[] la1tokens = new boolean[51];
+	 boolean[] la1tokens = new boolean[53];
 	 if (jj_kind >= 0) {
 	   la1tokens[jj_kind] = true;
 	   jj_kind = -1;
 	 }
-	 for (int i = 0; i < 24; i++) {
+	 for (int i = 0; i < 25; i++) {
 	   if (jj_la1[i] == jj_gen) {
 		 for (int j = 0; j < 32; j++) {
 		   if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -1108,7 +1127,7 @@ try {
 		 }
 	   }
 	 }
-	 for (int i = 0; i < 51; i++) {
+	 for (int i = 0; i < 53; i++) {
 	   if (la1tokens[i]) {
 		 jj_expentry = new int[1];
 		 jj_expentry[0] = i;
