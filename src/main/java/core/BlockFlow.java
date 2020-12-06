@@ -56,7 +56,11 @@ public class BlockFlow extends Flow {
 
     @Override
     public void SetNextFlowing(Flowable flow) {
-        this.outFlow.SetNextFlowing(flow);
+        DelayFlow delayOutFlow = new DelayFlow(this.outFlow);
+        delayOutFlow.SetNextFlowing(flow);
+        this.addFlow(delayOutFlow);
+//        this.outFlow = delayOutFlow;
+//        this.outFlow.SetNextFlowing(flow);
     }
 
     @Override

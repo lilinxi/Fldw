@@ -94,7 +94,9 @@ public class IfElseFlow extends Flow {
     @Override
     public void SetNextFlowing(Flowable flow) { // 同时绑定 nextFlow
         this.trueFlow.SetNextFlowing(flow);
-        this.falseFlow.SetNextFlowing(flow);
+        if (this.falseFlow != null) {
+            this.falseFlow.SetNextFlowing(flow);
+        }
         this.nextFlow = flow;
     }
 
