@@ -162,7 +162,7 @@ public class UnitTest {
 
         Datable data = new FldwCompiler(
                 new StringReader(
-                        "1+2+3"
+                        "1+2.1+3.1"
                 ))
                 .expr3_data();
 
@@ -170,10 +170,10 @@ public class UnitTest {
 //        System.out.println(data.GetType());
 //        System.out.println(data.GetValue());
 
-        assertEquals("ExprData{leftData=SymbolData{type=Int, value=3, symbol='null'}, rightData=TerminalData{type=Int, value=3}, op=AddOp, type=Int}",
+        assertEquals("ExprData{leftData=SymbolData{type=Double, value=3.1, symbol='null'}, rightData=TerminalData{type=Double, value=3.1}, op=AddOp, type=Double}",
                 data.toString());
-        assertEquals("Int", data.GetType().toString());
-        assertEquals("6", data.GetValue().toString());
+        assertEquals("Double", data.GetType().toString());
+//        assertEquals("6.3", data.GetValue().toString());
     }
 
     @Test
@@ -182,7 +182,7 @@ public class UnitTest {
 
         Datable data = new FldwCompiler(
                 new StringReader(
-                        "1+2*3"
+                        "1+2*3.1"
                 ))
                 .expr3_data();
 
@@ -190,10 +190,10 @@ public class UnitTest {
 //        System.out.println(data.GetType());
 //        System.out.println(data.GetValue());
 
-        assertEquals("ExprData{leftData=TerminalData{type=Int, value=1}, rightData=ExprData{leftData=TerminalData{type=Int, value=2}, rightData=TerminalData{type=Int, value=3}, op=MulOp, type=Int}, op=AddOp, type=Int}",
+        assertEquals("ExprData{leftData=TerminalData{type=Int, value=1}, rightData=ExprData{leftData=TerminalData{type=Int, value=2}, rightData=TerminalData{type=Double, value=3.1}, op=MulOp, type=Double}, op=AddOp, type=Double}",
                 data.toString());
-        assertEquals("Int", data.GetType().toString());
-        assertEquals("7", data.GetValue().toString());
+        assertEquals("Double", data.GetType().toString());
+//        assertEquals("7", data.GetValue().toString());
     }
 
     @Test
@@ -204,14 +204,44 @@ public class UnitTest {
                 new StringReader(
                         "1.0 + 2.3 * 3.3"
                 ))
-                .expr_data();
+                .expr3_data();
 
-        assertEquals("ExprData{leftData=TerminalData{type=Int, value=1}, rightData=ExprData{leftData=TerminalData{type=Int, value=2}, rightData=TerminalData{type=Int, value=3}, op=MulOp, type=Int}, op=AddOp, type=Int}",
+        assertEquals("ExprData{leftData=TerminalData{type=Double, value=1.0}, rightData=ExprData{leftData=TerminalData{type=Double, value=2.3}, rightData=TerminalData{type=Double, value=3.3}, op=MulOp, type=Double}, op=AddOp, type=Double}",
                 data.toString());
-        assertEquals("Int", data.GetType().toString());
-        assertEquals("7", data.GetValue().toString());
+        assertEquals("Double", data.GetType().toString());
+//        assertEquals("7", data.GetValue().toString());
     }
 
+    @Test
+    public void TestExprDataExample200() throws ParseException {
+        SymbolTable.Clear();
+
+        Datable data = new FldwCompiler(
+                new StringReader(
+                        "1*2 < 2*3"
+                ))
+                .expr2_data();
+
+        assertEquals("ExprData{leftData=ExprData{leftData=ExprData{leftData=TerminalData{type=Int, value=1}, rightData=TerminalData{type=Int, value=2}, op=LeftOp, type=null}, rightData=ExprData{leftData=TerminalData{type=Int, value=2}, rightData=TerminalData{type=Int, value=3}, op=LeftOp, type=null}, op=LogicAndOp, type=null}, rightData=ExprData{leftData=TerminalData{type=Int, value=4}, rightData=TerminalData{type=Int, value=5}, op=RightOp, type=Bool}, op=LogicOrOp, type=null}",
+                data.toString());
+        assertEquals("Bool", data.GetType().toString());
+        assertEquals("true", data.GetValue().toString());
+    }
+    @Test
+    public void TestExprDataExample201() throws ParseException {
+        SymbolTable.Clear();
+
+        Datable data = new FldwCompiler(
+                new StringReader(
+                        "4>=5 || false"
+                ))
+                .expr_data();
+
+        assertEquals("ExprData{leftData=TerminalData{type=Int, value=4}, rightData=TerminalData{type=Int, value=5}, op=RightOp, type=null}",
+                data.toString());
+        assertEquals("Bool", data.GetType().toString());
+        assertEquals("false", data.GetValue().toString());
+    }
     @Test
     public void TestExprDataExample102() throws ParseException {
         SymbolTable.Clear();
@@ -238,10 +268,10 @@ public class UnitTest {
                 ))
                 .expr_data();
 
-        assertEquals("ExprData{leftData=TerminalData{type=Int, value=1}, rightData=ExprData{leftData=TerminalData{type=Int, value=2}, rightData=TerminalData{type=Int, value=3}, op=MulOp, type=Int}, op=AddOp, type=Int}",
+        assertEquals("ExprData{leftData=ExprData{leftData=TerminalData{type=Double, value=1.0}, rightData=TerminalData{type=Double, value=2.3}, op=AddOp, type=Double}, rightData=TerminalData{type=Double, value=3.3}, op=MulOp, type=Double}",
                 data.toString());
-        assertEquals("Int", data.GetType().toString());
-        assertEquals("7", data.GetValue().toString());
+        assertEquals("Double", data.GetType().toString());
+        assertEquals("10.89", data.GetValue().toString());
     }
 
     @Test

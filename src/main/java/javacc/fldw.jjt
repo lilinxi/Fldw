@@ -235,8 +235,8 @@ ExprData expr_data_tmp() :
 Datable expr_data() :
 {
     ExprData topExprData = new ExprData();
-    Datable leftExprData = new ExprData();
-    Datable rightExprData = new ExprData();
+    Datable leftExprData;
+    Datable rightExprData = null;
 }
 {
     leftExprData = expr1_data()
@@ -246,19 +246,24 @@ Datable expr_data() :
         {
             topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
-            leftExprData = topExprData;
+            leftExprData = new SymbolData();
+            leftExprData.Push(topExprData);
         }
     )*
     {
-        return topExprData;
+        if (rightExprData != null) {
+            return topExprData;
+        } else {
+            return leftExprData;
+        }
     }
 }
 
 Datable expr1_data() :
 {
     ExprData topExprData = new ExprData();
-    Datable leftExprData = new ExprData();
-    Datable rightExprData = new ExprData();
+    Datable leftExprData;
+    Datable rightExprData = null;
 }
 {
     leftExprData = expr2_data()
@@ -268,19 +273,24 @@ Datable expr1_data() :
         {
             topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
-            leftExprData = topExprData;
+            leftExprData = new SymbolData();
+            leftExprData.Push(topExprData);
         }
     )*
     {
-        return topExprData;
+        if (rightExprData != null) {
+            return topExprData;
+        } else {
+            return leftExprData;
+        }
     }
 }
 
 Datable expr2_data() :
 {
     ExprData topExprData = new ExprData();
-    Datable leftExprData = new ExprData();
-    Datable rightExprData = new ExprData();
+    Datable leftExprData;
+    Datable rightExprData = null;
 }
 {
     leftExprData = expr3_data()
@@ -296,11 +306,16 @@ Datable expr2_data() :
         {
             topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
-            leftExprData = topExprData;
+            leftExprData = new SymbolData();
+            leftExprData.Push(topExprData);
         }
     )*
     {
-        return topExprData;
+        if (rightExprData != null) {
+            return topExprData;
+        } else {
+            return leftExprData;
+        }
     }
 }
 
@@ -412,16 +427,6 @@ ListFlow list_flow() :
 //        System.out.println(listFlow);
         return listFlow;
     }
-}
-//expre
-Datable term():
-{
-    Datable data;
-}
-{
-    data = terminal_data()
-    | data = symbol_data()
-    | data = <LBR> expr() <RBR>
 }
 
 //SymbolFlow symbol_flow() :

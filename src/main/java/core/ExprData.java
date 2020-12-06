@@ -27,14 +27,15 @@ public class ExprData extends Data {
                     return DataType.Int;
                 }
 //                两个类型不是都为 Int，那么就肯定有一个 Double，否则报错
-                if (leftType != DataType.Double || rightType != DataType.Double) {
+                if (leftType != DataType.Double && rightType != DataType.Double) {
                     throw new RuntimeException("expr type mismatch with " + leftType + " " + op + " " + rightType);
                 } else { // 类型强转为 Double
                     return DataType.Double;
                 }
             }
+
 //                两个类型必为 Int 或 Double，强转为 Double 进行比较，类型返回 Bool，否则报错
-            case LeftOp, RightOp -> {
+            case LeftOp, RightOp , LeftEqualOp ,RightEqualOp -> {
                 if ((leftType != DataType.Int && leftType != DataType.Double) ||
                         (rightType != DataType.Int && rightType != DataType.Double)) {
                     throw new RuntimeException("expr type mismatch with " + leftType + " " + op + " " + rightType);
@@ -43,7 +44,7 @@ public class ExprData extends Data {
                 }
             }
 //            需要类型强匹配，否则报错
-            case LogicEqualOp -> {
+            case LogicEqualOp ,LogicAndOp,LogicOrOp-> {
                 if (leftType == rightType) {
                     return DataType.Bool;
                 } else {
@@ -98,21 +99,105 @@ public class ExprData extends Data {
             throw new RuntimeException("unexpected call");
         }
         switch (this.op) {
+            //<,>,<=,>=
             case LeftOp -> {
-                return Double.parseDouble(this.leftData.GetValue().toString()) < Double.parseDouble(this.rightData.GetValue().toString());
+                if(this.GetType() == DataType.Bool) {
+                    return Double.parseDouble(this.leftData.GetValue().toString()) < Double.parseDouble(this.rightData.GetValue().toString());
+                }else{
+                    return "Wrong!";
+                }
             }
             case RightOp -> {
-                return Double.parseDouble(this.leftData.GetValue().toString()) > Double.parseDouble(this.rightData.GetValue().toString());
+                if(this.GetType() == DataType.Bool) {
+                    return Double.parseDouble(this.leftData.GetValue().toString()) > Double.parseDouble(this.rightData.GetValue().toString());
+                }else{
+                    return "Wrong!";
+                }
+            }
+            case LeftEqualOp -> {
+                if(this.GetType() == DataType.Bool) {
+                    return Double.parseDouble(this.leftData.GetValue().toString()) <= Double.parseDouble(this.rightData.GetValue().toString());
+                }else{
+                    return "Wrong!";
+                }
+            }
+            case RightEqualOp -> {
+                if(this.GetType() == DataType.Bool) {
+                    return Double.parseDouble(this.leftData.GetValue().toString()) >= Double.parseDouble(this.rightData.GetValue().toString());
+                }else{
+                    return "Wrong!";
+                }
+            }
+            //
+            case  LogicEqualOp -> {
+                if(this.GetType() == DataType.Bool){
+                    return this.leftData.GetValue().toString().equals(this.rightData.GetValue().toString());
+                }else{
+                    return "Wrong!";
+                }
+            }
+            case LogicOrOp  -> {
+                if(this.GetType() == DataType.Bool){
+                    return Boolean.parseBoolean(this.leftData.GetValue().toString()) || Boolean.parseBoolean(this.rightData.GetValue().toString());
+                }else{
+                    return "Wrong!";
+                }
+            }
+            case LogicAndOp  -> {
+                if(this.GetType() == DataType.Bool){
+                    return Boolean.parseBoolean(this.leftData.GetValue().toString()) && Boolean.parseBoolean(this.rightData.GetValue().toString());
+                }else{
+                    return "Wrong!";
+                }
             }
             case LogicNotOp -> {
                 return !this.leftData.GetValue().toString().equals(this.rightData.GetValue().toString()) ||
                         !this.leftData.GetType().toString().equals(this.rightData.GetType().toString());
             }
             case MulOp -> {
-                return Integer.parseInt(this.leftData.GetValue().toString()) * Integer.parseInt(this.rightData.GetValue().toString());
+                if(this.GetType() == DataType.Int) {
+                    return Integer.parseInt(this.leftData.GetValue().toString()) * Integer.parseInt(this.rightData.GetValue().toString());
+                }
+                else if(this.GetType() == DataType.Double) {
+                    return Double.parseDouble(this.leftData.GetValue().toString()) * Double.parseDouble(this.rightData.GetValue().toString());
+                }
+                else {
+                    return false;
+                }
+            }
+            case DivOp -> {
+                if(this.GetType() == DataType.Int) {
+                    return Integer.parseInt(this.leftData.GetValue().toString()) / Integer.parseInt(this.rightData.GetValue().toString());
+                }
+                else if(this.GetType() == DataType.Double) {
+                    return Double.parseDouble(this.leftData.GetValue().toString()) / Double.parseDouble(this.rightData.GetValue().toString());
+                }
+                else {
+                    return false;
+                }
             }
             case AddOp -> {
-                return Integer.parseInt(this.leftData.GetValue().toString()) + Integer.parseInt(this.rightData.GetValue().toString());
+                if(this.GetType() == DataType.Int) {
+                    return Integer.parseInt(this.leftData.GetValue().toString()) + Integer.parseInt(this.rightData.GetValue().toString());
+                }
+                else if(this.GetType() == DataType.Double) {
+                    return Double.parseDouble(this.leftData.GetValue().toString()) + Double.parseDouble(this.rightData.GetValue().toString());
+                }
+                else {
+                    return false;
+                }
+
+            }
+            case SubOp -> {
+                if(this.GetType() == DataType.Int) {
+                    return Integer.parseInt(this.leftData.GetValue().toString()) - Integer.parseInt(this.rightData.GetValue().toString());
+                }
+                else if(this.GetType() == DataType.Double) {
+                    return Double.parseDouble(this.leftData.GetValue().toString()) - Double.parseDouble(this.rightData.GetValue().toString());
+                }
+                else {
+                    return false;
+                }
             }
             default -> {
                 throw new RuntimeException("TODO");
