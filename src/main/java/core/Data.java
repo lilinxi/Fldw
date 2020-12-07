@@ -41,9 +41,9 @@ public class Data extends TokenList implements Datable {
     public boolean equals(Datable data) {
         if (this.GetType() == null && data.GetType() == null) {
             return true;
-        } else if (this.GetType() == data.GetType() && this.GetValue() == data.GetValue()) {
+        } else if (this.GetType() == data.GetType() && this.GetValue().toString().equals(data.GetValue().toString())) {
             return true;
-        }else {
+        } else {
             return false;
         }
     }

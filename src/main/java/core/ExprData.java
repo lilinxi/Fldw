@@ -20,13 +20,14 @@ public class ExprData extends Data {
         SubOp,
         MulOp,
         DivOp,
+        ModOp,
     }
 
     // 检查两元的类型和运算符是否匹配，并返回表达式的类型
     public static DataType CheckExprTypeMatch(DataType leftType, DataType rightType, ExprOp op) {
         switch (op) {
 //                两个类型必为 Int 或 Double，有一方为 Double 则强转为 Double，否则报错
-            case AddOp, SubOp, MulOp, DivOp -> {
+            case AddOp, SubOp, MulOp, DivOp, ModOp -> {
 //                两个类型都为 Int
                 if (leftType == DataType.Int && rightType == DataType.Int) {
                     return DataType.Int;
@@ -198,6 +199,15 @@ public class ExprData extends Data {
                     return false;
                 }
             }
+            case ModOp -> {
+                if (this.GetType() == DataType.Int) {
+                    return Integer.parseInt(this.leftData.GetValue().toString()) % Integer.parseInt(this.rightData.GetValue().toString());
+                } else if (this.GetType() == DataType.Double) {
+                    return Double.parseDouble(this.leftData.GetValue().toString()) % Double.parseDouble(this.rightData.GetValue().toString());
+                } else {
+                    return false;
+                }
+            }
             default -> {
                 throw new RuntimeException("TODO");
             }
@@ -230,7 +240,7 @@ public class ExprData extends Data {
     }
 
     @Override
-    public Datable Clone()  {
+    public Datable Clone() {
         return new ExprData(this);
     }
 }

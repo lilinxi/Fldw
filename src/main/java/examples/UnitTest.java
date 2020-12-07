@@ -260,6 +260,7 @@ public class UnitTest {
         assertEquals("Bool", data.GetType().toString());
         assertEquals("true", data.GetValue().toString());
     }
+
     @Test
     public void TestExprDataExample201() throws ParseException {
         SymbolTable.Clear();
@@ -274,6 +275,30 @@ public class UnitTest {
 //                data.toString());
         assertEquals("Bool", data.GetType().toString());
         assertEquals("false", data.GetValue().toString());
+    }
+
+    @Test
+    public void TestExprDataExample301() throws ParseException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+
+        try {
+            SymbolTable.Clear();
+            FldwCompiler.parse("""
+                    import std.Std
+                    [5+8,1+2] | stdout
+                    """);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        System.setOut(System.out);
+
+        assertEquals("""
+                        stdout: ExprData{leftData=TerminalData{type=Int, value=5}, rightData=TerminalData{type=Int, value=8}, op=AddOp, type=null}
+                        stdout: ExprData{leftData=TerminalData{type=Int, value=1}, rightData=TerminalData{type=Int, value=2}, op=AddOp, type=null}
+                        """
+                , output.toString());
     }
 
     @Test
@@ -1307,6 +1332,53 @@ public class UnitTest {
 //                        }
 //                        """,
 //                SymbolTable.CurrentSymbolTable().toString());
+    }
+
+    @Test
+    public void TestFuncExample5() {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+
+        try {
+            SymbolTable.Clear();
+            FldwCompiler.parse("""
+                    import std.Std
+                    function seq( [begin, end, step] ) {
+                        [begin] -> [a]
+                        [] | ret
+                        while ( a < end ) {
+                            #[a] | ret
+                            [a+step] -> [a]
+                        }
+                        ret | out
+                    }
+                    seq( [0, 10, 1] ) | seq_10
+                    for (  seq_10 -> x ) {
+                        if ( x % 2 == 0 ) {
+                            [x] | stdout
+                        } else {
+                            ["bee"] | stdout
+                        }
+                    }            
+                    """);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        System.setOut(System.out);
+
+        assertEquals("""
+                stdout: SymbolData{type=Int, value=0, symbol='x'}
+                stdout: TerminalData{type=String, value="bee"}
+                stdout: SymbolData{type=Int, value=2, symbol='x'}
+                stdout: TerminalData{type=String, value="bee"}
+                stdout: SymbolData{type=Int, value=4, symbol='x'}
+                stdout: TerminalData{type=String, value="bee"}
+                stdout: SymbolData{type=Int, value=6, symbol='x'}
+                stdout: TerminalData{type=String, value="bee"}
+                stdout: SymbolData{type=Int, value=8, symbol='x'}
+                stdout: TerminalData{type=String, value="bee"}
+                """, output.toString());
     }
 
     @Test

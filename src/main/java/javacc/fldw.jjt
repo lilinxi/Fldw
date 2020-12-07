@@ -7,27 +7,63 @@ package javacc;
 
 import java.io.*;
 import java.lang.reflect.*;
-import core.*;import examples.Examples;
+import java.util.*;
+import core.*;
 
 public class FldwCompiler {
     public static void main(String[] args) {
-//        String[] tests={"a<1.2"};
-//        for (String arg : tests) {
-            try {
-//                            Class.forName("std.Std");
-                parse(Examples.BlockExample4);
-//                System.out.println(evaluate(arg));
-//                return(evaluate(arg));
-            } catch (ParseException ex) {
-                System.err.println(ex.getMessage());
+        if (args.length > 0) {
+            String arg = args[0];
+            if (arg.endsWith(".fldw")) {
+                try {
+                    StringBuilder buffer = new StringBuilder();
+                    String line;  // 用来保存每行读取的内容
+                    InputStream is = new FileInputStream(arg);
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+                    line = reader.readLine(); // 读取第一行
+                    while (line != null) { // 如果 line 为空说明读完了
+                        buffer.append(line); // 将读到的内容添加到 buffer 中
+                        buffer.append("\n"); // 添加换行符
+                        line = reader.readLine(); // 读取下一行
+                    }
+                    reader.close();
+                    is.close();
+                    parse(buffer.toString());
+                } catch (ParseException | IOException e) {
+                    System.err.println(e.getMessage());
+                }
+            } else {
+                try {
+                    parse(arg);
+                } catch (ParseException e) {
+                    System.err.println(e.getMessage());
+                }
             }
-//        }
+            return;
+        }
+
+        System.out.println("Welcome to FLDW, version 1.0.0");
+        Scanner sc = new Scanner(System.in);
+        while (true) {
+            System.out.print("fldw > ");
+            while (sc.hasNextLine()) {
+                String in = sc.nextLine();
+                if (in.equals("exit")) {
+                    System.out.println("Bye!");
+                    return;
+                }
+                try {
+                    parse(in);
+                } catch (ParseException e) {
+                    System.err.println(e.getMessage());
+                }
+                System.out.print("fldw > ");
+            }
+        }
     }
 
     public static void parse(String src) throws ParseException {
         Reader reader = new StringReader(src);
-//        Object ret = new FldwCompiler(reader).expr_data_tmp();
-//        System.out.println(ret);
         new FldwCompiler(reader).program();
     }
 }
@@ -64,16 +100,12 @@ TOKEN : // Keywords and punctuation
     |   < RSBR : "]" >
     |   < LSBR : "[" >
 
-    |   < ASSIGN : "=" >
     |   < PLUS : "+" >
     |   < MINUS : "-" >
     |   < MULT : "*" >
     |   < DIV : "/" >
     |   < MOD : "%" >
-    |   < INC : "++" >
-    |   < DEC : "--" >
 
-    |   < EXLM : "!" >
     |   < LOGIC_EQUAL : "==" >
     |   < LOGIC_NOT : "!=" >
     |   < LOGIC_AND : "&&" >
@@ -85,22 +117,16 @@ TOKEN : // Keywords and punctuation
 
     |   < IF : "if" >
     |   < ELSE : "else" >
-//    |   < RETURN : "return" >
-//    |   < STRING : "string" >
     |   < WHILE : "while" >
     |   < FOR : "for" >
 
     |   < FUNC : "function" >
-//    |   < FUNC_IN : "in" >
-//    |   < FUNC_OUT : "out" >
 
-    |   < FLOWING : "|" >
-    |   < MATCHING : "->" >
-    |   < HASHTAG : "#" > // 取值操作
-    |   < COLON : ":" > // 流的开始和停止
+    |   < FLOWING : "|" >       // 数据管道操作
+    |   < MATCHING : "->" >     // 模式匹配操作
+    |   < HASHTAG : "#" >       // 变量取值操作
+    |   < EXLM : "!" >          // 显示定义为临时变量
 
-//    |   < STDIN : "stdin" >
-//    |   < STDOUT : "stdout" >
     |   < IMPORT : "import" >
     |   < DOT : "." >
 }
@@ -158,9 +184,8 @@ TOKEN : // anything not recognised so far
 /*****************************************************************/
 TerminalData terminal_data() :
 {
-    Token terminalToken;
     Datable.DataType type;
-    TerminalData terminalData;
+    Token terminalToken;
 }
 {
     // 语法：terminal_data() = < INT_VALUE > | < DOUBLE_VALUE > | < BOOL_VALUE > | < STRING_VALUE >
@@ -183,9 +208,7 @@ TerminalData terminal_data() :
     |   terminalToken = < NULL_VALUE > { type = null; }
     )
     {
-        terminalData =  new TerminalData(type, terminalToken.image);
-        terminalData.addToken(terminalToken.image);
-        return terminalData;
+        return new TerminalData(type, terminalToken.image);
     }
 }
 
@@ -193,50 +216,19 @@ SymbolData symbol_data() :
 {
     Token symbolToken;
     SymbolData symbolData;
-        boolean partialSymbol=false;
+    boolean partialSymbol = false;
 }
 {
-    // 语法：symbol_data() = < SYMBOL>  | < SYMBOL> < EXLM >
-    [ < EXLM > {partialSymbol=true;} ] symbolToken = < SYMBOL>
+    // 语法：symbol_data() = [ < EXLM > ] < SYMBOL>
+    [ < EXLM > { partialSymbol=true; } ]
+    symbolToken = < SYMBOL>
     {
-                if (partialSymbol) {
-                            symbolData = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(symbolToken.image, SymbolTable.SymbolType.Data).assertGetSymbolData();
-                } else {
-                            symbolData = SymbolTable.CurrentSymbolTable().PutOrRecurseGetSymbol(symbolToken.image, SymbolTable.SymbolType.Data).assertGetSymbolData();
-                }
-//        symbolData.addToken(symbolToken.image);
+        if (partialSymbol) {
+            symbolData = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(symbolToken.image, SymbolTable.SymbolType.Data).assertGetSymbolData();
+        } else {
+            symbolData = SymbolTable.CurrentSymbolTable().PutOrRecurseGetSymbol(symbolToken.image, SymbolTable.SymbolType.Data).assertGetSymbolData();
+        }
         return symbolData;
-    }
-}
-
-// TODO：tmp
-ExprData expr_data_tmp() :
-{
-    Token leftDataToken;
-    Token rightDataToken;
-    Token opToken;
-    ExprData exprData = new ExprData();
-    Datable leftData, rightData;
-}
-{
-    leftData = data()
-    {
-        exprData.setLeftData(leftData);
-    }
-    (
-            < LEFT > { exprData.setOp(ExprData.ExprOp.LeftOp); }
-        |   < RIGHT > { exprData.setOp(ExprData.ExprOp.RightOp); }
-        |   < LEFT_EQUAL >
-        |   < RIGHT_EQUAL >
-        |   < LOGIC_EQUAL > { exprData.setOp(ExprData.ExprOp.LogicEqualOp); }
-        |   < LOGIC_NOT > { exprData.setOp(ExprData.ExprOp.LogicNotEqualOp); }
-    )
-    rightData = data()
-    {
-            exprData.setRightData(rightData);
-    }
-    {
-        return exprData;
     }
 }
 
@@ -247,6 +239,7 @@ Datable expr_data() :
     Datable rightExprData = null;
 }
 {
+    // 语法：expr_data() = expr1_data() ( < LOGIC_OR > expr1_data() )*
     leftExprData = expr1_data()
     (
         < LOGIC_OR > { topExprData.setOp(ExprData.ExprOp.LogicOrOp); }
@@ -254,10 +247,7 @@ Datable expr_data() :
         {
             topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
-//                        leftExprData = new SymbolData(); // 每个生成式内部立即求值，生成式外部建立表达式树，进行懒求值
-//                        leftExprData.Push(topExprData);
-                leftExprData = topExprData.Clone();
-
+            leftExprData = topExprData.Clone();
         }
     )*
     {
@@ -272,10 +262,11 @@ Datable expr_data() :
 Datable expr1_data() :
 {
     ExprData topExprData = new ExprData();
- Datable leftExprData;
+    Datable leftExprData;
     Datable rightExprData = null;
 }
 {
+    // 语法：expr1_data() = expr2_data() ( < LOGIC_AND > expr2_data() )*
     leftExprData = expr2_data()
     (
         < LOGIC_AND> { topExprData.setOp(ExprData.ExprOp.LogicAndOp); }
@@ -283,18 +274,15 @@ Datable expr1_data() :
         {
             topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
-//                        leftExprData = new SymbolData();
-//                        leftExprData.Push(topExprData);
-                                        leftExprData = topExprData.Clone();
-
+            leftExprData = topExprData.Clone();
         }
     )*
     {
           if (rightExprData != null) {
-                   return topExprData;
-               } else {
-                   return leftExprData;
-               }
+              return topExprData;
+          } else {
+              return leftExprData;
+          }
     }
 }
 
@@ -302,34 +290,33 @@ Datable expr2_data() :
 {
     ExprData topExprData = new ExprData();
     Datable leftExprData;
-     Datable rightExprData = null;
+    Datable rightExprData = null;
 }
 {
+    // 语法：expr2_data() = expr3_data() ( (< LEFT > | < RIGHT > | < LEFT_EQUAL > | < RIGHT_EQUAL > | < LOGIC_EQUAL > | < LOGIC_NOT >) expr3_data() )*
     leftExprData = expr3_data()
     (
-        LOOKAHEAD(2)(   < LEFT > { topExprData.setOp(ExprData.ExprOp.LeftOp); }
+        LOOKAHEAD(2) (
+            < LEFT > { topExprData.setOp(ExprData.ExprOp.LeftOp); }
         |   < RIGHT > { topExprData.setOp(ExprData.ExprOp.RightOp); }
         |   < LEFT_EQUAL > { topExprData.setOp(ExprData.ExprOp.LeftEqualOp); }
         |   < RIGHT_EQUAL > { topExprData.setOp(ExprData.ExprOp.RightEqualOp); }
         |   < LOGIC_EQUAL > { topExprData.setOp(ExprData.ExprOp.LogicEqualOp);}
         |   < LOGIC_NOT > { topExprData.setOp(ExprData.ExprOp.LogicNotEqualOp);}
-         )
+        )
         rightExprData = expr3_data()
         {
             topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
-//                       leftExprData = new SymbolData();
-//                       leftExprData.Push(topExprData);
-                                       leftExprData = topExprData.Clone();
-
+            leftExprData = topExprData.Clone();
         }
     )*
     {
            if (rightExprData != null) {
-                    return topExprData;
-                } else {
-                    return leftExprData;
-                }
+               return topExprData;
+           } else {
+               return leftExprData;
+           }
     }
 }
 
@@ -340,6 +327,7 @@ Datable expr3_data() :
     Datable rightExprData = null;
 }
 {
+    // 语法：expr3_data() = expr4_data() ( (< PLUS > | < MINUS >) expr4_data() )*
     leftExprData = expr4_data()
     (
         (   < PLUS > { topExprData.setOp(ExprData.ExprOp.AddOp); }
@@ -349,10 +337,7 @@ Datable expr3_data() :
         {
             topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
-//            leftExprData = new SymbolData();
-//            leftExprData.Push(topExprData);
-                            leftExprData = topExprData.Clone();
-
+            leftExprData = topExprData.Clone();
         }
     )*
     {
@@ -371,18 +356,18 @@ Datable expr4_data() :
     Datable rightExprData = null;
 }
 {
+    // 语法：expr4_data() = term() ( (< MULT > | < DIV > | < MOD >) term() )*
     leftExprData = term()
     (
         (   < MULT > { topExprData.setOp(ExprData.ExprOp.MulOp); }
         |   < DIV > { topExprData.setOp(ExprData.ExprOp.DivOp); }
+        |   < MOD > { topExprData.setOp(ExprData.ExprOp.ModOp); }
         )
         rightExprData = term()
         {
             topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
-//            leftExprData = new SymbolData();
-//            leftExprData.Push(topExprData);
-                leftExprData = topExprData.Clone();
+            leftExprData = topExprData.Clone();
         }
     )*
     {
@@ -399,6 +384,7 @@ Datable term() :
     Datable data;
 }
 {
+    // 语法：term() = terminal_data() | symbol_data() | ( < LBR > expr_data() < RBR > )
     (    data = terminal_data()
     |    data = symbol_data()
     |    < LBR > data = expr_data() < RBR >
@@ -413,10 +399,10 @@ Datable data() :
     Datable data;
 }
 {
-    // 语法：data() = terminal_data() | symbol_data() | expr_data_tmp()
-    (    LOOKAHEAD(2)data = terminal_data()
+    // 语法：data() = expr_data() | symbol_data() | terminal_data()
+    (   LOOKAHEAD(3) data = expr_data()
     |   LOOKAHEAD(3) data = symbol_data()
-    |   data = expr_data()
+    |   LOOKAHEAD(3) data = terminal_data()
     )
     {
         return data;
@@ -429,12 +415,8 @@ ListFlow list_flow() :
     Datable data;
 }
 {
-    // 语法：list_flow() = < LSBR  > data() ( < COMMA > data() )* < RSBR >
-    [ < HASHTAG > {listFlow.setCopyValue(true);} ] < LSBR  >
-//    data = data()
-//    {
-//        listFlow.Push(data);
-//    }
+    // 语法：list_flow() = [ < HASHTAG > ] < LSBR  > data() ( [ < COMMA > ] data() )* < RSBR >
+    [ < HASHTAG > { listFlow.setCopyValue(true);} ] < LSBR  >
     ( [< COMMA >] data = data()
         {
             listFlow.Push(data);
@@ -442,21 +424,9 @@ ListFlow list_flow() :
     )*
     < RSBR >
     {
-//        System.out.println(listFlow);
         return listFlow;
     }
 }
-
-//SymbolFlow symbol_flow() :
-//{
-//}
-//{
-//    // 语法：symbol_flow() = < ITER> <SYMBOL> stmt()
-//    {
-////        System.out.println(new SymbolFlow());
-//        return new SymbolDataFlow();
-//    }
-//}
 
 IfElseFlow if_else_flow() :
 {
@@ -465,8 +435,8 @@ IfElseFlow if_else_flow() :
     Flowable falseFlow = null;
 }
 {
-    // 语法：if_else_stmt() = < IF > < LBR > expr_data_tmp() < RBR > block() [ <ELSE > block() ]
-    < IF > < LBR > conditionData = expr_data() < RBR > trueFlow = block_flow("if") [ <ELSE > falseFlow = block_flow("else") ]
+    // 语法：if_else_stmt() = < IF > < LBR > data() < RBR > block() [ < ELSE > block() ]
+    < IF > < LBR > conditionData = data() < RBR > trueFlow = block_flow("if") [ <ELSE > falseFlow = block_flow("else") ]
     {
         return new IfElseFlow(conditionData, trueFlow, falseFlow);
     }
@@ -478,8 +448,8 @@ WhileFlow while_flow() :
     Flowable trueFlow;
 }
 {
-    // 语法：< WHILE > < LBR > expr_data_tmp() < RBR > block()
-    < WHILE > < LBR > conditionData = expr_data() < RBR > trueFlow = block_flow("while")
+    // 语法：while_flow() = < WHILE > < LBR > data() < RBR > block()
+    < WHILE > < LBR > conditionData = data() < RBR > trueFlow = block_flow("while")
     {
         return new WhileFlow(conditionData, trueFlow);
     }
@@ -490,14 +460,12 @@ ForFlow for_flow() :
     Flowable iterFlow;
     SymbolData iterSymbolData;
     BlockFlow forBlockFlow;
-    ForFlow forFlow;
 }
 {
-    // 语法：for_flow() = < FOR > < LBR > flow() < FLOWING > symbol_data() < RBR > block_flow()
+    // 语法：for_flow() = < FOR > < LBR > flow() < MATCHING > symbol_data() < RBR > block_flow()
     < FOR > < LBR > iterFlow = flow() < MATCHING > iterSymbolData = symbol_data() < RBR > forBlockFlow = block_flow("for")
     {
-        forFlow = new ForFlow(iterFlow, iterSymbolData, forBlockFlow);
-        return forFlow;
+        return new ForFlow(iterFlow, iterSymbolData, forBlockFlow);
     }
 }
 
@@ -508,6 +476,7 @@ DelayFuncFlow func_flow() :
     DelayFuncFlow funcFlow;
 }
 {
+    // 语法：func_flow() = < SYMBOL > < LBR > [ list_flow() ] < RBR >
     funcSymbol = < SYMBOL > < LBR > [ paramFlow = list_flow()] < RBR >
     {
         funcFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(funcSymbol.image).assertGetDelayFuncFlow();
@@ -524,43 +493,43 @@ HeadTailFlow head_tail_flow() :
     Token tailListFlowSymbol;
     Flowable tailListFlow;
     HeadTailFlow headTailFlow;
-        boolean partialSymbol=false;
+    boolean partialSymbol=false;
 }
 {
-    // 语法：head_tail_flow() = < LSBR  > symbol_data() < SEMIC > < SYMBOL> < RSBR >
+    // 语法：head_tail_flow() = < LSBR  > symbol_data() < SEMIC > [ EXLM ] < SYMBOL> < RSBR >
     < LSBR  > headData = symbol_data() < SEMIC >
     [ < EXLM > {partialSymbol=true;} ] tailListFlowSymbol = < SYMBOL>
-                {
-                    if (partialSymbol) {
-                        tailListFlow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(tailListFlowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
-                    } else {
-                        tailListFlow = SymbolTable.CurrentSymbolTable().PutOrRecurseGetSymbol(tailListFlowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
-                    }
-                }
+    {
+        if (partialSymbol) {
+            tailListFlow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(tailListFlowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
+        } else {
+            tailListFlow = SymbolTable.CurrentSymbolTable().PutOrRecurseGetSymbol(tailListFlowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
+        }
+    }
     < RSBR >
     {
         return new HeadTailFlow(headData, tailListFlow);
     }
 }
 
-BlockFlow block_flow(String blockName) : // block 不能嵌套
+BlockFlow block_flow(String blockName) :
 {
     BlockFlow blockFlow;
     Flowable topFlow;
 }
 {
-    // 语法：block() = < LCBR > (flowing)* < RCBR > [ < EXLM > ]
-    < LCBR > { Core.AddEager(); SymbolTable.EnterBlock(blockName); blockFlow = new BlockFlow();}
-//    ( import_stmt() )*
+    // 语法：block() = < LCBR > ( flowing() )* < RCBR >
+    < LCBR >
+    {
+        Core.AddEager();
+        SymbolTable.EnterBlock(blockName);
+        blockFlow = new BlockFlow(); // 在新符号表压栈之后再创建流块
+    }
     (
-//        LOOKAHEAD(3) topFlow = flowing() { blockFlow.addFlow(topFlow); }
        topFlow = flowing() { blockFlow.addFlow(topFlow); }
     )*
-//    stmts()
     < RCBR > { Core.SubEager(); SymbolTable.ExitBlock(); }
-//    [ < EXLM > { blockFlow.Flowing(); } ]
     {
-//        System.err.println("blcokFlow: "+blockFlow);
         return blockFlow;
     }
 }
@@ -569,18 +538,16 @@ Flowable flow() :
 {
     Flowable flow = new ListFlow();
     Token flowSymbol;
-    boolean gotoNext=true;
     boolean partialSymbol=false;
 }
 {
-    // 语法：flow() = list_flow() | symbol_flow() | func_flow()
+    // 语法：flow() = func_flow() | head_tail_flow() | ([ < EXLM > ] < SYMBOL>) | list_flow() | if_else_flow() | while_flow() | block_flow() | for_flow()
     (
 
 //        LOOKHEAD 的要放在最前面
-        LOOKAHEAD(2) flow = func_flow() // 预读 < SYMBOL > < LBR >
-    |   LOOKAHEAD(3) flow = head_tail_flow() // 预读 < LSBR > < SYMBOL > <SEMIC >
+        LOOKAHEAD(2) flow = func_flow()         // 预读 < SYMBOL > < LBR >
+    |   LOOKAHEAD(3) flow = head_tail_flow()    // 预读 < LSBR > < SYMBOL > <SEMIC >
     |   (
-//            [ < COLON > {gotoNext=true;}]
             [ < EXLM > {partialSymbol=true;} ] flowSymbol = < SYMBOL>
             {
                 if (partialSymbol) {
@@ -589,7 +556,6 @@ Flowable flow() :
                     flow = SymbolTable.CurrentSymbolTable().PutOrRecurseGetSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
                 }
             }
-//            [ LOOKAHEAD(2) < COLON > {gotoNext=false;}] {flow.SetGotoNext(gotoNext);System.err.println(gotoNext);}
         )
     |   flow = list_flow()
     |   flow = if_else_flow()
@@ -609,7 +575,7 @@ Flowable flowing() :
     Flowable rightFlow = new ListFlow();
 }
 {
-    // 语法：match_flow() = flow() < FLOWING > flow()
+    // 语法：flowing() = flow() ( ( < MATCHING > | < FLOWING > ) flow() )*
     topFlow = flow()
     {
         leftFlow = topFlow;
@@ -622,50 +588,12 @@ Flowable flowing() :
     rightFlow = flow()
     {
         leftFlow.SetNextFlowing(rightFlow);
-//                                        System.err.println(leftFlow.GetSymbol() +leftFlow.GetIdentity()+ "->"+rightFlow.GetSymbol()+rightFlow.GetIdentity());
-//                                        System.err.println("leftFlow:\n"+leftFlow);
-//                                        System.err.println("rightFlow:\n"+rightFlow);
-//                                        System.err.println("symboltable:\n"+SymbolTable.CurrentSymbolTable());
         leftFlow = rightFlow;
     }
     )*
     {
-//        System.out.println("Root Symbol Table: " + SymbolTable.CurrentSymbolTable());
-//        System.out.println("before flowing: " + topFlow);
         if (Core.IsEager()) {
-//            System.out.println("eager! flowing");
             topFlow.Flowing();
-        }
-//        System.out.println("after flowing: " + topFlow);
-//                                        System.err.println("topFlow:\n"+topFlow);
-//                                                System.err.println("symboltable:\n"+SymbolTable.CurrentSymbolTable());
-        return topFlow;
-    }
-}
-
-Flowable matching() :
-{
-    Flowable topFlow = new ListFlow();
-    Flowable leftFlow = new ListFlow();
-    Flowable rightFlow = new ListFlow();
-}
-{
-    // 语法：matching() = flow() < rightFlow > flow()
-    topFlow = flowing()
-    {
-//        System.err.println("matching");
-        leftFlow = topFlow;
-    }
-    (< MATCHING >
-    rightFlow = flowing()
-    {
-        leftFlow.SetNextMatching(rightFlow);
-        leftFlow = rightFlow;
-    }
-    )*
-    {
-        if (Core.IsEager()) {
-            topFlow.Matching();
         }
         return topFlow;
     }
@@ -674,9 +602,9 @@ Flowable matching() :
 void def_func_stmt() : // 函数就是一个有参数和符号关联的 Block
 {
     Token funcSymbol;
-    int count = 0;
+    int count = 0; // {: +1; }: -1
     Token curToken;
-    StringBuffer funcBuf = new StringBuffer();
+    StringBuilder funcBuffer = new StringBuilder();
 }
 {
     // 语法：def_func_stmt() = < FUNC > < SYMBOL > < LBR > [ list_flow() ] < RBR > block_flow()
@@ -684,18 +612,18 @@ void def_func_stmt() : // 函数就是一个有参数和符号关联的 Block
     {
         do{
             curToken = token_source.getNextToken();
-            funcBuf.append(curToken);
-            funcBuf.append(" ");
+            funcBuffer.append(curToken);
+            funcBuffer.append(" ");
         } while (curToken.image!= ")");
         curToken = token_source.getNextToken();
         if (curToken.image=="{"){
-            funcBuf.append(curToken);
-            funcBuf.append(" ");
+            funcBuffer.append(curToken);
+            funcBuffer.append(" ");
             count++;
             do{
                 curToken = token_source.getNextToken();
-                funcBuf.append(curToken);
-                funcBuf.append(" ");
+                funcBuffer.append(curToken);
+                funcBuffer.append(" ");
                 if (curToken.image=="{") {
                     count++;
                 } else if (curToken.image=="}") {
@@ -705,8 +633,7 @@ void def_func_stmt() : // 函数就是一个有参数和符号关联的 Block
         }
     }
     {
-//        System.err.println(funcBuf);
-        SymbolTable.CurrentSymbolTable().PutSymbol(funcSymbol.image, SymbolTable.SymbolType.Function, funcBuf.toString());
+        SymbolTable.CurrentSymbolTable().PutSymbol(funcSymbol.image, SymbolTable.SymbolType.Function, funcBuffer.toString());
     }
 }
 
@@ -716,14 +643,13 @@ FuncFlow make_func_flow(String funcName) : // 函数就是一个有参数和符�
     BlockFlow block_flow;
 }
 {
-    // 语法：def_func_stmt() = < FUNC > < SYMBOL > < LBR > [ list_flow() ] < RBR > block_flow()
+    // 语法：make_func_flow() = < LBR > [ list_flow() ] < RBR > block_flow()
     < LBR > { SymbolTable.EnterBlock(funcName); }
     [ param_flow = list_flow() ]
     < RBR >
     block_flow = block_flow("func") { SymbolTable.ExitBlock(); }
     {
-        FuncFlow f = new FuncFlow(param_flow, block_flow);
-        return f;
+        return new FuncFlow(param_flow, block_flow);;
     }
 }
 
@@ -733,7 +659,7 @@ void import_stmt() :
     Token module_name;
 }
 {
-    // 语法：import_stmt() = < IMPORT > < STRING_VALUE >
+    // 语法：import_stmt() = < IMPORT > < SYMBOL > < DOT > < SYMBOL >
     < IMPORT >
     package_name = < SYMBOL >
     < DOT >
@@ -753,9 +679,10 @@ void stmt() :
 {
 }
 {
+    // 语法：stmt() = flowing() | def_func_stmt() | import_stmt()
         flowing()
     |   def_func_stmt()
-    |   import_stmt() //| block_flow()
+    |   import_stmt()
     {
         return;
     }
@@ -765,6 +692,7 @@ void stmts() :
 {
 }
 {
+    // 语法：stmts() = ( stmt() )*
     ( stmt() )*
     {
         return;
@@ -777,6 +705,7 @@ void program() :
 {
 }
 {
+    // 语法：program() = stmts() < EOF >
     stmts() < EOF >
     {
         return;
