@@ -243,8 +243,8 @@ ExprData expr_data_tmp() :
 Datable expr_data() :
 {
     ExprData topExprData = new ExprData();
-    Datable leftExprData = new ExprData();
-    Datable rightExprData = new ExprData();
+    Datable leftExprData;
+    Datable rightExprData = null;
 }
 {
     leftExprData = expr1_data()
@@ -254,19 +254,24 @@ Datable expr_data() :
         {
             topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
-            leftExprData = topExprData;
+            leftExprData = new SymbolData();
+            leftExprData.Push(topExprData);
         }
     )*
     {
-        return topExprData;
+        if (rightExprData != null) {
+            return topExprData;
+        } else {
+            return leftExprData;
+        }
     }
 }
 
 Datable expr1_data() :
 {
     ExprData topExprData = new ExprData();
-    Datable leftExprData = new ExprData();
-    Datable rightExprData = new ExprData();
+    Datable leftExprData;
+    Datable rightExprData = null;
 }
 {
     leftExprData = expr2_data()
@@ -276,19 +281,24 @@ Datable expr1_data() :
         {
             topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
-            leftExprData = topExprData;
+            leftExprData = new SymbolData();
+            leftExprData.Push(topExprData);
         }
     )*
     {
-        return topExprData;
+        if (rightExprData != null) {
+            return topExprData;
+        } else {
+            return leftExprData;
+        }
     }
 }
 
 Datable expr2_data() :
 {
     ExprData topExprData = new ExprData();
-    Datable leftExprData = new ExprData();
-    Datable rightExprData = new ExprData();
+    Datable leftExprData;
+    Datable rightExprData = null;
 }
 {
     leftExprData = expr3_data()
@@ -304,11 +314,16 @@ Datable expr2_data() :
         {
             topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
-            leftExprData = topExprData;
+            leftExprData = new SymbolData();
+            leftExprData.Push(topExprData);
         }
     )*
     {
-        return topExprData;
+        if (rightExprData != null) {
+            return topExprData;
+        } else {
+            return leftExprData;
+        }
     }
 }
 
@@ -718,7 +733,7 @@ void import_stmt() :
              Class<?> clazz = Class.forName(package_name.image + "." + module_name.image);
              Method loadModule = clazz.getMethod(Core.ModuleLoadFunc);
              loadModule.invoke(null);
-        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
+        } catch (ClassNotFoundException ex) {
             throw new RuntimeException(ex.getMessage());
         }
     }
