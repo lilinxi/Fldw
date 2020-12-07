@@ -1,7 +1,7 @@
 package core;
 
 // Flowable 默认实现类
-public class Flow extends TokenList implements Flowable {
+public class Flow extends Symbol implements Flowable {
     //    @Override
 //    public int GetIdentity() {
 //        return System.identityHashCode(this);

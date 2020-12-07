@@ -59,7 +59,6 @@ public class StdInFlow extends Flow {
             if (!stdin.startsWith("[")) {
                 stdin = "[" + stdin + "]";
             }
-//            System.out.println(stdin);
             try {
                 this.cacheFlow.Push(new javacc.FldwCompiler(new StringReader(stdin)).flowing());
             } catch (ParseException e) {

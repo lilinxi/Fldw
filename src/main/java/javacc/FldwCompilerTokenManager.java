@@ -5,6 +5,7 @@ import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
 import core.*;
+import examples.UnitTest;
 
 /** Token Manager. */
 @SuppressWarnings ("unused")

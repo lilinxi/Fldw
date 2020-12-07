@@ -1,7 +1,7 @@
 package core;
 
 // Datable 默认实现类
-public class Data extends TokenList implements Datable {
+public class Data extends Symbol implements Datable {
 //    @Override
 //    public int GetIdentity() {
 //        return System.identityHashCode(this);

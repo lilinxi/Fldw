@@ -16,7 +16,7 @@ public class StdOutFlow extends Flow {
 
     @Override
     public boolean Push(Datable data) {
-//        TODO：Debug 模式，输出全部信息
+//        Debug 模式，输出全部信息
         if (UnitTest.UnitTest) {
             System.out.println("stdout: " + data);
         } else {

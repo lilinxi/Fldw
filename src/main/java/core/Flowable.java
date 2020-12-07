@@ -1,7 +1,7 @@
 package core;
 
 // 支持的流所提供的接口
-public interface Flowable {
+public interface Flowable{
     public static enum FlowOp {
         Pushing,
         Matching

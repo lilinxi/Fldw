@@ -45,10 +45,6 @@ public class FuncFlow extends Flow {
 //        System.out.println("===");
     }
 
-    @Override
-    public int GetIdentity() {
-        return -1;
-    }
 
     @Override
     public String GetSymbol() {

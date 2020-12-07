@@ -16,7 +16,7 @@ import org.junit.runner.notification.Failure;
 import static org.junit.Assert.*;
 
 public class UnitTest {
-    public final static boolean UnitTest = true;
+    public static boolean UnitTest = true;
 
     public static void main(String[] args) throws ParseException {
         Result result = JUnitCore.runClasses(UnitTest.class);
