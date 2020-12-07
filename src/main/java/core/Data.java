@@ -47,4 +47,9 @@ public class Data extends TokenList implements Datable {
             return false;
         }
     }
+
+    @Override
+    public Datable Clone() {
+        return this;
+    }
 }

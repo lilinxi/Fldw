@@ -21,4 +21,6 @@ public interface Datable {
     boolean SetValue(Object value); // 设置值，返回是否设置成功，需要先设置类型再设置值
 
     boolean equals(Datable data);// 判断类型和值是否都相等
+
+    Datable Clone();
 }

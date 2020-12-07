@@ -71,6 +71,14 @@ public class ExprData extends Data {
     public ExprData() {
     }
 
+    public ExprData(ExprData exprData) {
+        this.leftData = exprData.leftData.Clone();
+        this.rightData = exprData.rightData.Clone();
+        this.op = exprData.op;
+        this.type = exprData.type;
+    }
+
+
     public void setLeftData(Datable leftData) {
         this.leftData = leftData;
     }
@@ -101,6 +109,7 @@ public class ExprData extends Data {
         if (this.type == null) { // 任何不提前获取类型的获取值操作都是耍流氓
             throw new RuntimeException("unexpected call");
         }
+//        SymbolTable sym = SymbolTable.CurrentSymbolTable();
         switch (this.op) {
             //<,>,<=,>=
             case LeftOp -> {
@@ -218,5 +227,10 @@ public class ExprData extends Data {
                 ", op=" + op +
                 ", type=" + type +
                 '}';
+    }
+
+    @Override
+    public Datable Clone()  {
+        return new ExprData(this);
     }
 }

@@ -1,11 +1,11 @@
 package core;
 
 public class WhileFlow extends Flow {
-    private ExprData conditionData; // 因为是动态类型语言，所以每次运行时都要重新判定类型
+    private Datable conditionData; // 因为是动态类型语言，所以每次运行时都要重新判定类型
     private Flowable trueFlow;
     private Flowable nextFlow;
 
-    public WhileFlow(ExprData conditionData, Flowable trueFlow) {
+    public WhileFlow(Datable conditionData, Flowable trueFlow) {
         this.conditionData = conditionData;
         this.trueFlow = trueFlow;
     }

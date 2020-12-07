@@ -1,20 +1,23 @@
 package core;
 
 public class IfElseFlow extends Flow {
-    private ExprData conditionData; // 因为是动态类型语言，所以每次运行时都要重新判定类型
+    private Datable conditionData; // 因为是动态类型语言，所以每次运行时都要重新判定类型
     private Flowable trueFlow;
     private Flowable falseFlow;
     private Flowable nextFlow;
+    private ListFlow cacheFlow;
 
-    public IfElseFlow(ExprData conditionData, Flowable trueFlow, Flowable falseFlow) {
+    public IfElseFlow(Datable conditionData, Flowable trueFlow, Flowable falseFlow) {
         this.conditionData = conditionData;
         this.trueFlow = trueFlow;
         this.falseFlow = falseFlow;
         this.nextFlow = null;
+        this.cacheFlow = new ListFlow();
     }
 
     @Override
     public boolean Push(Datable data) {
+//        return this.cacheFlow.Push(data);
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new RuntimeException("type mismatch");
         }
@@ -28,6 +31,7 @@ public class IfElseFlow extends Flow {
 
     @Override
     public boolean Push(Flowable flow) {
+//        return this.cacheFlow.Push(flow);
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new RuntimeException("type mismatch");
         }
@@ -41,6 +45,7 @@ public class IfElseFlow extends Flow {
 
     @Override
     public boolean Push(int index, Datable data) {
+//        return this.cacheFlow.Push(index,data);
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new RuntimeException("type mismatch");
         }
@@ -80,6 +85,7 @@ public class IfElseFlow extends Flow {
 
     @Override
     public Datable Get(int index) {
+//        return this.cacheFlow.Get(index);
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new RuntimeException("type mismatch");
         }
@@ -117,8 +123,12 @@ public class IfElseFlow extends Flow {
         }
         boolean ret = true;
         if (conditionData.GetValue().equals(true)) {
+//            this.trueFlow.SetNextFlowing(this.nextFlow);
+//            this.trueFlow.Push(this.cacheFlow);
             ret = this.trueFlow.Flowing();
         } else if (this.falseFlow != null) {
+//            this.falseFlow.SetNextFlowing(this.nextFlow);
+//            this.falseFlow.Push(this.cacheFlow);
             ret = this.falseFlow.Flowing();
         }
         return ret;

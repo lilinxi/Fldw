@@ -254,8 +254,10 @@ Datable expr_data() :
         {
             topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
-                        leftExprData = new SymbolData(); // 每个生成式内部立即求值，生成式外部建立表达式树，进行懒求值
-                        leftExprData.Push(topExprData);
+//                        leftExprData = new SymbolData(); // 每个生成式内部立即求值，生成式外部建立表达式树，进行懒求值
+//                        leftExprData.Push(topExprData);
+                leftExprData = topExprData.Clone();
+
         }
     )*
     {
@@ -281,8 +283,10 @@ Datable expr1_data() :
         {
             topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
-                        leftExprData = new SymbolData();
-                        leftExprData.Push(topExprData);
+//                        leftExprData = new SymbolData();
+//                        leftExprData.Push(topExprData);
+                                        leftExprData = topExprData.Clone();
+
         }
     )*
     {
@@ -303,7 +307,7 @@ Datable expr2_data() :
 {
     leftExprData = expr3_data()
     (
-        (   < LEFT > { topExprData.setOp(ExprData.ExprOp.LeftOp); }
+        LOOKAHEAD(2)(   < LEFT > { topExprData.setOp(ExprData.ExprOp.LeftOp); }
         |   < RIGHT > { topExprData.setOp(ExprData.ExprOp.RightOp); }
         |   < LEFT_EQUAL > { topExprData.setOp(ExprData.ExprOp.LeftEqualOp); }
         |   < RIGHT_EQUAL > { topExprData.setOp(ExprData.ExprOp.RightEqualOp); }
@@ -314,8 +318,10 @@ Datable expr2_data() :
         {
             topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
-                       leftExprData = new SymbolData();
-                       leftExprData.Push(topExprData);
+//                       leftExprData = new SymbolData();
+//                       leftExprData.Push(topExprData);
+                                       leftExprData = topExprData.Clone();
+
         }
     )*
     {
@@ -343,8 +349,10 @@ Datable expr3_data() :
         {
             topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
-            leftExprData = new SymbolData();
-            leftExprData.Push(topExprData);
+//            leftExprData = new SymbolData();
+//            leftExprData.Push(topExprData);
+                            leftExprData = topExprData.Clone();
+
         }
     )*
     {
@@ -372,8 +380,9 @@ Datable expr4_data() :
         {
             topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
-            leftExprData = new SymbolData();
-            leftExprData.Push(topExprData);
+//            leftExprData = new SymbolData();
+//            leftExprData.Push(topExprData);
+                leftExprData = topExprData.Clone();
         }
     )*
     {
@@ -405,8 +414,9 @@ Datable data() :
 }
 {
     // 语法：data() = terminal_data() | symbol_data() | expr_data_tmp()
-    (    data = terminal_data()
-    |    data = symbol_data()
+    (    LOOKAHEAD(2)data = terminal_data()
+    |   LOOKAHEAD(3) data = symbol_data()
+    |   data = expr_data()
     )
     {
         return data;
@@ -450,13 +460,13 @@ ListFlow list_flow() :
 
 IfElseFlow if_else_flow() :
 {
-    ExprData conditionData;
+    Datable conditionData;
     Flowable trueFlow;
     Flowable falseFlow = null;
 }
 {
     // 语法：if_else_stmt() = < IF > < LBR > expr_data_tmp() < RBR > block() [ <ELSE > block() ]
-    < IF > < LBR > conditionData = expr_data_tmp() < RBR > trueFlow = block_flow("if") [ <ELSE > falseFlow = block_flow("else") ]
+    < IF > < LBR > conditionData = expr_data() < RBR > trueFlow = block_flow("if") [ <ELSE > falseFlow = block_flow("else") ]
     {
         return new IfElseFlow(conditionData, trueFlow, falseFlow);
     }
@@ -464,12 +474,12 @@ IfElseFlow if_else_flow() :
 
 WhileFlow while_flow() :
 {
-    ExprData conditionData;
+    Datable conditionData;
     Flowable trueFlow;
 }
 {
     // 语法：< WHILE > < LBR > expr_data_tmp() < RBR > block()
-    < WHILE > < LBR > conditionData = expr_data_tmp() < RBR > trueFlow = block_flow("while")
+    < WHILE > < LBR > conditionData = expr_data() < RBR > trueFlow = block_flow("while")
     {
         return new WhileFlow(conditionData, trueFlow);
     }
