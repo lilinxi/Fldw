@@ -229,7 +229,7 @@ ExprData expr_data_tmp() :
         |   < LEFT_EQUAL >
         |   < RIGHT_EQUAL >
         |   < LOGIC_EQUAL > { exprData.setOp(ExprData.ExprOp.LogicEqualOp); }
-        |   < LOGIC_NOT > { exprData.setOp(ExprData.ExprOp.LogicNotOp); }
+        |   < LOGIC_NOT > { exprData.setOp(ExprData.ExprOp.LogicNotEqualOp); }
     )
     rightData = data()
     {
@@ -243,8 +243,8 @@ ExprData expr_data_tmp() :
 Datable expr_data() :
 {
     ExprData topExprData = new ExprData();
-    Datable leftExprData = new ExprData();
-    Datable rightExprData = new ExprData();
+    Datable leftExprData;
+    Datable rightExprData = null;
 }
 {
     leftExprData = expr1_data()
@@ -254,19 +254,24 @@ Datable expr_data() :
         {
             topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
-            leftExprData = topExprData;
+                        leftExprData = new SymbolData(); // 每个生成式内部立即求值，生成式外部建立表达式树，进行懒求值
+                        leftExprData.Push(topExprData);
         }
     )*
     {
-        return topExprData;
+                if (rightExprData != null) {
+                    return topExprData;
+                } else {
+                    return leftExprData;
+                }
     }
 }
 
 Datable expr1_data() :
 {
     ExprData topExprData = new ExprData();
-    Datable leftExprData = new ExprData();
-    Datable rightExprData = new ExprData();
+ Datable leftExprData;
+    Datable rightExprData = null;
 }
 {
     leftExprData = expr2_data()
@@ -276,19 +281,24 @@ Datable expr1_data() :
         {
             topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
-            leftExprData = topExprData;
+                        leftExprData = new SymbolData();
+                        leftExprData.Push(topExprData);
         }
     )*
     {
-        return topExprData;
+          if (rightExprData != null) {
+                   return topExprData;
+               } else {
+                   return leftExprData;
+               }
     }
 }
 
 Datable expr2_data() :
 {
     ExprData topExprData = new ExprData();
-    Datable leftExprData = new ExprData();
-    Datable rightExprData = new ExprData();
+    Datable leftExprData;
+     Datable rightExprData = null;
 }
 {
     leftExprData = expr3_data()
@@ -298,17 +308,22 @@ Datable expr2_data() :
         |   < LEFT_EQUAL > { topExprData.setOp(ExprData.ExprOp.LeftEqualOp); }
         |   < RIGHT_EQUAL > { topExprData.setOp(ExprData.ExprOp.RightEqualOp); }
         |   < LOGIC_EQUAL > { topExprData.setOp(ExprData.ExprOp.LogicEqualOp);}
-        |   < LOGIC_NOT > { topExprData.setOp(ExprData.ExprOp.LogicNotOp);}
+        |   < LOGIC_NOT > { topExprData.setOp(ExprData.ExprOp.LogicNotEqualOp);}
          )
         rightExprData = expr3_data()
         {
             topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
-            leftExprData = topExprData;
+                       leftExprData = new SymbolData();
+                       leftExprData.Push(topExprData);
         }
     )*
     {
-        return topExprData;
+           if (rightExprData != null) {
+                    return topExprData;
+                } else {
+                    return leftExprData;
+                }
     }
 }
 

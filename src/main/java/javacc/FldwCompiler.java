@@ -129,7 +129,7 @@ exprData.setOp(ExprData.ExprOp.LogicEqualOp);
       }
     case LOGIC_NOT:{
       jj_consume_token(LOGIC_NOT);
-exprData.setOp(ExprData.ExprOp.LogicNotOp);
+exprData.setOp(ExprData.ExprOp.LogicNotEqualOp);
       break;
       }
     default:
@@ -144,8 +144,8 @@ exprData.setRightData(rightData);
 }
 
   final public Datable expr_data() throws ParseException {ExprData topExprData = new ExprData();
-    Datable leftExprData = new ExprData();
-    Datable rightExprData = new ExprData();
+    Datable leftExprData;
+    Datable rightExprData = null;
     leftExprData = expr1_data();
     label_1:
     while (true) {
@@ -163,15 +163,20 @@ topExprData.setOp(ExprData.ExprOp.LogicOrOp);
       rightExprData = expr1_data();
 topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
-            leftExprData = topExprData;
+                        leftExprData = new SymbolData(); // 每个生成式内部立即求值，生成式外部建立表达式树，进行懒求值
+                        leftExprData.Push(topExprData);
     }
-{if ("" != null) return topExprData;}
+if (rightExprData != null) {
+                    {if ("" != null) return topExprData;}
+                } else {
+                    {if ("" != null) return leftExprData;}
+                }
     throw new Error("Missing return statement in function");
 }
 
   final public Datable expr1_data() throws ParseException {ExprData topExprData = new ExprData();
-    Datable leftExprData = new ExprData();
-    Datable rightExprData = new ExprData();
+ Datable leftExprData;
+    Datable rightExprData = null;
     leftExprData = expr2_data();
     label_2:
     while (true) {
@@ -189,15 +194,20 @@ topExprData.setOp(ExprData.ExprOp.LogicAndOp);
       rightExprData = expr2_data();
 topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
-            leftExprData = topExprData;
+                        leftExprData = new SymbolData();
+                        leftExprData.Push(topExprData);
     }
-{if ("" != null) return topExprData;}
+if (rightExprData != null) {
+                   {if ("" != null) return topExprData;}
+               } else {
+                   {if ("" != null) return leftExprData;}
+               }
     throw new Error("Missing return statement in function");
 }
 
   final public Datable expr2_data() throws ParseException {ExprData topExprData = new ExprData();
-    Datable leftExprData = new ExprData();
-    Datable rightExprData = new ExprData();
+    Datable leftExprData;
+     Datable rightExprData = null;
     leftExprData = expr3_data();
     label_3:
     while (true) {
@@ -243,7 +253,7 @@ topExprData.setOp(ExprData.ExprOp.LogicEqualOp);
         }
       case LOGIC_NOT:{
         jj_consume_token(LOGIC_NOT);
-topExprData.setOp(ExprData.ExprOp.LogicNotOp);
+topExprData.setOp(ExprData.ExprOp.LogicNotEqualOp);
         break;
         }
       default:
@@ -254,9 +264,14 @@ topExprData.setOp(ExprData.ExprOp.LogicNotOp);
       rightExprData = expr3_data();
 topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
-            leftExprData = topExprData;
+                       leftExprData = new SymbolData();
+                       leftExprData.Push(topExprData);
     }
-{if ("" != null) return topExprData;}
+if (rightExprData != null) {
+                    {if ("" != null) return topExprData;}
+                } else {
+                    {if ("" != null) return leftExprData;}
+                }
     throw new Error("Missing return statement in function");
 }
 
@@ -898,23 +913,7 @@ try {
     return false;
   }
 
-  private boolean jj_3R_symbol_data_200_5_13()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_symbol_data_200_7_14()) jj_scanpos = xsp;
-    if (jj_scan_token(SYMBOL)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_func_flow_486_5_11()
- {
-    if (jj_scan_token(SYMBOL)) return true;
-    if (jj_scan_token(LBR)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_head_tail_flow_506_5_12()
+  private boolean jj_3R_head_tail_flow_521_5_12()
  {
     if (jj_scan_token(LSBR)) return true;
     if (jj_3R_symbol_data_200_5_13()) return true;
@@ -924,13 +923,29 @@ try {
 
   private boolean jj_3_2()
  {
-    if (jj_3R_head_tail_flow_506_5_12()) return true;
+    if (jj_3R_head_tail_flow_521_5_12()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_symbol_data_200_5_13()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_symbol_data_200_7_14()) jj_scanpos = xsp;
+    if (jj_scan_token(SYMBOL)) return true;
     return false;
   }
 
   private boolean jj_3_1()
  {
-    if (jj_3R_func_flow_486_5_11()) return true;
+    if (jj_3R_func_flow_501_5_11()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_func_flow_501_5_11()
+ {
+    if (jj_scan_token(SYMBOL)) return true;
+    if (jj_scan_token(LBR)) return true;
     return false;
   }
 
