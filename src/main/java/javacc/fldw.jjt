@@ -31,13 +31,13 @@ public class FldwCompiler {
                     reader.close();
                     is.close();
                     parse(buffer.toString());
-                } catch (ParseException | IOException e) {
+                } catch (ParseException | ExplainException | IOException e) {
                     System.err.println(e.getMessage());
                 }
             } else {
                 try {
                     parse(arg);
-                } catch (ParseException e) {
+                } catch (ParseException | ExplainException e) {
                     System.err.println(e.getMessage());
                 }
             }
@@ -56,7 +56,7 @@ public class FldwCompiler {
                 }
                 try {
                     parse(in);
-                } catch (ParseException e) {
+                } catch (ParseException | ExplainException e) {
                     System.err.println(e.getMessage());
                 }
                 System.out.print("fldw > ");
@@ -64,7 +64,7 @@ public class FldwCompiler {
         }
     }
 
-    public static void parse(String src) throws ParseException {
+    public static void parse(String src) throws ParseException, ExplainException {
         Reader reader = new StringReader(src);
         new FldwCompiler(reader).program();
     }
@@ -184,7 +184,7 @@ TOKEN : // anything not recognised so far
 /*****************************************************************/
 /***************************语法分析*******************************/
 /*****************************************************************/
-TerminalData terminal_data() :
+TerminalData terminal_data() throws ExplainException :
 {
     Datable.DataType type;
     Token terminalToken;
@@ -214,7 +214,7 @@ TerminalData terminal_data() :
     }
 }
 
-SymbolData symbol_data() :
+SymbolData symbol_data() throws ExplainException :
 {
     Token symbolToken;
     SymbolData symbolData;
@@ -234,7 +234,7 @@ SymbolData symbol_data() :
     }
 }
 
-Datable expr_data() :
+Datable expr_data() throws ExplainException :
 {
     ExprData topExprData = new ExprData();
     Datable leftExprData;
@@ -261,7 +261,7 @@ Datable expr_data() :
     }
 }
 
-Datable expr1_data() :
+Datable expr1_data() throws ExplainException :
 {
     ExprData topExprData = new ExprData();
     Datable leftExprData;
@@ -288,7 +288,7 @@ Datable expr1_data() :
     }
 }
 
-Datable expr2_data() :
+Datable expr2_data() throws ExplainException :
 {
     ExprData topExprData = new ExprData();
     Datable leftExprData;
@@ -322,7 +322,7 @@ Datable expr2_data() :
     }
 }
 
-Datable expr3_data() :
+Datable expr3_data() throws ExplainException :
 {
     ExprData topExprData = new ExprData();
     Datable leftExprData;
@@ -351,7 +351,7 @@ Datable expr3_data() :
     }
 }
 
-Datable expr4_data() :
+Datable expr4_data() throws ExplainException :
 {
     ExprData topExprData = new ExprData();
     Datable leftExprData;
@@ -381,7 +381,7 @@ Datable expr4_data() :
     }
 }
 
-Datable term() :
+Datable term() throws ExplainException :
 {
     Datable data;
 }
@@ -396,7 +396,7 @@ Datable term() :
     }
 }
 
-Datable data() :
+Datable data() throws ExplainException :
 {
     Datable data;
 }
@@ -411,7 +411,7 @@ Datable data() :
     }
 }
 
-ListFlow list_flow() :
+ListFlow list_flow() throws ExplainException :
 {
     ListFlow listFlow = new ListFlow();
     Datable data;
@@ -430,7 +430,7 @@ ListFlow list_flow() :
     }
 }
 
-IfElseFlow if_else_flow() :
+IfElseFlow if_else_flow() throws ExplainException :
 {
     Datable conditionData;
     Flowable trueFlow;
@@ -444,7 +444,7 @@ IfElseFlow if_else_flow() :
     }
 }
 
-WhileFlow while_flow() :
+WhileFlow while_flow() throws ExplainException :
 {
     Datable conditionData;
     Flowable trueFlow;
@@ -457,7 +457,7 @@ WhileFlow while_flow() :
     }
 }
 
-ForFlow for_flow() :
+ForFlow for_flow() throws ExplainException :
 {
     Flowable iterFlow;
     SymbolData iterSymbolData;
@@ -471,7 +471,7 @@ ForFlow for_flow() :
     }
 }
 
-DelayFuncFlow func_flow() :
+DelayFuncFlow func_flow() throws ExplainException :
 {
     Token funcSymbol;
     ListFlow paramFlow = null;
@@ -489,7 +489,7 @@ DelayFuncFlow func_flow() :
     }
 }
 
-HeadTailFlow head_tail_flow() :
+HeadTailFlow head_tail_flow() throws ExplainException :
 {
     SymbolData headData;
     Token tailListFlowSymbol;
@@ -514,7 +514,7 @@ HeadTailFlow head_tail_flow() :
     }
 }
 
-BlockFlow block_flow(String blockName) :
+BlockFlow block_flow(String blockName) throws ExplainException :
 {
     BlockFlow blockFlow;
     Flowable topFlow;
@@ -536,7 +536,7 @@ BlockFlow block_flow(String blockName) :
     }
 }
 
-Flowable flow() :
+Flowable flow() throws ExplainException :
 {
     Flowable flow = new ListFlow();
     Token flowSymbol;
@@ -570,7 +570,7 @@ Flowable flow() :
     }
 }
 
-Flowable flowing() :
+Flowable flowing() throws ExplainException :
 {
     Flowable topFlow = new ListFlow();
     Flowable leftFlow = new ListFlow();
@@ -601,7 +601,7 @@ Flowable flowing() :
     }
 }
 
-void def_func_stmt() : // 函数就是一个有参数和符号关联的 Block
+void def_func_stmt() throws ExplainException : // 函数就是一个有参数和符号关联的 Block
 {
     Token funcSymbol;
     int count = 0; // {: +1; }: -1
@@ -639,7 +639,7 @@ void def_func_stmt() : // 函数就是一个有参数和符号关联的 Block
     }
 }
 
-FuncFlow make_func_flow(String funcName) : // 函数就是一个有参数和符号关联的 Block
+FuncFlow make_func_flow(String funcName) throws ExplainException : // 函数就是一个有参数和符号关联的 Block
 {
     ListFlow param_flow = null;
     BlockFlow block_flow;
@@ -655,7 +655,7 @@ FuncFlow make_func_flow(String funcName) : // 函数就是一个有参数和符�
     }
 }
 
-void import_stmt() :
+void import_stmt() throws ExplainException :
 {
     Token package_name;
     Token module_name;
@@ -677,7 +677,7 @@ void import_stmt() :
     }
 }
 
-void stmt() :
+void stmt() throws ExplainException :
 {
 }
 {
@@ -690,7 +690,7 @@ void stmt() :
     }
 }
 
-void stmts() :
+void stmts() throws ExplainException :
 {
 }
 {
@@ -701,7 +701,7 @@ void stmts() :
     }
 }
 
-void program() :
+void program() throws ExplainException :
 {
 }
 {
