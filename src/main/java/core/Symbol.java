@@ -1,5 +1,8 @@
 package core;
 
+/**
+ * 数据和流的基类，包含指针地址 identity
+ */
 public class Symbol {
     private int identity;
 

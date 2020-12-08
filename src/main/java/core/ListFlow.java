@@ -2,18 +2,13 @@ package core;
 
 import java.util.LinkedList;
 
+/**
+ * 列表流，包含一个数据的列表
+ */
 public class ListFlow extends Flow {
-    private String symbol;
-    private LinkedList<Datable> dataList;
-    private Flowable nextFlowing;
-    @Deprecated
-    private Flowable nextMatching;
-    @Deprecated
-    private boolean matching = false;
-    @Deprecated
-    private boolean copyValue = false;
-    @Deprecated
-    private boolean gotoNext = true;
+    private String symbol;                  // 列表符号
+    private LinkedList<Datable> dataList;   // 数据列表
+    private Flowable nextFlowing;           // 下一流
 
     public ListFlow() {
         this.symbol = null;
@@ -26,35 +21,24 @@ public class ListFlow extends Flow {
         this.symbol = symbol;
     }
 
-    public void setMatching(boolean matching) {
-        this.matching = matching;
-    }
-
-    public void setCopyValue(boolean copyValue) {
-        this.copyValue = copyValue;
+    @Override
+    public String GetSymbol() throws ExplainException {
+        StringBuilder builder = new StringBuilder(this.symbol);
+        for (Datable data : this.dataList) {
+            builder.append("_");
+            builder.append(data.GetSymbol());
+        }
+        return builder.toString();
     }
 
     @Override
-    public String GetSymbol()throws ExplainException {
-        return this.symbol;
-    }
-
-    @Override
-    public boolean Push(Datable data)throws ExplainException {
-//        SymbolData tmp = new SymbolData();
-//        tmp.Push(data);
-//        System.err.println("---");
-//        System.err.println(data);
-//        System.err.println(tmp);
-        dataList.add(data);
-//        System.err.println(this);
-//        System.err.println("---");
-        return true;
+    public boolean Push(Datable data) throws ExplainException {
+        return dataList.add(data);
 
     }
 
     @Override
-    public boolean Push(Flowable flow)throws ExplainException {
+    public boolean Push(Flowable flow) throws ExplainException {
         Datable data;
         while ((data = flow.Pop()) != null) {
             boolean success = this.Push(data);
@@ -64,12 +48,12 @@ public class ListFlow extends Flow {
     }
 
     @Override
-    public boolean Push(int index, Datable data)throws ExplainException {
+    public boolean Push(int index, Datable data) throws ExplainException {
         return this.Get(index).Push(data);
     }
 
     @Override
-    public boolean Match(Flowable flow) throws ExplainException{
+    public boolean Match(Flowable flow) throws ExplainException {
         int minSize = Math.min(this.inLen(), flow.inLen());
         for (int i = 0; i < minSize; i++) {
             boolean success = flow.Push(i, this.Get(i));
@@ -79,7 +63,7 @@ public class ListFlow extends Flow {
     }
 
     @Override
-    public Datable Pop()throws ExplainException {
+    public Datable Pop() throws ExplainException {
         if (this.inLen() > 0) {
             return dataList.pop();
         }
@@ -87,12 +71,12 @@ public class ListFlow extends Flow {
     }
 
     @Override
-    public int inLen()throws ExplainException {
+    public int inLen() throws ExplainException {
         return this.dataList.size();
     }
 
     @Override
-    public Datable Get(int index)throws ExplainException {
+    public Datable Get(int index) throws ExplainException {
         if (index >= 0 && index < this.dataList.size()) {
             if (this.copyValue) {
                 SymbolData tmp = new SymbolData();
@@ -102,27 +86,27 @@ public class ListFlow extends Flow {
                 return this.dataList.get(index);
             }
         } else {
-            throw new RuntimeException("out of arrange");
+            throw new ExplainException("out of arrange");
         }
     }
 
     @Override
-    public void SetNextFlowing(Flowable flow)throws ExplainException {
+    public void SetNextFlowing(Flowable flow) throws ExplainException {
         this.nextFlowing = flow;
     }
 
     @Override
-    public Flowable NextFlowing()throws ExplainException {
+    public Flowable NextFlowing() throws ExplainException {
         return this.nextFlowing;
     }
 
     @Override
-    public boolean HasNextFlowing()throws ExplainException {
+    public boolean HasNextFlowing() throws ExplainException {
         return this.nextFlowing != null;
     }
 
     @Override
-    public boolean Flowing()throws ExplainException {
+    public boolean Flowing() throws ExplainException {
         if (this.nextFlowing == null) {
             return true;
         }
@@ -132,11 +116,7 @@ public class ListFlow extends Flow {
                     boolean success = this.nextFlowing.Push(this.Get(i));
                     if (!success) return false;
                 }
-                if (this.gotoNext) {
-                    return this.nextFlowing.Flowing();
-                } else {
-                    return true;
-                }
+                return this.nextFlowing.Flowing();
             }
             case Matching -> {
                 int minSize = Math.min(this.inLen(), this.nextFlowing.inLen());
@@ -144,46 +124,13 @@ public class ListFlow extends Flow {
                     boolean success = this.nextFlowing.Push(i, this.Get(i));
                     if (!success) return false;
                 }
-                if (this.gotoNext) {
-                    return this.nextFlowing.Flowing();
-                } else {
-                    return true;
-                }
+                return this.nextFlowing.Flowing();
             }
             default -> {
-                throw new RuntimeException();
+                throw new ExplainException("unexpected flowOp: " + this.flowOp);
             }
         }
     }
-
-//    @Override
-//    public void SetNextMatching(Flowable flow) {
-//        this.nextMatching = flow;
-//    }
-//
-//    @Override
-//    public Flowable NextMatching() {
-//        return this.nextMatching;
-//    }
-//
-//    @Override
-//    public boolean HasNextMatching() {
-//        return this.nextMatching != null;
-//    }
-
-//    @Override
-//    public boolean Matching() {
-//        if (this.nextMatching == null) {
-//            return true;
-//        } else {
-//            int minSize = Math.min(this.inLen(), this.nextMatching.inLen());
-//            for (int i = 0; i < minSize; i++) {
-//                boolean success = this.nextMatching.Push(i, this.Get(i));
-//                if (!success) return false;
-//            }
-//            return this.nextMatching.Matching();
-//        }
-//    }
 
     @Override
     public String toString() {

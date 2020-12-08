@@ -2,10 +2,15 @@ package core;
 
 import java.util.ArrayList;
 
+/**
+ * 语句块流：一个语句块作为一整个流操作来进行处理，包含默认的输入流`in`，输出流`out`和中间处理流列表`flowList`
+ * <p>
+ * 输入操作导入`in`，输出操作由`out`导出，中间操作遍历`flowList`
+ */
 public class BlockFlow extends Flow {
-    private Flowable inFlow;
-    private Flowable outFlow;
-    private ArrayList<Flowable> flowList;
+    private Flowable inFlow;                // 输入流
+    private Flowable outFlow;               // 输出流
+    private ArrayList<Flowable> flowList;   // 中间处理流
 
     public BlockFlow() {
         this.inFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(SymbolTable.InSymbol).assertGetFlowable();
@@ -13,8 +18,25 @@ public class BlockFlow extends Flow {
         this.flowList = new ArrayList<>();
     }
 
+    /**
+     * 添加一个中间处理流
+     *
+     * @param flow
+     * @return
+     * @throws ExplainException
+     */
     public boolean addFlow(Flowable flow) throws ExplainException {
         return this.flowList.add(flow);
+    }
+
+    @Override
+    public String GetSymbol() throws ExplainException {
+        StringBuilder builder = new StringBuilder("block");
+        for (Flowable flow : this.flowList) {
+            builder.append("->");
+            builder.append(flow.GetSymbol());
+        }
+        return builder.toString();
     }
 
     @Override
@@ -30,6 +52,11 @@ public class BlockFlow extends Flow {
     @Override
     public boolean Push(int index, Datable data) throws ExplainException {
         return this.inFlow.Push(index, data);
+    }
+
+    @Override
+    public boolean Match(Flowable flow) throws ExplainException {
+        return this.inFlow.Match(flow);
     }
 
     @Override
@@ -54,11 +81,10 @@ public class BlockFlow extends Flow {
 
     @Override
     public void SetNextFlowing(Flowable flow) throws ExplainException {
+        // 在中间处理操作中，操作结果不直接输入到下一流，而是使用延迟流，延迟等待所有中间处理操作完成后，再输入到下一流
         DelayFlow delayOutFlow = new DelayFlow(this.outFlow);
         delayOutFlow.SetNextFlowing(flow);
         this.addFlow(delayOutFlow);
-//        this.outFlow = delayOutFlow;
-//        this.outFlow.SetNextFlowing(flow);
     }
 
     @Override
@@ -73,12 +99,9 @@ public class BlockFlow extends Flow {
 
     @Override
     public boolean Flowing() throws ExplainException {
-//        System.out.println(this.flowList);
         for (Flowable flow : this.flowList) {
-//            System.out.println("flow: " + flow);
             boolean success = flow.Flowing();
-//            System.out.println("end flow: " + flow.GetSymbol());
-            if (!success) return false;
+            if (!success) throw new ExplainException("Flowing Error: " + flow);
         }
         return true;
     }

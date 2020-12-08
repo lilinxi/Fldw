@@ -1,11 +1,16 @@
 package core;
 
-// Flowable 默认实现类
+/**
+ * Flowable 默认实现类
+ */
 public class Flow extends Symbol implements Flowable {
-    protected FlowOp flowOp;
+    protected FlowOp flowOp;                // 流操作
+    protected boolean copyValue;            // 取指针还是取值
+
 
     public Flow() {
-        this.flowOp = FlowOp.Pushing;
+        this.flowOp = FlowOp.Pushing;   // 默认为数据管道操作
+        this.copyValue = false;         // 默认为取指针
     }
 
     @Override
@@ -16,6 +21,16 @@ public class Flow extends Symbol implements Flowable {
     @Override
     public void SetFlowOp(FlowOp flowOp) throws ExplainException {
         this.flowOp = flowOp;
+    }
+
+    @Override
+    public void setCopyValue(boolean copyValue) throws ExplainException {
+        this.copyValue = copyValue;
+    }
+
+    @Override
+    public void setParamFlow(Flowable paramFlow) throws ExplainException {
+        throw new ExplainException("Illegal call");
     }
 
     @Override

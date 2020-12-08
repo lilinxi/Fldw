@@ -44,6 +44,17 @@ a=b+c
 
 # 设计思路
 
+代码贡献：
+
+```shell script
+(base) limengfan@limengfandeMacBook-Pro javacc % git log --author="lilinxi" --pretty=tformat: --numstat | awk '{ add += $1; subs += $2; loc += $1 - $2 } END { printf "added lines: %s, removed lines: %s, total lines: %s\n", add, subs, loc }' -
+added lines: 18082, removed lines: 9526, total lines: 8556
+```
+
+---
+
+# 研发理念
+
 ---
 
 # 感悟体会
