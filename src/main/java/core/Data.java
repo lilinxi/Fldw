@@ -1,50 +1,49 @@
 package core;
 
-// Datable 默认实现类
-public class Data extends TokenList implements Datable {
-//    @Override
-//    public int GetIdentity() {
-//        return System.identityHashCode(this);
-//    }
-
+/**
+ * Datable 默认实现类
+ */
+public class Data extends Symbol implements Datable {
     @Override
-    public boolean Push(Datable data) {
-        throw new RuntimeException("no impl, wrong call");
+    public boolean Push(Datable data) throws ExplainException {
+        throw new ExplainException("Illegal call");
     }
 
     @Override
-    public DataType GetType() {
-        throw new RuntimeException("no impl, wrong call");
+    public DataType GetType() throws ExplainException {
+        throw new ExplainException("Illegal call");
     }
 
     @Override
-    public Object GetValue() {
-        throw new RuntimeException("no impl, wrong call");
+    public Object GetValue() throws ExplainException {
+        throw new ExplainException("Illegal call");
     }
 
     @Override
-    public String GetSymbol() {
-        throw new RuntimeException("no impl, wrong call");
+    public String GetSymbol() throws ExplainException {
+        throw new ExplainException("Illegal call");
     }
 
     @Override
-    public boolean SetType(DataType type) {
-        throw new RuntimeException("no impl, wrong call");
+    public boolean SetType(DataType type) throws ExplainException {
+        throw new ExplainException("Illegal call");
     }
 
     @Override
-    public boolean SetValue(Object value) {
-        throw new RuntimeException("no impl, wrong call");
+    public boolean SetValue(Object value) throws ExplainException {
+        throw new ExplainException("Illegal call");
     }
 
     @Override
-    public boolean equals(Datable data) {
+    public boolean equals(Datable data) throws ExplainException {
+        // 类型为空则都为 null，判定为相等；否则必须类型和值都相等则判定为相等
         if (this.GetType() == null && data.GetType() == null) {
             return true;
-        } else if (this.GetType() == data.GetType() && this.GetValue() == data.GetValue()) {
-            return true;
-        }else {
-            return false;
-        }
+        } else return this.GetType() == data.GetType() && this.GetValue().toString().equals(data.GetValue().toString());
+    }
+
+    @Override
+    public Datable Clone() throws ExplainException {
+        return this;
     }
 }

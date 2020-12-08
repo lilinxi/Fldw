@@ -1,0 +1,20 @@
+import std.Std
+function sort() {
+    in | [!head;!tail]
+    if ( head != null ) { 
+        [] | !leftHead
+        [] | !rightHead
+        for ( tail -> !tmp) {
+            if ( tmp < head ) {
+                #[tmp] | leftHead
+            } 
+            else {
+                #[tmp] | rightHead
+            }
+        }
+        leftHead | sort() | out
+        [head] | out
+        rightHead | sort() | out
+    } | out
+}
+stdin | sort() | stdout

@@ -29,75 +29,67 @@ public interface FldwCompilerConstants {
   /** RegularExpression Id. */
   int LSBR = 14;
   /** RegularExpression Id. */
-  int ASSIGN = 15;
+  int PLUS = 15;
   /** RegularExpression Id. */
-  int PLUS = 16;
+  int MINUS = 16;
   /** RegularExpression Id. */
-  int MINUS = 17;
+  int MULT = 17;
   /** RegularExpression Id. */
-  int MULT = 18;
+  int DIV = 18;
   /** RegularExpression Id. */
-  int DIV = 19;
+  int MOD = 19;
   /** RegularExpression Id. */
-  int MOD = 20;
+  int LOGIC_EQUAL = 20;
   /** RegularExpression Id. */
-  int INC = 21;
+  int LOGIC_NOT = 21;
   /** RegularExpression Id. */
-  int DEC = 22;
+  int LOGIC_AND = 22;
   /** RegularExpression Id. */
-  int EXLM = 23;
+  int LOGIC_OR = 23;
   /** RegularExpression Id. */
-  int LOGIC_EQUAL = 24;
+  int LEFT = 24;
   /** RegularExpression Id. */
-  int LOGIC_NOT = 25;
+  int RIGHT = 25;
   /** RegularExpression Id. */
-  int LOGIC_AND = 26;
+  int LEFT_EQUAL = 26;
   /** RegularExpression Id. */
-  int LOGIC_OR = 27;
+  int RIGHT_EQUAL = 27;
   /** RegularExpression Id. */
-  int LEFT = 28;
+  int IF = 28;
   /** RegularExpression Id. */
-  int RIGHT = 29;
+  int ELSE = 29;
   /** RegularExpression Id. */
-  int LEFT_EQUAL = 30;
+  int WHILE = 30;
   /** RegularExpression Id. */
-  int RIGHT_EQUAL = 31;
+  int FOR = 31;
   /** RegularExpression Id. */
-  int IF = 32;
+  int FUNC = 32;
   /** RegularExpression Id. */
-  int ELSE = 33;
+  int FLOWING = 33;
   /** RegularExpression Id. */
-  int WHILE = 34;
+  int MATCHING = 34;
   /** RegularExpression Id. */
-  int FOR = 35;
+  int HASHTAG = 35;
   /** RegularExpression Id. */
-  int FUNC = 36;
+  int EXLM = 36;
   /** RegularExpression Id. */
-  int FLOWING = 37;
+  int IMPORT = 37;
   /** RegularExpression Id. */
-  int MATCHING = 38;
+  int DOT = 38;
   /** RegularExpression Id. */
-  int HASHTAG = 39;
+  int INT_VALUE = 39;
   /** RegularExpression Id. */
-  int COLON = 40;
+  int DOUBLE_VALUE = 40;
   /** RegularExpression Id. */
-  int IMPORT = 41;
+  int BOOL_VALUE = 41;
   /** RegularExpression Id. */
-  int DOT = 42;
+  int STRING_VALUE = 46;
   /** RegularExpression Id. */
-  int INT_VALUE = 43;
+  int NULL_VALUE = 47;
   /** RegularExpression Id. */
-  int DOUBLE_VALUE = 44;
+  int SYMBOL = 48;
   /** RegularExpression Id. */
-  int BOOL_VALUE = 45;
-  /** RegularExpression Id. */
-  int STRING_VALUE = 50;
-  /** RegularExpression Id. */
-  int NULL_VALUE = 51;
-  /** RegularExpression Id. */
-  int SYMBOL = 52;
-  /** RegularExpression Id. */
-  int OTHER = 53;
+  int OTHER = 49;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -121,15 +113,11 @@ public interface FldwCompilerConstants {
     "\"{\"",
     "\"]\"",
     "\"[\"",
-    "\"=\"",
     "\"+\"",
     "\"-\"",
     "\"*\"",
     "\"/\"",
     "\"%\"",
-    "\"++\"",
-    "\"--\"",
-    "\"!\"",
     "\"==\"",
     "\"!=\"",
     "\"&&\"",
@@ -146,16 +134,16 @@ public interface FldwCompilerConstants {
     "\"|\"",
     "\"->\"",
     "\"#\"",
-    "\":\"",
+    "\"!\"",
     "\"import\"",
     "\".\"",
     "<INT_VALUE>",
     "<DOUBLE_VALUE>",
     "<BOOL_VALUE>",
     "\"\\\"\"",
-    "<token of kind 47>",
-    "<token of kind 48>",
-    "<token of kind 49>",
+    "<token of kind 43>",
+    "<token of kind 44>",
+    "<token of kind 45>",
     "\"\\\"\"",
     "\"null\"",
     "<SYMBOL>",

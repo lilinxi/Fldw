@@ -2,85 +2,106 @@ package core;
 
 import java.util.ArrayList;
 
+/**
+ * 语句块流：一个语句块作为一整个流操作来进行处理，包含默认的输入流`in`，输出流`out`和中间处理流列表`flowList`
+ * <p>
+ * 输入操作导入`in`，输出操作由`out`导出，中间操作遍历`flowList`
+ */
 public class BlockFlow extends Flow {
-    private int identity; // System.identityHashCode(this) 返回对象的内存地址，不管该对象的类是否重写了 hashCode() 方法。
-    private Flowable inFlow;
-    private Flowable outFlow;
-    private ArrayList<Flowable> flowList;
+    private Flowable inFlow;                // 输入流
+    private Flowable outFlow;               // 输出流
+    private ArrayList<Flowable> flowList;   // 中间处理流
 
-    public BlockFlow() {
-        this.identity = System.identityHashCode(this);
+    public BlockFlow() throws ExplainException {
         this.inFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(SymbolTable.InSymbol).assertGetFlowable();
         this.outFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(SymbolTable.OutSymbol).assertGetFlowable();
         this.flowList = new ArrayList<>();
     }
 
-    public boolean addFlow(Flowable flow) {
+    /**
+     * 添加一个中间处理流
+     *
+     * @param flow
+     * @return
+     * @throws ExplainException
+     */
+    public boolean addFlow(Flowable flow) throws ExplainException {
         return this.flowList.add(flow);
     }
 
     @Override
-    public boolean Push(Datable data) {
+    public String GetSymbol() throws ExplainException {
+        StringBuilder builder = new StringBuilder("block");
+        for (Flowable flow : this.flowList) {
+            builder.append("->");
+            builder.append(flow.GetSymbol());
+        }
+        return builder.toString();
+    }
+
+    @Override
+    public boolean Push(Datable data) throws ExplainException {
         return this.inFlow.Push(data);
     }
 
     @Override
-    public boolean Push(Flowable flow) {
+    public boolean Push(Flowable flow) throws ExplainException {
         return this.inFlow.Push(flow);
     }
 
     @Override
-    public boolean Push(int index, Datable data) {
+    public boolean Push(int index, Datable data) throws ExplainException {
         return this.inFlow.Push(index, data);
     }
 
     @Override
-    public Datable Pop() {
+    public boolean Match(Flowable flow) throws ExplainException {
+        return this.inFlow.Match(flow);
+    }
+
+    @Override
+    public Datable Pop() throws ExplainException {
         return this.outFlow.Pop();
     }
 
     @Override
-    public int inLen() {
+    public int inLen() throws ExplainException {
         return this.inFlow.inLen();
     }
 
     @Override
-    public int outLen() {
+    public int outLen() throws ExplainException {
         return this.outFlow.outLen();
     }
 
     @Override
-    public Datable Get(int index) {
+    public Datable Get(int index) throws ExplainException {
         return this.outFlow.Get(index);
     }
 
     @Override
-    public void SetNextFlowing(Flowable flow) {
+    public void SetNextFlowing(Flowable flow) throws ExplainException {
+        // 在中间处理操作中，操作结果不直接输入到下一流，而是使用延迟流，延迟等待所有中间处理操作完成后，再输入到下一流
         DelayFlow delayOutFlow = new DelayFlow(this.outFlow);
         delayOutFlow.SetNextFlowing(flow);
         this.addFlow(delayOutFlow);
-//        this.outFlow = delayOutFlow;
-//        this.outFlow.SetNextFlowing(flow);
     }
 
     @Override
-    public Flowable NextFlowing() {
+    public Flowable NextFlowing() throws ExplainException {
         return this.outFlow.NextFlowing();
     }
 
     @Override
-    public boolean HasNextFlowing() {
+    public boolean HasNextFlowing() throws ExplainException {
         return this.outFlow.HasNextFlowing();
     }
 
     @Override
-    public boolean Flowing() {
-//        System.out.println(this.flowList);
+    public boolean Flowing() throws ExplainException {
         for (Flowable flow : this.flowList) {
-//            System.out.println("flow: " + flow);
             boolean success = flow.Flowing();
-//            System.out.println("end flow: " + flow.GetSymbol());
-            if (!success) return false;
+            if (!success) throw new ExplainException("Flowing Error: " + flow);
         }
         return true;
     }
