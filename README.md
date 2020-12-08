@@ -1,24 +1,21 @@
 # Fldw
 
-The Fldw language, a stream program language with the pattern matching.
+The Fldw language, means the flowing of data, a stream program language with the pattern matching.
 
-LL(3) 语法，不支持递归语法。
+Fldw，寓意数据的流动，是一个支持模式匹配的流式编程语言。
 
-动态类型，支持符号栈，支持函数的递归调用，解析执行。
+其为动态类型，支持语句块和符号定义域，支持指针和值传递，支持函数的递归调用。
 
-
-5. 错误处理 + 代码整理
-6. docker 部署
-
-TODO：清理符号表
-
-```shell script
-a=b+c
-```
+其为 LL(3) 语法。
 
 ---
 
 # 快速上手
+
+
+```shell script
+docker run -it --net host openjdk /bin/bash
+```
 
 ---
 
