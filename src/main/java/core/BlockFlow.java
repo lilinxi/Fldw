@@ -12,7 +12,7 @@ public class BlockFlow extends Flow {
     private Flowable outFlow;               // 输出流
     private ArrayList<Flowable> flowList;   // 中间处理流
 
-    public BlockFlow() {
+    public BlockFlow() throws ExplainException {
         this.inFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(SymbolTable.InSymbol).assertGetFlowable();
         this.outFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(SymbolTable.OutSymbol).assertGetFlowable();
         this.flowList = new ArrayList<>();

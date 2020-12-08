@@ -17,6 +17,21 @@ public class IfElseFlow extends Flow {
     }
 
     @Override
+    public String GetSymbol() throws ExplainException {
+        StringBuilder builder = new StringBuilder();
+        builder.append("if");
+        builder.append("(");
+        builder.append(this.conditionData.GetSymbol());
+        builder.append(")");
+        builder.append(this.trueFlow.GetSymbol());
+        if (this.falseFlow != null) {
+            builder.append("else");
+            builder.append(this.falseFlow.GetSymbol());
+        }
+        return builder.toString();
+    }
+
+    @Override
     public boolean Push(Datable data) throws ExplainException {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new ExplainException("type mismatch " + conditionData.GetType());
@@ -56,6 +71,19 @@ public class IfElseFlow extends Flow {
     }
 
     @Override
+    public boolean Match(Flowable flow) throws ExplainException {
+        if (conditionData.GetType() != Datable.DataType.Bool) {
+            throw new ExplainException("type mismatch " + conditionData.GetType());
+        }
+        if (conditionData.GetValue().equals(true)) {
+            return this.trueFlow.Match(flow);
+        } else if (this.falseFlow != null) {
+            return this.falseFlow.Match(flow);
+        }
+        return true;
+    }
+
+    @Override
     public Datable Pop() throws ExplainException {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new ExplainException("type mismatch " + conditionData.GetType());
@@ -77,6 +105,19 @@ public class IfElseFlow extends Flow {
             return this.trueFlow.inLen();
         } else if (this.falseFlow != null) {
             return this.falseFlow.inLen();
+        }
+        return 0;
+    }
+
+    @Override
+    public int outLen() throws ExplainException {
+        if (conditionData.GetType() != Datable.DataType.Bool) {
+            throw new ExplainException("type mismatch " + conditionData.GetType());
+        }
+        if (conditionData.GetValue().equals(true)) {
+            return this.trueFlow.outLen();
+        } else if (this.falseFlow != null) {
+            return this.falseFlow.outLen();
         }
         return 0;
     }
