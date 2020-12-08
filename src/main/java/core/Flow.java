@@ -14,28 +14,33 @@ public class Flow extends Symbol implements Flowable {
     }
 
     @Override
+    public void SetFlowOp(FlowOp flowOp) throws ExplainException {
+        this.flowOp = flowOp;
+    }
+
+    @Override
     public boolean Push(Datable data) throws ExplainException {
-        throw new ExplainException("no impl, wrong call");
+        throw new ExplainException("Illegal call");
     }
 
     @Override
     public boolean Push(Flowable flow) throws ExplainException {
-        throw new ExplainException("no impl, wrong call");
+        throw new ExplainException("Illegal call");
     }
 
     @Override
     public boolean Push(int index, Datable data) throws ExplainException {
-        throw new ExplainException("no impl, wrong call");
+        throw new ExplainException("Illegal call");
     }
 
     @Override
     public boolean Match(Flowable flow) throws ExplainException {
-        throw new ExplainException("no impl, wrong call");
+        throw new ExplainException("Illegal call");
     }
 
     @Override
     public Datable Pop() throws ExplainException {
-        throw new ExplainException("no impl, wrong call");
+        throw new ExplainException("Illegal call");
     }
 
     @Override
@@ -50,23 +55,17 @@ public class Flow extends Symbol implements Flowable {
 
     @Override
     public Datable Get(int index) throws ExplainException {
-        throw new ExplainException("no impl, wrong call");
+        throw new ExplainException("Illegal call");
     }
-
-    @Override
-    public void SetFlowOp(FlowOp flowOp) throws ExplainException {
-        this.flowOp = flowOp;
-    }
-
 
     @Override
     public void SetNextFlowing(Flowable flow) throws ExplainException {
-        throw new ExplainException("no impl, wrong call");
+        throw new ExplainException("Illegal call");
     }
 
     @Override
     public Flowable NextFlowing() throws ExplainException {
-        throw new ExplainException("no impl, wrong call");
+        throw new ExplainException("Illegal call");
     }
 
     @Override

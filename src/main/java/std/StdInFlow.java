@@ -6,45 +6,56 @@ import javacc.ParseException;
 import java.io.StringReader;
 import java.util.Scanner;
 
+/**
+ * Stdin 流，标准输入流
+ * <p>
+ * 标准输入的合法值为一个列表流，例如：
+ * <p>
+ * [1, 2, 3]
+ * 1, 2, 3
+ * 1 2 3
+ * <p>
+ * 其中 [ 和 , 都可以省略
+ */
 public class StdInFlow extends Flow {
-    private ListFlow cacheFlow;
+    private ListFlow cacheFlow; // 输入缓冲流
 
     public StdInFlow() {
         this.cacheFlow = new ListFlow();
     }
 
     @Override
-    public String GetSymbol()throws ExplainException {
+    public String GetSymbol() throws ExplainException {
         return Std.StdInFlowSymbol;
     }
 
     @Override
-    public Datable Pop()throws ExplainException {
+    public Datable Pop() throws ExplainException {
         return this.cacheFlow.Pop();
     }
 
     @Override
-    public int inLen()throws ExplainException {
+    public int inLen() throws ExplainException {
         return this.cacheFlow.inLen();
     }
 
     @Override
-    public Datable Get(int index)throws ExplainException {
+    public Datable Get(int index) throws ExplainException {
         return this.cacheFlow.Get(index);
     }
 
     @Override
-    public void SetNextFlowing(Flowable flow)throws ExplainException {
+    public void SetNextFlowing(Flowable flow) throws ExplainException {
         this.cacheFlow.SetNextFlowing(flow);
     }
 
     @Override
-    public Flowable NextFlowing()throws ExplainException {
+    public Flowable NextFlowing() throws ExplainException {
         return this.cacheFlow.NextFlowing();
     }
 
     @Override
-    public boolean HasNextFlowing()throws ExplainException {
+    public boolean HasNextFlowing() throws ExplainException {
         return this.cacheFlow.HasNextFlowing();
     }
 

@@ -6,6 +6,9 @@ import core.Flow;
 import core.Flowable;
 import examples.UnitTest;
 
+/**
+ * Stdout 流，标准输出流
+ */
 public class StdOutFlow extends Flow {
     public StdOutFlow() {
     }
@@ -27,7 +30,7 @@ public class StdOutFlow extends Flow {
     }
 
     @Override
-    public boolean Push(Flowable flow)throws ExplainException {
+    public boolean Push(Flowable flow) throws ExplainException {
         Datable data;
         while ((data = flow.Pop()) != null) {
             boolean success = this.Push(data);
@@ -37,7 +40,7 @@ public class StdOutFlow extends Flow {
     }
 
     @Override
-    public boolean HasNextFlowing()throws ExplainException {
+    public boolean HasNextFlowing() throws ExplainException {
         return false;
     }
 
