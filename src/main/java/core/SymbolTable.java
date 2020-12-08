@@ -1,12 +1,12 @@
 package core;
 
-import javacc.FldwCompiler;
 import javacc.ParseException;
 
-import java.io.StringReader;
 import java.util.*;
 
-// 符号表
+/**
+ * 符号表
+ */
 public class SymbolTable {
     //    所有符号可以代表的类型：数据，流，函数，符号表
     public static enum SymbolType {
@@ -23,18 +23,14 @@ public class SymbolTable {
     private static String getTmpSymbol() { // 临时变量有序，不采用 UUID，便于测试
 //        UUID uuid = UUID.randomUUID();
 //        return uuid.toString();
-        return "tmp" + TmpSymbolIndex++;
+        return "_tmp" + TmpSymbolIndex++;
     }
 
     //    符号表项
     public static class SymbolItem {
-        private String symbol;
-        private SymbolType type;
-        private Object value;
-
-//        public SymbolItem(String symbol) {
-//            this.symbol = symbol;
-//        }
+        private String symbol;      // 符号
+        private SymbolType type;    // 符号种类
+        private Object value;       // 符号值
 
         public SymbolItem(String symbol, SymbolType type, Object value) {
             this.symbol = symbol;
@@ -58,45 +54,30 @@ public class SymbolTable {
             this.value = value;
         }
 
-        public SymbolData assertGetSymbolData() {
+        public SymbolData assertGetSymbolData() throws ExplainException {
             if (this.getType() != SymbolType.Data) {
-                throw new RuntimeException("assert type mismatch");
+                throw new ExplainException("assert type mismatch");
             }
             return (SymbolData) this.getValue();
         }
 
-        public FuncFlow assertGetFuncFlow() throws ParseException {
+        public DelayFuncFlow assertGetDelayFuncFlow() throws ExplainException {
             if (this.getType() != SymbolType.Function) {
-                throw new RuntimeException("assert type mismatch");
-            }
-            return new FldwCompiler(new StringReader(this.getValue().toString())).make_func_flow(this.getSymbol());
-        }
-
-        public DelayFuncFlow assertGetDelayFuncFlow() throws ParseException {
-            if (this.getType() != SymbolType.Function) {
-                throw new RuntimeException("assert type mismatch");
+                throw new ExplainException("assert type mismatch");
             }
             return new DelayFuncFlow(this.getSymbol(), this.getValue().toString());
         }
 
-        public Flowable assertGetFlowable() {
+        public Flowable assertGetFlowable() throws ExplainException {
             if (this.getType() != SymbolType.Flow) {
-                throw new RuntimeException("assert type mismatch");
+                throw new ExplainException("assert type mismatch");
             }
             return (Flowable) this.getValue();
         }
 
-//        @Deprecated
-//        public ListFlow assertGetListFlow() {
-//            if (this.getType() != SymbolType.Flow) {
-//                throw new RuntimeException("assert type mismatch");
-//            }
-//            return (ListFlow) this.getValue();
-//        }
-
-        public SymbolTable assertGetSymbolTable() {
+        public SymbolTable assertGetSymbolTable() throws ExplainException {
             if (this.getType() != SymbolType.BlockSymbolTable) {
-                throw new RuntimeException("assert type mismatch");
+                throw new ExplainException("assert type mismatch");
             }
             return (SymbolTable) this.getValue();
         }
@@ -111,22 +92,22 @@ public class SymbolTable {
         }
     }
 
-    public final static String RootSymbol = "root";
-    public final static String InSymbol = "in";
-    public final static String OutSymbol = "out";
+    public final static String RootSymbol = "root"; // 根符号表
+    public final static String InSymbol = "in";     // in 流符号
+    public final static String OutSymbol = "out";   // out 流的符号
 
-    private String symbol;
-    private SymbolTable parentSymbolTable;
-    private TreeMap<String, SymbolItem> SymbolItemTreeMap; // TreeMap 有序，方便对符号表进行测试
+    private String symbol;                                  // 符号表的符号
+    private SymbolTable parentSymbolTable;                  // 父符号表
+    private TreeMap<String, SymbolItem> SymbolItemTreeMap;  // TreeMap 有序，方便对符号表进行测试
 
     //    私有化构造函数，符号表只能通过两种方式构建：（1）根符号表；（2）Blocks 内符号表
-    private SymbolTable(String symbol, SymbolTable parentSymbolTable) {
+    private SymbolTable(String symbol, SymbolTable parentSymbolTable) throws ExplainException {
         this.symbol = symbol;
         this.parentSymbolTable = parentSymbolTable;
         this.SymbolItemTreeMap = new TreeMap<>();
 
         //        每个符号表都内嵌了 in 和 out 两个符号流，表示都可以作为一个流调用，但是只有函数 Block 包含显示的名称，可以直接被用户调用
-        //        TODO：未来或许可以进行多个程序的串联
+        //        可以进行多个程序的串联
         this.PutSymbol(SymbolTable.InSymbol, SymbolType.Flow);
         this.PutSymbol(SymbolTable.OutSymbol, SymbolType.Flow);
     }
@@ -136,7 +117,7 @@ public class SymbolTable {
     }
 
     //    新增符号时，获取符号的默认值
-    private Object NewSymbolValue(String symbol, SymbolType type) {
+    private Object NewSymbolValue(String symbol, SymbolType type) throws ExplainException {
         switch (type) {
             case Data -> {
                 return new SymbolData(symbol);
@@ -145,23 +126,24 @@ public class SymbolTable {
                 return new ListFlow(symbol);
             }
             case Function -> { // 因为函数变量不能赋值，所以创建默认值没有意义
-                throw new RuntimeException("wrong type");
+                throw new ExplainException("wrong type");
             }
             case BlockSymbolTable -> {
                 return new SymbolTable(symbol, this);
             }
             default -> {
-                throw new RuntimeException("wrong call");
+                throw new ExplainException("wrong call");
             }
         }
     }
 
-    public SymbolItem RecurseGetSymbol(String symbol) {
+    //    递归查找符号表，默认不对流进行延迟拷贝
+    public SymbolItem RecurseGetSymbol(String symbol) throws ExplainException {
         return this.RecurseGetSymbol(symbol, false); // 默认为 false
     }
 
     //    递归查找符号表
-    public SymbolItem RecurseGetSymbol(String symbol, boolean delayCopy) {
+    public SymbolItem RecurseGetSymbol(String symbol, boolean delayCopy) throws ExplainException {
         SymbolItem value = this.GetSymbol(symbol, delayCopy);
         if (value != null) {
             return value;
@@ -173,33 +155,24 @@ public class SymbolTable {
     }
 
     //    不递归，只查找当前符号表
-    public SymbolItem GetSymbol(String symbol, boolean delayCopy) {
+    public SymbolItem GetSymbol(String symbol, boolean delayCopy) throws ExplainException {
         SymbolItem symbolItem = this.SymbolItemTreeMap.get(symbol);
         if (delayCopy && symbolItem != null && symbolItem.getType() == SymbolType.Flow) {
-            SymbolItem ret = new SymbolItem(symbolItem.getSymbol(), symbolItem.getType(), new DelayFlow(symbolItem.assertGetFlowable()));
-//            System.err.println(ret.getValue());
-            return ret;
+            return new SymbolItem(symbolItem.getSymbol(), symbolItem.getType(), new DelayFlow(symbolItem.assertGetFlowable()));
         }
         return symbolItem;
     }
 
-//    //    新增符号，没有类型，强制终止递归查找符号表，PutOrRecurseGetSymbol() 操作会覆盖已有值
-//    public SymbolItem PutSymbol(String symbol) {
-//        return this.;
-//    }
-
     //    新增符号，新增默认的空符号，返回新增的符号项
-    public SymbolItem PutSymbol(String symbol, SymbolType type) {
+    public SymbolItem PutSymbol(String symbol, SymbolType type) throws ExplainException {
         Object value = this.NewSymbolValue(symbol, type);
         return this.PutSymbol(symbol, type, value);
     }
 
     //    新增符号，返回新增的符号项
-    public SymbolItem PutSymbol(String symbol, SymbolType type, Object value) {
-//        Object value = this.NewSymbolValue(symbol, type);
-
+    public SymbolItem PutSymbol(String symbol, SymbolType type, Object value) throws ExplainException {
         if (this.SymbolItemTreeMap.containsKey(symbol)) {
-            throw new RuntimeException("duplicate symbol"); // 符号重复
+            throw new ExplainException("duplicate symbol"); // 符号重复
         } else {
 //            java TreeMap put 的返回值并不是插入的元素，而是 null 或者被重复 key 覆盖的元素
             SymbolItem item = new SymbolItem(symbol, type, value);
@@ -209,17 +182,13 @@ public class SymbolTable {
     }
 
     //    遇见一个符号，不确定是已有的还是新增的，若有则返回，没有则新增
-    public SymbolItem PutOrRecurseGetSymbol(String symbol, SymbolType type) {
+    public SymbolItem PutOrRecurseGetSymbol(String symbol, SymbolType type) throws ExplainException {
         SymbolItem symbolItem = this.RecurseGetSymbol(symbol, true); // 默认为 true
-//        System.err.println("At: " + this);
-//        System.err.println("At: " + this.symbol);
-//        System.err.println("Get: " + symbolItem);
-
         if (symbolItem != null) {
             if (symbolItem.getType() == type) {
                 return symbolItem;
             } else {
-                throw new RuntimeException("duplicate symbol:" + symbol + ", " + symbolItem.getType() + ", " + type); // 符号重复
+                throw new ExplainException("duplicate symbol:" + symbol + ", " + symbolItem.getType() + ", " + type); // 符号重复
             }
         } else {
             return this.PutSymbol(symbol, type);
@@ -227,17 +196,14 @@ public class SymbolTable {
     }
 
     //    遇见一个符号，不确定是已有的还是新增的，若有则返回，没有则新增
-    public SymbolItem PutOrGetSymbol(String symbol, SymbolType type) {
+    public SymbolItem PutOrGetSymbol(String symbol, SymbolType type) throws ExplainException {
         SymbolItem symbolItem = this.GetSymbol(symbol, true); // 默认为 true
-//        System.err.println("At: " + this);
-//        System.err.println("At: " + this.symbol);
-//        System.err.println("Get: " + symbolItem);
 
         if (symbolItem != null) {
             if (symbolItem.getType() == type) {
                 return symbolItem;
             } else {
-                throw new RuntimeException("duplicate symbol:" + symbol + ", " + symbolItem.getType() + ", " + type); // 符号重复
+                throw new ExplainException("duplicate symbol:" + symbol + ", " + symbolItem.getType() + ", " + type); // 符号重复
             }
         } else {
             return this.PutSymbol(symbol, type);
@@ -265,12 +231,22 @@ public class SymbolTable {
     }
 
     //    根符号表
-    private static final SymbolTable RootSymbolTable = new SymbolTable(SymbolTable.RootSymbol, null);
+    private static SymbolTable RootSymbolTable;
+
+    //    创建根符号表
+    static {
+        try {
+            RootSymbolTable = new SymbolTable(SymbolTable.RootSymbol, null);
+        } catch (ExplainException e) {
+            throw new RuntimeException("Root Symbol Table Error!");
+        }
+    }
 
     //    符号表栈
     private static final Stack<SymbolTable> SymbolTableStack = new Stack<>();
 
-    public static void Clear() {
+    //    清空符号表
+    public static void Clear() throws ExplainException {
         SymbolTable.RootSymbolTable.SymbolItemTreeMap.clear();
         SymbolTable.SymbolTableStack.clear();
         //        符号表栈从根符号表开始
@@ -278,13 +254,14 @@ public class SymbolTable {
         SymbolTable.RootSymbolTable.PutSymbol(SymbolTable.InSymbol, SymbolType.Flow);
         SymbolTable.RootSymbolTable.PutSymbol(SymbolTable.OutSymbol, SymbolType.Flow);
         SymbolTable.TmpSymbolIndex = 0;
-
-//        SymbolTable.CurrentSymbolTable().PutSymbol(Std.StdInFlowSymbol, SymbolTable.SymbolType.Flow, StdInFlow.GetInstance());
-//        SymbolTable.CurrentSymbolTable().PutSymbol(Std.StdOutFlowSymbol, SymbolTable.SymbolType.Flow, StdOutFlow.GetInstance());
     }
 
     static {
-        Clear();
+        try {
+            Clear();
+        } catch (ExplainException e) {
+            e.printStackTrace();
+        }
     }
 
     //    获取当前符号表，即栈顶符号表
@@ -292,54 +269,22 @@ public class SymbolTable {
         return SymbolTable.SymbolTableStack.peek();
     }
 
-    public static SymbolTable EnterBlock(String name) {
+    //    创建新符号表，符号表栈压入一位
+    public static SymbolTable EnterBlock(String name) throws ExplainException {
         //        Block 表示为匿名的函数
         if (name == null) {
             name = SymbolTable.getTmpSymbol();
         } else {
             name += SymbolTable.getTmpSymbol();
         }
-//        System.err.println("Goto: " + name);
         SymbolTable.SymbolTableStack.push(
                 SymbolTable.CurrentSymbolTable().PutOrRecurseGetSymbol(name, SymbolType.BlockSymbolTable)
                         .assertGetSymbolTable());
-//        System.err.println("Goto: " + name + ", At: " + SymbolTable.CurrentSymbolTable().symbol);
         return SymbolTable.CurrentSymbolTable();
     }
 
+    //    符号表栈弹出一位
     public static SymbolTable ExitBlock() {
-//        System.err.println("Go out");
         return SymbolTable.SymbolTableStack.pop();
     }
-
-    @Deprecated
-    public static SymbolTable EnterBlockIndependent(String name) {
-        SymbolTable.SymbolTableStack.push(new SymbolTable("independent", null));
-        return SymbolTable.EnterBlock(name);
-    }
-
-    @Deprecated
-    public static SymbolTable ExitBlockIndependent() {
-        SymbolTable peekSymbolTable = SymbolTable.SymbolTableStack.pop();
-        SymbolTable.SymbolTableStack.pop();
-        peekSymbolTable.setParentSymbolTable(SymbolTable.CurrentSymbolTable());
-        return peekSymbolTable;
-    }
-
-
-    //    遇见一个符号，不确定是已有的还是新增的，若有则返回，没有则新增
-//    public static SymbolItem PutOrRecurseGetSymbol(String symbol, SymbolType type) {
-//        SymbolTable curSymbolTable = SymbolTable.CurrentSymbolTable();
-//
-//        SymbolItem symbolItem = curSymbolTable.GetSymbol(symbol);
-//        if (symbolItem != null) {
-//            if (symbolItem.getType() == type) {
-//                return symbolItem;
-//            } else {
-//                throw new RuntimeException("duplicate symbol"); // 符号重复
-//            }
-//        } else {
-//            return curSymbolTable.PutSymbol(symbol, type);
-//        }
-//    }
 }

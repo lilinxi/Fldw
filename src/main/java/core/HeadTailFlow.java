@@ -1,9 +1,14 @@
 package core;
 
+/**
+ * 首位流
+ * <p>
+ * 将流分割为首位的数据符号和末尾的其余数据流
+ */
 public class HeadTailFlow extends Flow {
-    private SymbolData headData;
-    private Flowable tailFlow;
-    private boolean setHead;
+    private SymbolData headData;        // 首符号
+    private Flowable tailFlow;          // 尾数据流
+    private boolean setHead;            // 是否当前设置位为首位
 
     public HeadTailFlow(SymbolData headData, Flowable tailFlow) {
         this.headData = headData;
@@ -12,12 +17,12 @@ public class HeadTailFlow extends Flow {
     }
 
     @Override
-    public String GetSymbol() {
-        throw new RuntimeException("wrong call"); // 不包含 Symbol，无法被符号表查找
+    public String GetSymbol() throws ExplainException {
+        return this.headData.GetSymbol() + ";" + this.tailFlow.GetSymbol();
     }
 
     @Override
-    public boolean Push(Datable data) {
+    public boolean Push(Datable data) throws ExplainException {
         if (this.setHead) {
             this.headData.Push(data);
             this.setHead = false;
@@ -28,42 +33,12 @@ public class HeadTailFlow extends Flow {
     }
 
     @Override
-    public boolean Push(Flowable flow) {
+    public boolean Push(Flowable flow) throws ExplainException {
         Datable data;
         while ((data = flow.Pop()) != null) {
             boolean success = this.Push(data);
             if (!success) return false;
         }
-        return true;
-    }
-
-    @Override
-    public Datable Pop() {
-        throw new RuntimeException("wrong call");
-    }
-
-    @Override
-    public int inLen() {
-        return 0;
-    }
-
-    @Override
-    public void SetNextFlowing(Flowable flow) {
-        throw new RuntimeException("can not set next");
-    }
-
-    @Override
-    public Flowable NextFlowing() {
-        throw new RuntimeException("wrong call");
-    }
-
-    @Override
-    public boolean HasNextFlowing() {
-        return false;
-    }
-
-    @Override
-    public boolean Flowing() {
         return true;
     }
 

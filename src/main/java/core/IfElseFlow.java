@@ -1,12 +1,15 @@
 package core;
 
+/**
+ * if-else 控制流
+ */
 public class IfElseFlow extends Flow {
-    private ExprData conditionData; // 因为是动态类型语言，所以每次运行时都要重新判定类型
-    private Flowable trueFlow;
-    private Flowable falseFlow;
-    private Flowable nextFlow;
+    private Datable conditionData;  // 判断条件，因为是动态类型语言，所以每次运行时都要重新判定类型
+    private Flowable trueFlow;      // 真值流
+    private Flowable falseFlow;     // 假值流
+    private Flowable nextFlow;      // 下一流
 
-    public IfElseFlow(ExprData conditionData, Flowable trueFlow, Flowable falseFlow) {
+    public IfElseFlow(Datable conditionData, Flowable trueFlow, Flowable falseFlow) {
         this.conditionData = conditionData;
         this.trueFlow = trueFlow;
         this.falseFlow = falseFlow;
@@ -14,9 +17,24 @@ public class IfElseFlow extends Flow {
     }
 
     @Override
-    public boolean Push(Datable data) {
+    public String GetSymbol() throws ExplainException {
+        StringBuilder builder = new StringBuilder();
+        builder.append("if");
+        builder.append("(");
+        builder.append(this.conditionData.GetSymbol());
+        builder.append(")");
+        builder.append(this.trueFlow.GetSymbol());
+        if (this.falseFlow != null) {
+            builder.append("else");
+            builder.append(this.falseFlow.GetSymbol());
+        }
+        return builder.toString();
+    }
+
+    @Override
+    public boolean Push(Datable data) throws ExplainException {
         if (conditionData.GetType() != Datable.DataType.Bool) {
-            throw new RuntimeException("type mismatch");
+            throw new ExplainException("type mismatch " + conditionData.GetType());
         }
         if (conditionData.GetValue().equals(true)) {
             return this.trueFlow.Push(data);
@@ -27,9 +45,9 @@ public class IfElseFlow extends Flow {
     }
 
     @Override
-    public boolean Push(Flowable flow) {
+    public boolean Push(Flowable flow) throws ExplainException {
         if (conditionData.GetType() != Datable.DataType.Bool) {
-            throw new RuntimeException("type mismatch");
+            throw new ExplainException("type mismatch " + conditionData.GetType());
         }
         if (conditionData.GetValue().equals(true)) {
             return this.trueFlow.Push(flow);
@@ -40,22 +58,35 @@ public class IfElseFlow extends Flow {
     }
 
     @Override
-    public boolean Push(int index, Datable data) {
+    public boolean Push(int index, Datable data) throws ExplainException {
         if (conditionData.GetType() != Datable.DataType.Bool) {
-            throw new RuntimeException("type mismatch");
+            throw new ExplainException("type mismatch " + conditionData.GetType());
         }
         if (conditionData.GetValue().equals(true)) {
             return this.trueFlow.Push(index, data);
-        } else if (this.falseFlow != null)  {
+        } else if (this.falseFlow != null) {
             return this.falseFlow.Push(index, data);
         }
         return true;
     }
 
     @Override
-    public Datable Pop() {
+    public boolean Match(Flowable flow) throws ExplainException {
         if (conditionData.GetType() != Datable.DataType.Bool) {
-            throw new RuntimeException("type mismatch");
+            throw new ExplainException("type mismatch " + conditionData.GetType());
+        }
+        if (conditionData.GetValue().equals(true)) {
+            return this.trueFlow.Match(flow);
+        } else if (this.falseFlow != null) {
+            return this.falseFlow.Match(flow);
+        }
+        return true;
+    }
+
+    @Override
+    public Datable Pop() throws ExplainException {
+        if (conditionData.GetType() != Datable.DataType.Bool) {
+            throw new ExplainException("type mismatch " + conditionData.GetType());
         }
         if (conditionData.GetValue().equals(true)) {
             return this.trueFlow.Pop();
@@ -66,12 +97,25 @@ public class IfElseFlow extends Flow {
     }
 
     @Override
-    public int inLen() {
+    public int inLen() throws ExplainException {
         if (conditionData.GetType() != Datable.DataType.Bool) {
-            throw new RuntimeException("type mismatch");
+            throw new ExplainException("type mismatch " + conditionData.GetType());
         }
         if (conditionData.GetValue().equals(true)) {
             return this.trueFlow.inLen();
+        } else if (this.falseFlow != null) {
+            return this.falseFlow.inLen();
+        }
+        return 0;
+    }
+
+    @Override
+    public int outLen() throws ExplainException {
+        if (conditionData.GetType() != Datable.DataType.Bool) {
+            throw new ExplainException("type mismatch " + conditionData.GetType());
+        }
+        if (conditionData.GetValue().equals(true)) {
+            return this.trueFlow.outLen();
         } else if (this.falseFlow != null) {
             return this.falseFlow.outLen();
         }
@@ -79,9 +123,9 @@ public class IfElseFlow extends Flow {
     }
 
     @Override
-    public Datable Get(int index) {
+    public Datable Get(int index) throws ExplainException {
         if (conditionData.GetType() != Datable.DataType.Bool) {
-            throw new RuntimeException("type mismatch");
+            throw new ExplainException("type mismatch " + conditionData.GetType());
         }
         if (conditionData.GetValue().equals(true)) {
             return this.trueFlow.Get(index);
@@ -92,7 +136,7 @@ public class IfElseFlow extends Flow {
     }
 
     @Override
-    public void SetNextFlowing(Flowable flow) { // 同时绑定 nextFlow
+    public void SetNextFlowing(Flowable flow) throws ExplainException { // 同时绑定 nextFlow
         this.trueFlow.SetNextFlowing(flow);
         if (this.falseFlow != null) {
             this.falseFlow.SetNextFlowing(flow);
@@ -101,27 +145,26 @@ public class IfElseFlow extends Flow {
     }
 
     @Override
-    public Flowable NextFlowing() {
+    public Flowable NextFlowing() throws ExplainException {
         return this.nextFlow;
     }
 
     @Override
-    public boolean HasNextFlowing() {
+    public boolean HasNextFlowing() throws ExplainException {
         return this.nextFlow != null;
     }
 
     @Override
-    public boolean Flowing() {
+    public boolean Flowing() throws ExplainException {
         if (conditionData.GetType() != Datable.DataType.Bool) {
-            throw new RuntimeException("type mismatch");
+            throw new ExplainException("type mismatch " + conditionData.GetType());
         }
-        boolean ret = true;
         if (conditionData.GetValue().equals(true)) {
-            ret = this.trueFlow.Flowing();
+            return this.trueFlow.Flowing();
         } else if (this.falseFlow != null) {
-            ret = this.falseFlow.Flowing();
+            return this.falseFlow.Flowing();
         }
-        return ret;
+        return this.nextFlow.Flowing(); // 判断为假且没有假值流，直接接下一流
     }
 
     @Override

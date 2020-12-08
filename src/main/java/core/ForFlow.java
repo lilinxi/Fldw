@@ -1,9 +1,12 @@
 package core;
 
+/**
+ * For 控制语句流，对流中的每个数据进行一次迭代操作
+ */
 public class ForFlow extends Flow {
-    private Flowable iterFlow;
-    private SymbolData iterSymbolData;
-    private BlockFlow forBlockFlow;
+    private Flowable iterFlow;              // 迭代的流
+    private SymbolData iterSymbolData;      // 迭代的数据的符号
+    private BlockFlow forBlockFlow;         // 迭代的语句块
 
     public ForFlow(Flowable iterFlow, SymbolData iterSymbolData, BlockFlow forBlockFlow) {
         this.iterFlow = iterFlow;
@@ -12,79 +15,80 @@ public class ForFlow extends Flow {
     }
 
     @Override
-    public boolean Push(Datable data) {
+    public String GetSymbol() throws ExplainException {
+        StringBuilder builder = new StringBuilder();
+        builder.append("for");
+        builder.append("(");
+        builder.append(this.iterFlow.GetSymbol());
+        builder.append("->");
+        builder.append(this.iterSymbolData.GetSymbol());
+        builder.append(")");
+        builder.append(this.forBlockFlow.GetSymbol());
+        return builder.toString();
+    }
+
+    @Override
+    public boolean Push(Datable data) throws ExplainException {
         return this.forBlockFlow.Push(data);
     }
 
     @Override
-    public boolean Push(Flowable flow) {
+    public boolean Push(Flowable flow) throws ExplainException {
         return this.forBlockFlow.Push(flow);
     }
 
     @Override
-    public boolean Push(int index, Datable data) {
+    public boolean Push(int index, Datable data) throws ExplainException {
         return this.forBlockFlow.Push(index, data);
     }
 
     @Override
-    public Datable Pop() {
+    public boolean Match(Flowable flow) throws ExplainException {
+        return this.forBlockFlow.Match(flow);
+    }
+
+    @Override
+    public Datable Pop() throws ExplainException {
         return this.forBlockFlow.Pop();
     }
 
     @Override
-    public int inLen() {
+    public int inLen() throws ExplainException {
         return this.forBlockFlow.inLen();
     }
 
     @Override
-    public int outLen() {
+    public int outLen() throws ExplainException {
         return this.forBlockFlow.outLen();
     }
 
     @Override
-    public Datable Get(int index) {
+    public Datable Get(int index) throws ExplainException {
         return this.forBlockFlow.Get(index);
     }
 
     @Override
-    public void SetNextFlowing(Flowable flow) {
+    public void SetNextFlowing(Flowable flow) throws ExplainException {
         this.forBlockFlow.SetNextFlowing(flow);
     }
 
     @Override
-    public Flowable NextFlowing() {
+    public Flowable NextFlowing() throws ExplainException {
         return this.forBlockFlow.NextFlowing();
     }
 
     @Override
-    public boolean HasNextFlowing() {
+    public boolean HasNextFlowing() throws ExplainException {
         return this.forBlockFlow.HasNextFlowing();
     }
 
     @Override
-    public boolean Flowing() {
+    public boolean Flowing() throws ExplainException {
         for (int i = 0; i < this.iterFlow.outLen(); i++) {
             this.iterSymbolData.Push(this.iterFlow.Get(i));
-//            System.err.println("1");
-//            System.err.println(this.iterFlow.Get(i));
-//            System.err.println(this.iterSymbolData);
-//            System.err.println(this.forBlockFlow);
             boolean success = this.forBlockFlow.Flowing();
-//            System.err.println("2");
-            if (!success) return false;
-//            boolean success = this.nextFlowing.Push(this.Get(i));
-//            if (!success) return false;
+            if (!success) throw new ExplainException("Flowing Error: " + this.forBlockFlow);
         }
-//        while (this.iterFlow.outLen() > 0) {
-////            System.err.println(this.iterFlow);
-////            System.err.println(this.forBlockFlow);
-//            System.err.println("1");
-//            System.err.println(this.forBlockFlow);
-//            this.iterSymbolData.Push(this.iterFlow.Pop());
-//            boolean success = this.forBlockFlow.Flowing();
-//            System.err.println("2");
-//            if (!success) return false;
-//        }
         return true;
     }
 
