@@ -12,57 +12,57 @@ public class ForFlow extends Flow {
     }
 
     @Override
-    public boolean Push(Datable data) {
+    public boolean Push(Datable data) throws ExplainException{
         return this.forBlockFlow.Push(data);
     }
 
     @Override
-    public boolean Push(Flowable flow) {
+    public boolean Push(Flowable flow)throws ExplainException {
         return this.forBlockFlow.Push(flow);
     }
 
     @Override
-    public boolean Push(int index, Datable data) {
+    public boolean Push(int index, Datable data)throws ExplainException {
         return this.forBlockFlow.Push(index, data);
     }
 
     @Override
-    public Datable Pop() {
+    public Datable Pop()throws ExplainException {
         return this.forBlockFlow.Pop();
     }
 
     @Override
-    public int inLen() {
+    public int inLen() throws ExplainException{
         return this.forBlockFlow.inLen();
     }
 
     @Override
-    public int outLen() {
+    public int outLen() throws ExplainException{
         return this.forBlockFlow.outLen();
     }
 
     @Override
-    public Datable Get(int index) {
+    public Datable Get(int index)throws ExplainException {
         return this.forBlockFlow.Get(index);
     }
 
     @Override
-    public void SetNextFlowing(Flowable flow) {
+    public void SetNextFlowing(Flowable flow) throws ExplainException{
         this.forBlockFlow.SetNextFlowing(flow);
     }
 
     @Override
-    public Flowable NextFlowing() {
+    public Flowable NextFlowing() throws ExplainException{
         return this.forBlockFlow.NextFlowing();
     }
 
     @Override
-    public boolean HasNextFlowing() {
+    public boolean HasNextFlowing() throws ExplainException{
         return this.forBlockFlow.HasNextFlowing();
     }
 
     @Override
-    public boolean Flowing() {
+    public boolean Flowing() throws ExplainException{
         for (int i = 0; i < this.iterFlow.outLen(); i++) {
             this.iterSymbolData.Push(this.iterFlow.Get(i));
 //            System.err.println("1");

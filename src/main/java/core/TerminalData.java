@@ -13,32 +13,32 @@ public class TerminalData extends Data {
     }
 
     @Override
-    public boolean Push(Datable data) {
+    public boolean Push(Datable data)throws ExplainException {
         return false;
     }
 
     @Override
-    public DataType GetType() {
+    public DataType GetType() throws ExplainException{
         return this.type;
     }
 
     @Override
-    public Object GetValue() {
+    public Object GetValue()throws ExplainException {
         return this.value;
     }
 
     @Override
-    public String GetSymbol() {
+    public String GetSymbol()throws ExplainException {
         throw new RuntimeException("wrong call");
     }
 
     @Override
-    public boolean SetType(DataType type) {
+    public boolean SetType(DataType type)throws ExplainException {
         throw new RuntimeException("wrong call");
     }
 
     @Override
-    public boolean SetValue(Object value) {
+    public boolean SetValue(Object value)throws ExplainException {
         throw new RuntimeException("wrong call");
     }
 

@@ -65,12 +65,12 @@ public class SymbolTable {
             return (SymbolData) this.getValue();
         }
 
-        public FuncFlow assertGetFuncFlow() throws ParseException {
-            if (this.getType() != SymbolType.Function) {
-                throw new RuntimeException("assert type mismatch");
-            }
-            return new FldwCompiler(new StringReader(this.getValue().toString())).make_func_flow(this.getSymbol());
-        }
+//        public FuncFlow assertGetFuncFlow() throws ParseException {
+//            if (this.getType() != SymbolType.Function) {
+//                throw new RuntimeException("assert type mismatch");
+//            }
+//            return new FldwCompiler(new StringReader(this.getValue().toString())).make_func_flow(this.getSymbol());
+//        }
 
         public DelayFuncFlow assertGetDelayFuncFlow() throws ParseException {
             if (this.getType() != SymbolType.Function) {

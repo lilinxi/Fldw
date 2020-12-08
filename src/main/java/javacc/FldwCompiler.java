@@ -5,6 +5,7 @@ package javacc;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
+
 import core.*;
 import examples.UnitTest;
 
@@ -28,13 +29,13 @@ public class FldwCompiler implements FldwCompilerConstants {
                     reader.close();
                     is.close();
                     parse(buffer.toString());
-                } catch (ParseException | IOException e) {
+                } catch (ParseException | ExplainException | IOException e) {
                     System.err.println(e.getMessage());
                 }
             } else {
                 try {
                     parse(arg);
-                } catch (ParseException e) {
+                } catch (ParseException | ExplainException e) {
                     System.err.println(e.getMessage());
                 }
             }
@@ -53,7 +54,7 @@ public class FldwCompiler implements FldwCompilerConstants {
                 }
                 try {
                     parse(in);
-                } catch (ParseException e) {
+                } catch (ParseException | ExplainException e) {
                     System.err.println(e.getMessage());
                 }
                 System.out.print("fldw > ");
@@ -61,1461 +62,1610 @@ public class FldwCompiler implements FldwCompilerConstants {
         }
     }
 
-    public static void parse(String src) throws ParseException {
+    public static void parse(String src) throws ParseException, ExplainException {
         Reader reader = new StringReader(src);
         new FldwCompiler(reader).program();
     }
 
 /*****************************************************************/
 /***************************语法分析*******************************/
-/*****************************************************************/
-  final public TerminalData terminal_data() throws ParseException {Datable.DataType type;
-    Token terminalToken;
-    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-    case INT_VALUE:{
-      terminalToken = jj_consume_token(INT_VALUE);
-type = Datable.DataType.Int;
-      break;
-      }
-    case DOUBLE_VALUE:{
-      terminalToken = jj_consume_token(DOUBLE_VALUE);
-type = Datable.DataType.Double;
-      break;
-      }
-    case BOOL_VALUE:{
-      terminalToken = jj_consume_token(BOOL_VALUE);
-type = Datable.DataType.Bool;
-      break;
-      }
-    case STRING_VALUE:{
-      terminalToken = jj_consume_token(STRING_VALUE);
-type = Datable.DataType.String;
-      break;
-      }
-    case NULL_VALUE:{
-      terminalToken = jj_consume_token(NULL_VALUE);
-type = null;
-      break;
-      }
-    default:
-      jj_la1[0] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
+    /*****************************************************************/
+    final public TerminalData terminal_data() throws ParseException, ExplainException {
+        Datable.DataType type;
+        Token terminalToken;
+        switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
+            case INT_VALUE: {
+                terminalToken = jj_consume_token(INT_VALUE);
+                type = Datable.DataType.Int;
+                break;
+            }
+            case DOUBLE_VALUE: {
+                terminalToken = jj_consume_token(DOUBLE_VALUE);
+                type = Datable.DataType.Double;
+                break;
+            }
+            case BOOL_VALUE: {
+                terminalToken = jj_consume_token(BOOL_VALUE);
+                type = Datable.DataType.Bool;
+                break;
+            }
+            case STRING_VALUE: {
+                terminalToken = jj_consume_token(STRING_VALUE);
+                type = Datable.DataType.String;
+                break;
+            }
+            case NULL_VALUE: {
+                terminalToken = jj_consume_token(NULL_VALUE);
+                type = null;
+                break;
+            }
+            default:
+                jj_la1[0] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
+        }
+        {
+            if ("" != null) return new TerminalData(type, terminalToken.image);
+        }
+        throw new Error("Missing return statement in function");
     }
-{if ("" != null) return new TerminalData(type, terminalToken.image);}
-    throw new Error("Missing return statement in function");
-}
 
-  final public SymbolData symbol_data() throws ParseException {Token symbolToken;
-    SymbolData symbolData;
-    boolean partialSymbol = false;
-    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-    case EXLM:{
-      jj_consume_token(EXLM);
-partialSymbol=true;
-      break;
-      }
-    default:
-      jj_la1[1] = jj_gen;
-      ;
-    }
-    symbolToken = jj_consume_token(SYMBOL);
-if (partialSymbol) {
+    final public SymbolData symbol_data() throws ParseException, ExplainException {
+        Token symbolToken;
+        SymbolData symbolData;
+        boolean partialSymbol = false;
+        switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
+            case EXLM: {
+                jj_consume_token(EXLM);
+                partialSymbol = true;
+                break;
+            }
+            default:
+                jj_la1[1] = jj_gen;
+                ;
+        }
+        symbolToken = jj_consume_token(SYMBOL);
+        if (partialSymbol) {
             symbolData = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(symbolToken.image, SymbolTable.SymbolType.Data).assertGetSymbolData();
         } else {
             symbolData = SymbolTable.CurrentSymbolTable().PutOrRecurseGetSymbol(symbolToken.image, SymbolTable.SymbolType.Data).assertGetSymbolData();
         }
-        {if ("" != null) return symbolData;}
-    throw new Error("Missing return statement in function");
-}
+        {
+            if ("" != null) return symbolData;
+        }
+        throw new Error("Missing return statement in function");
+    }
 
-  final public Datable expr_data() throws ParseException {ExprData topExprData = new ExprData();
-    Datable leftExprData;
-    Datable rightExprData = null;
-    // 语法：expr_data() = expr1_data() ( < LOGIC_OR > expr1_data() )*
+    final public Datable expr_data() throws ParseException, ExplainException {
+        ExprData topExprData = new ExprData();
+        Datable leftExprData;
+        Datable rightExprData = null;
+        // 语法：expr_data() = expr1_data() ( < LOGIC_OR > expr1_data() )*
         leftExprData = expr1_data();
-    label_1:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case LOGIC_OR:{
-        ;
-        break;
-        }
-      default:
-        jj_la1[2] = jj_gen;
-        break label_1;
-      }
-      jj_consume_token(LOGIC_OR);
-topExprData.setOp(ExprData.ExprOp.LogicOrOp);
-      rightExprData = expr1_data();
-topExprData.setLeftData(leftExprData);
-            topExprData.setRightData(rightExprData);
-            leftExprData = topExprData.Clone();
-    }
-if (rightExprData != null) {
-                    {if ("" != null) return topExprData;}
-                } else {
-                    {if ("" != null) return leftExprData;}
+        label_1:
+        while (true) {
+            switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
+                case LOGIC_OR: {
+                    ;
+                    break;
                 }
-    throw new Error("Missing return statement in function");
-}
+                default:
+                    jj_la1[2] = jj_gen;
+                    break label_1;
+            }
+            jj_consume_token(LOGIC_OR);
+            topExprData.setOp(ExprData.ExprOp.LogicOrOp);
+            rightExprData = expr1_data();
+            topExprData.setLeftData(leftExprData);
+            topExprData.setRightData(rightExprData);
+            leftExprData = topExprData.Clone();
+        }
+        if (rightExprData != null) {
+            {
+                if ("" != null) return topExprData;
+            }
+        } else {
+            {
+                if ("" != null) return leftExprData;
+            }
+        }
+        throw new Error("Missing return statement in function");
+    }
 
-  final public Datable expr1_data() throws ParseException {ExprData topExprData = new ExprData();
-    Datable leftExprData;
-    Datable rightExprData = null;
-    // 语法：expr1_data() = expr2_data() ( < LOGIC_AND > expr2_data() )*
+    final public Datable expr1_data() throws ParseException, ExplainException {
+        ExprData topExprData = new ExprData();
+        Datable leftExprData;
+        Datable rightExprData = null;
+        // 语法：expr1_data() = expr2_data() ( < LOGIC_AND > expr2_data() )*
         leftExprData = expr2_data();
-    label_2:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case LOGIC_AND:{
-        ;
-        break;
-        }
-      default:
-        jj_la1[3] = jj_gen;
-        break label_2;
-      }
-      jj_consume_token(LOGIC_AND);
-topExprData.setOp(ExprData.ExprOp.LogicAndOp);
-      rightExprData = expr2_data();
-topExprData.setLeftData(leftExprData);
+        label_2:
+        while (true) {
+            switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
+                case LOGIC_AND: {
+                    ;
+                    break;
+                }
+                default:
+                    jj_la1[3] = jj_gen;
+                    break label_2;
+            }
+            jj_consume_token(LOGIC_AND);
+            topExprData.setOp(ExprData.ExprOp.LogicAndOp);
+            rightExprData = expr2_data();
+            topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
             leftExprData = topExprData.Clone();
+        }
+        if (rightExprData != null) {
+            {
+                if ("" != null) return topExprData;
+            }
+        } else {
+            {
+                if ("" != null) return leftExprData;
+            }
+        }
+        throw new Error("Missing return statement in function");
     }
-if (rightExprData != null) {
-              {if ("" != null) return topExprData;}
-          } else {
-              {if ("" != null) return leftExprData;}
-          }
-    throw new Error("Missing return statement in function");
-}
 
-  final public Datable expr2_data() throws ParseException {ExprData topExprData = new ExprData();
-    Datable leftExprData;
-    Datable rightExprData = null;
-    // 语法：expr2_data() = expr3_data() ( (< LEFT > | < RIGHT > | < LEFT_EQUAL > | < RIGHT_EQUAL > | < LOGIC_EQUAL > | < LOGIC_NOT >) expr3_data() )*
+    final public Datable expr2_data() throws ParseException, ExplainException {
+        ExprData topExprData = new ExprData();
+        Datable leftExprData;
+        Datable rightExprData = null;
+        // 语法：expr2_data() = expr3_data() ( (< LEFT > | < RIGHT > | < LEFT_EQUAL > | < RIGHT_EQUAL > | < LOGIC_EQUAL > | < LOGIC_NOT >) expr3_data() )*
         leftExprData = expr3_data();
-    label_3:
-    while (true) {
-      if (jj_2_1(2)) {
-        ;
-      } else {
-        break label_3;
-      }
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case LEFT:{
-        jj_consume_token(LEFT);
-topExprData.setOp(ExprData.ExprOp.LeftOp);
-        break;
-        }
-      case RIGHT:{
-        jj_consume_token(RIGHT);
-topExprData.setOp(ExprData.ExprOp.RightOp);
-        break;
-        }
-      case LEFT_EQUAL:{
-        jj_consume_token(LEFT_EQUAL);
-topExprData.setOp(ExprData.ExprOp.LeftEqualOp);
-        break;
-        }
-      case RIGHT_EQUAL:{
-        jj_consume_token(RIGHT_EQUAL);
-topExprData.setOp(ExprData.ExprOp.RightEqualOp);
-        break;
-        }
-      case LOGIC_EQUAL:{
-        jj_consume_token(LOGIC_EQUAL);
-topExprData.setOp(ExprData.ExprOp.LogicEqualOp);
-        break;
-        }
-      case LOGIC_NOT:{
-        jj_consume_token(LOGIC_NOT);
-topExprData.setOp(ExprData.ExprOp.LogicNotEqualOp);
-        break;
-        }
-      default:
-        jj_la1[4] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-      rightExprData = expr3_data();
-topExprData.setLeftData(leftExprData);
+        label_3:
+        while (true) {
+            if (jj_2_1(2)) {
+                ;
+            } else {
+                break label_3;
+            }
+            switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
+                case LEFT: {
+                    jj_consume_token(LEFT);
+                    topExprData.setOp(ExprData.ExprOp.LeftOp);
+                    break;
+                }
+                case RIGHT: {
+                    jj_consume_token(RIGHT);
+                    topExprData.setOp(ExprData.ExprOp.RightOp);
+                    break;
+                }
+                case LEFT_EQUAL: {
+                    jj_consume_token(LEFT_EQUAL);
+                    topExprData.setOp(ExprData.ExprOp.LeftEqualOp);
+                    break;
+                }
+                case RIGHT_EQUAL: {
+                    jj_consume_token(RIGHT_EQUAL);
+                    topExprData.setOp(ExprData.ExprOp.RightEqualOp);
+                    break;
+                }
+                case LOGIC_EQUAL: {
+                    jj_consume_token(LOGIC_EQUAL);
+                    topExprData.setOp(ExprData.ExprOp.LogicEqualOp);
+                    break;
+                }
+                case LOGIC_NOT: {
+                    jj_consume_token(LOGIC_NOT);
+                    topExprData.setOp(ExprData.ExprOp.LogicNotEqualOp);
+                    break;
+                }
+                default:
+                    jj_la1[4] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
+            }
+            rightExprData = expr3_data();
+            topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
             leftExprData = topExprData.Clone();
+        }
+        if (rightExprData != null) {
+            {
+                if ("" != null) return topExprData;
+            }
+        } else {
+            {
+                if ("" != null) return leftExprData;
+            }
+        }
+        throw new Error("Missing return statement in function");
     }
-if (rightExprData != null) {
-               {if ("" != null) return topExprData;}
-           } else {
-               {if ("" != null) return leftExprData;}
-           }
-    throw new Error("Missing return statement in function");
-}
 
-  final public Datable expr3_data() throws ParseException {ExprData topExprData = new ExprData();
-    Datable leftExprData;
-    Datable rightExprData = null;
-    // 语法：expr3_data() = expr4_data() ( (< PLUS > | < MINUS >) expr4_data() )*
+    final public Datable expr3_data() throws ParseException, ExplainException {
+        ExprData topExprData = new ExprData();
+        Datable leftExprData;
+        Datable rightExprData = null;
+        // 语法：expr3_data() = expr4_data() ( (< PLUS > | < MINUS >) expr4_data() )*
         leftExprData = expr4_data();
-    label_4:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case PLUS:
-      case MINUS:{
-        ;
-        break;
-        }
-      default:
-        jj_la1[5] = jj_gen;
-        break label_4;
-      }
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case PLUS:{
-        jj_consume_token(PLUS);
-topExprData.setOp(ExprData.ExprOp.AddOp);
-        break;
-        }
-      case MINUS:{
-        jj_consume_token(MINUS);
-topExprData.setOp(ExprData.ExprOp.SubOp);
-        break;
-        }
-      default:
-        jj_la1[6] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-      rightExprData = expr4_data();
-topExprData.setLeftData(leftExprData);
+        label_4:
+        while (true) {
+            switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
+                case PLUS:
+                case MINUS: {
+                    ;
+                    break;
+                }
+                default:
+                    jj_la1[5] = jj_gen;
+                    break label_4;
+            }
+            switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
+                case PLUS: {
+                    jj_consume_token(PLUS);
+                    topExprData.setOp(ExprData.ExprOp.AddOp);
+                    break;
+                }
+                case MINUS: {
+                    jj_consume_token(MINUS);
+                    topExprData.setOp(ExprData.ExprOp.SubOp);
+                    break;
+                }
+                default:
+                    jj_la1[6] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
+            }
+            rightExprData = expr4_data();
+            topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
             leftExprData = topExprData.Clone();
-    }
-if (rightExprData != null) {
-            {if ("" != null) return topExprData;}
-        } else {
-            {if ("" != null) return leftExprData;}
         }
-    throw new Error("Missing return statement in function");
-}
+        if (rightExprData != null) {
+            {
+                if ("" != null) return topExprData;
+            }
+        } else {
+            {
+                if ("" != null) return leftExprData;
+            }
+        }
+        throw new Error("Missing return statement in function");
+    }
 
-  final public Datable expr4_data() throws ParseException {ExprData topExprData = new ExprData();
-    Datable leftExprData;
-    Datable rightExprData = null;
-    // 语法：expr4_data() = term() ( (< MULT > | < DIV > | < MOD >) term() )*
+    final public Datable expr4_data() throws ParseException, ExplainException {
+        ExprData topExprData = new ExprData();
+        Datable leftExprData;
+        Datable rightExprData = null;
+        // 语法：expr4_data() = term() ( (< MULT > | < DIV > | < MOD >) term() )*
         leftExprData = term();
-    label_5:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case MULT:
-      case DIV:
-      case MOD:{
-        ;
-        break;
-        }
-      default:
-        jj_la1[7] = jj_gen;
-        break label_5;
-      }
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case MULT:{
-        jj_consume_token(MULT);
-topExprData.setOp(ExprData.ExprOp.MulOp);
-        break;
-        }
-      case DIV:{
-        jj_consume_token(DIV);
-topExprData.setOp(ExprData.ExprOp.DivOp);
-        break;
-        }
-      case MOD:{
-        jj_consume_token(MOD);
-topExprData.setOp(ExprData.ExprOp.ModOp);
-        break;
-        }
-      default:
-        jj_la1[8] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-      rightExprData = term();
-topExprData.setLeftData(leftExprData);
+        label_5:
+        while (true) {
+            switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
+                case MULT:
+                case DIV:
+                case MOD: {
+                    ;
+                    break;
+                }
+                default:
+                    jj_la1[7] = jj_gen;
+                    break label_5;
+            }
+            switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
+                case MULT: {
+                    jj_consume_token(MULT);
+                    topExprData.setOp(ExprData.ExprOp.MulOp);
+                    break;
+                }
+                case DIV: {
+                    jj_consume_token(DIV);
+                    topExprData.setOp(ExprData.ExprOp.DivOp);
+                    break;
+                }
+                case MOD: {
+                    jj_consume_token(MOD);
+                    topExprData.setOp(ExprData.ExprOp.ModOp);
+                    break;
+                }
+                default:
+                    jj_la1[8] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
+            }
+            rightExprData = term();
+            topExprData.setLeftData(leftExprData);
             topExprData.setRightData(rightExprData);
             leftExprData = topExprData.Clone();
-    }
-if (rightExprData != null) {
-            {if ("" != null) return topExprData;}
+        }
+        if (rightExprData != null) {
+            {
+                if ("" != null) return topExprData;
+            }
         } else {
-            {if ("" != null) return leftExprData;}
+            {
+                if ("" != null) return leftExprData;
+            }
         }
-    throw new Error("Missing return statement in function");
-}
-
-  final public Datable term() throws ParseException {Datable data;
-    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-    case INT_VALUE:
-    case DOUBLE_VALUE:
-    case BOOL_VALUE:
-    case STRING_VALUE:
-    case NULL_VALUE:{
-      data = terminal_data();
-      break;
-      }
-    case EXLM:
-    case SYMBOL:{
-      data = symbol_data();
-      break;
-      }
-    case LBR:{
-      jj_consume_token(LBR);
-      data = expr_data();
-      jj_consume_token(RBR);
-      break;
-      }
-    default:
-      jj_la1[9] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
+        throw new Error("Missing return statement in function");
     }
-{if ("" != null) return data;}
-    throw new Error("Missing return statement in function");
-}
 
-  final public Datable data() throws ParseException {Datable data;
-    if (jj_2_2(3)) {
-      data = expr_data();
-    } else if (jj_2_3(3)) {
-      data = symbol_data();
-    } else if (jj_2_4(3)) {
-      data = terminal_data();
-    } else {
-      jj_consume_token(-1);
-      throw new ParseException();
-    }
-{if ("" != null) return data;}
-    throw new Error("Missing return statement in function");
-}
-
-  final public ListFlow list_flow() throws ParseException {ListFlow listFlow = new ListFlow();
-    Datable data;
-    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-    case HASHTAG:{
-      jj_consume_token(HASHTAG);
-listFlow.setCopyValue(true);
-      break;
-      }
-    default:
-      jj_la1[10] = jj_gen;
-      ;
-    }
-    jj_consume_token(LSBR);
-    label_6:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case COMMA:
-      case LBR:
-      case EXLM:
-      case INT_VALUE:
-      case DOUBLE_VALUE:
-      case BOOL_VALUE:
-      case STRING_VALUE:
-      case NULL_VALUE:
-      case SYMBOL:{
-        ;
-        break;
+    final public Datable term() throws ParseException, ExplainException {
+        Datable data;
+        switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
+            case INT_VALUE:
+            case DOUBLE_VALUE:
+            case BOOL_VALUE:
+            case STRING_VALUE:
+            case NULL_VALUE: {
+                data = terminal_data();
+                break;
+            }
+            case EXLM:
+            case SYMBOL: {
+                data = symbol_data();
+                break;
+            }
+            case LBR: {
+                jj_consume_token(LBR);
+                data = expr_data();
+                jj_consume_token(RBR);
+                break;
+            }
+            default:
+                jj_la1[9] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
         }
-      default:
-        jj_la1[11] = jj_gen;
-        break label_6;
-      }
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case COMMA:{
-        jj_consume_token(COMMA);
-        break;
+        {
+            if ("" != null) return data;
         }
-      default:
-        jj_la1[12] = jj_gen;
-        ;
-      }
-      data = data();
-listFlow.Push(data);
+        throw new Error("Missing return statement in function");
     }
-    jj_consume_token(RSBR);
-{if ("" != null) return listFlow;}
-    throw new Error("Missing return statement in function");
-}
 
-  final public IfElseFlow if_else_flow() throws ParseException {Datable conditionData;
-    Flowable trueFlow;
-    Flowable falseFlow = null;
-    jj_consume_token(IF);
-    jj_consume_token(LBR);
-    conditionData = data();
-    jj_consume_token(RBR);
-    trueFlow = block_flow("if");
-    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-    case ELSE:{
-      jj_consume_token(ELSE);
-      falseFlow = block_flow("else");
-      break;
-      }
-    default:
-      jj_la1[13] = jj_gen;
-      ;
+    final public Datable data() throws ParseException, ExplainException {
+        Datable data;
+        if (jj_2_2(3)) {
+            data = expr_data();
+        } else if (jj_2_3(3)) {
+            data = symbol_data();
+        } else if (jj_2_4(3)) {
+            data = terminal_data();
+        } else {
+            jj_consume_token(-1);
+            throw new ParseException();
+        }
+        {
+            if ("" != null) return data;
+        }
+        throw new Error("Missing return statement in function");
     }
-{if ("" != null) return new IfElseFlow(conditionData, trueFlow, falseFlow);}
-    throw new Error("Missing return statement in function");
-}
 
-  final public WhileFlow while_flow() throws ParseException {Datable conditionData;
-    Flowable trueFlow;
-    jj_consume_token(WHILE);
-    jj_consume_token(LBR);
-    conditionData = data();
-    jj_consume_token(RBR);
-    trueFlow = block_flow("while");
-{if ("" != null) return new WhileFlow(conditionData, trueFlow);}
-    throw new Error("Missing return statement in function");
-}
+    final public ListFlow list_flow() throws ParseException, ExplainException {
+        ListFlow listFlow = new ListFlow();
+        Datable data;
+        switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
+            case HASHTAG: {
+                jj_consume_token(HASHTAG);
+                listFlow.setCopyValue(true);
+                break;
+            }
+            default:
+                jj_la1[10] = jj_gen;
+                ;
+        }
+        jj_consume_token(LSBR);
+        label_6:
+        while (true) {
+            switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
+                case COMMA:
+                case LBR:
+                case EXLM:
+                case INT_VALUE:
+                case DOUBLE_VALUE:
+                case BOOL_VALUE:
+                case STRING_VALUE:
+                case NULL_VALUE:
+                case SYMBOL: {
+                    ;
+                    break;
+                }
+                default:
+                    jj_la1[11] = jj_gen;
+                    break label_6;
+            }
+            switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
+                case COMMA: {
+                    jj_consume_token(COMMA);
+                    break;
+                }
+                default:
+                    jj_la1[12] = jj_gen;
+                    ;
+            }
+            data = data();
+            listFlow.Push(data);
+        }
+        jj_consume_token(RSBR);
+        {
+            if ("" != null) return listFlow;
+        }
+        throw new Error("Missing return statement in function");
+    }
 
-  final public ForFlow for_flow() throws ParseException {Flowable iterFlow;
-    SymbolData iterSymbolData;
-    BlockFlow forBlockFlow;
-    jj_consume_token(FOR);
-    jj_consume_token(LBR);
-    iterFlow = flow();
-    jj_consume_token(MATCHING);
-    iterSymbolData = symbol_data();
-    jj_consume_token(RBR);
-    forBlockFlow = block_flow("for");
-{if ("" != null) return new ForFlow(iterFlow, iterSymbolData, forBlockFlow);}
-    throw new Error("Missing return statement in function");
-}
+    final public IfElseFlow if_else_flow() throws ParseException, ExplainException {
+        Datable conditionData;
+        Flowable trueFlow;
+        Flowable falseFlow = null;
+        jj_consume_token(IF);
+        jj_consume_token(LBR);
+        conditionData = data();
+        jj_consume_token(RBR);
+        trueFlow = block_flow("if");
+        switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
+            case ELSE: {
+                jj_consume_token(ELSE);
+                falseFlow = block_flow("else");
+                break;
+            }
+            default:
+                jj_la1[13] = jj_gen;
+                ;
+        }
+        {
+            if ("" != null) return new IfElseFlow(conditionData, trueFlow, falseFlow);
+        }
+        throw new Error("Missing return statement in function");
+    }
 
-  final public DelayFuncFlow func_flow() throws ParseException {Token funcSymbol;
-    ListFlow paramFlow = null;
-    DelayFuncFlow funcFlow;
-    // 语法：func_flow() = < SYMBOL > < LBR > [ list_flow() ] < RBR >
+    final public WhileFlow while_flow() throws ParseException, ExplainException {
+        Datable conditionData;
+        Flowable trueFlow;
+        jj_consume_token(WHILE);
+        jj_consume_token(LBR);
+        conditionData = data();
+        jj_consume_token(RBR);
+        trueFlow = block_flow("while");
+        {
+            if ("" != null) return new WhileFlow(conditionData, trueFlow);
+        }
+        throw new Error("Missing return statement in function");
+    }
+
+    final public ForFlow for_flow() throws ParseException, ExplainException {
+        Flowable iterFlow;
+        SymbolData iterSymbolData;
+        BlockFlow forBlockFlow;
+        jj_consume_token(FOR);
+        jj_consume_token(LBR);
+        iterFlow = flow();
+        jj_consume_token(MATCHING);
+        iterSymbolData = symbol_data();
+        jj_consume_token(RBR);
+        forBlockFlow = block_flow("for");
+        {
+            if ("" != null) return new ForFlow(iterFlow, iterSymbolData, forBlockFlow);
+        }
+        throw new Error("Missing return statement in function");
+    }
+
+    final public DelayFuncFlow func_flow() throws ParseException, ExplainException {
+        Token funcSymbol;
+        ListFlow paramFlow = null;
+        DelayFuncFlow funcFlow;
+        // 语法：func_flow() = < SYMBOL > < LBR > [ list_flow() ] < RBR >
         funcSymbol = jj_consume_token(SYMBOL);
-    jj_consume_token(LBR);
-    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-    case LSBR:
-    case HASHTAG:{
-      paramFlow = list_flow();
-      break;
-      }
-    default:
-      jj_la1[14] = jj_gen;
-      ;
-    }
-    jj_consume_token(RBR);
-funcFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(funcSymbol.image).assertGetDelayFuncFlow();
+        jj_consume_token(LBR);
+        switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
+            case LSBR:
+            case HASHTAG: {
+                paramFlow = list_flow();
+                break;
+            }
+            default:
+                jj_la1[14] = jj_gen;
+                ;
+        }
+        jj_consume_token(RBR);
+        funcFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(funcSymbol.image).assertGetDelayFuncFlow();
         if (paramFlow != null) {
             funcFlow.setParamFlow(paramFlow);
         }
-        {if ("" != null) return funcFlow;}
-    throw new Error("Missing return statement in function");
-}
-
-  final public HeadTailFlow head_tail_flow() throws ParseException {SymbolData headData;
-    Token tailListFlowSymbol;
-    Flowable tailListFlow;
-    HeadTailFlow headTailFlow;
-    boolean partialSymbol=false;
-    jj_consume_token(LSBR);
-    headData = symbol_data();
-    jj_consume_token(SEMIC);
-    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-    case EXLM:{
-      jj_consume_token(EXLM);
-partialSymbol=true;
-      break;
-      }
-    default:
-      jj_la1[15] = jj_gen;
-      ;
+        {
+            if ("" != null) return funcFlow;
+        }
+        throw new Error("Missing return statement in function");
     }
-    tailListFlowSymbol = jj_consume_token(SYMBOL);
-if (partialSymbol) {
+
+    final public HeadTailFlow head_tail_flow() throws ParseException, ExplainException {
+        SymbolData headData;
+        Token tailListFlowSymbol;
+        Flowable tailListFlow;
+        HeadTailFlow headTailFlow;
+        boolean partialSymbol = false;
+        jj_consume_token(LSBR);
+        headData = symbol_data();
+        jj_consume_token(SEMIC);
+        switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
+            case EXLM: {
+                jj_consume_token(EXLM);
+                partialSymbol = true;
+                break;
+            }
+            default:
+                jj_la1[15] = jj_gen;
+                ;
+        }
+        tailListFlowSymbol = jj_consume_token(SYMBOL);
+        if (partialSymbol) {
             tailListFlow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(tailListFlowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
         } else {
             tailListFlow = SymbolTable.CurrentSymbolTable().PutOrRecurseGetSymbol(tailListFlowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
         }
-    jj_consume_token(RSBR);
-{if ("" != null) return new HeadTailFlow(headData, tailListFlow);}
-    throw new Error("Missing return statement in function");
-}
+        jj_consume_token(RSBR);
+        {
+            if ("" != null) return new HeadTailFlow(headData, tailListFlow);
+        }
+        throw new Error("Missing return statement in function");
+    }
 
-  final public BlockFlow block_flow(String blockName) throws ParseException {BlockFlow blockFlow;
-    Flowable topFlow;
-    jj_consume_token(LCBR);
-Core.AddEager();
+    final public BlockFlow block_flow(String blockName) throws ParseException, ExplainException {
+        BlockFlow blockFlow;
+        Flowable topFlow;
+        jj_consume_token(LCBR);
+        Core.AddEager();
         SymbolTable.EnterBlock(blockName);
         blockFlow = new BlockFlow(); // 在新符号表压栈之后再创建流块
 
-    label_7:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case LCBR:
-      case LSBR:
-      case IF:
-      case WHILE:
-      case FOR:
-      case HASHTAG:
-      case EXLM:
-      case SYMBOL:{
-        ;
-        break;
-        }
-      default:
-        jj_la1[16] = jj_gen;
-        break label_7;
-      }
-      topFlow = flowing();
-blockFlow.addFlow(topFlow);
-    }
-    jj_consume_token(RCBR);
-Core.SubEager(); SymbolTable.ExitBlock();
-{if ("" != null) return blockFlow;}
-    throw new Error("Missing return statement in function");
-}
-
-  final public Flowable flow() throws ParseException {Flowable flow = new ListFlow();
-    Token flowSymbol;
-    boolean partialSymbol=false;
-    if (jj_2_5(2)) {
-      flow = func_flow();
-    } else if (jj_2_6(3)) {
-      flow = head_tail_flow();
-    } else {
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case EXLM:
-      case SYMBOL:{
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case EXLM:{
-          jj_consume_token(EXLM);
-partialSymbol=true;
-          break;
-          }
-        default:
-          jj_la1[17] = jj_gen;
-          ;
-        }
-        flowSymbol = jj_consume_token(SYMBOL);
-if (partialSymbol) {
-                    flow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
-                } else {
-                    flow = SymbolTable.CurrentSymbolTable().PutOrRecurseGetSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
+        label_7:
+        while (true) {
+            switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
+                case LCBR:
+                case LSBR:
+                case IF:
+                case WHILE:
+                case FOR:
+                case HASHTAG:
+                case EXLM:
+                case SYMBOL: {
+                    ;
+                    break;
                 }
-        break;
+                default:
+                    jj_la1[16] = jj_gen;
+                    break label_7;
+            }
+            topFlow = flowing();
+            blockFlow.addFlow(topFlow);
         }
-      case LSBR:
-      case HASHTAG:{
-        flow = list_flow();
-        break;
+        jj_consume_token(RCBR);
+        Core.SubEager();
+        SymbolTable.ExitBlock();
+        {
+            if ("" != null) return blockFlow;
         }
-      case IF:{
-        flow = if_else_flow();
-        break;
-        }
-      case WHILE:{
-        flow = while_flow();
-        break;
-        }
-      case LCBR:{
-        flow = block_flow("block");
-        break;
-        }
-      case FOR:{
-        flow = for_flow();
-        break;
-        }
-      default:
-        jj_la1[18] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
+        throw new Error("Missing return statement in function");
     }
-{if ("" != null) return flow;}
-    throw new Error("Missing return statement in function");
-}
 
-  final public Flowable flowing() throws ParseException {Flowable topFlow = new ListFlow();
-    Flowable leftFlow = new ListFlow();
-    Flowable rightFlow = new ListFlow();
-    // 语法：flowing() = flow() ( ( < MATCHING > | < FLOWING > ) flow() )*
-        topFlow = flow();
-leftFlow = topFlow;
-    label_8:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case FLOWING:
-      case MATCHING:{
-        ;
-        break;
+    final public Flowable flow() throws ParseException, ExplainException {
+        Flowable flow = new ListFlow();
+        Token flowSymbol;
+        boolean partialSymbol = false;
+        if (jj_2_5(2)) {
+            flow = func_flow();
+        } else if (jj_2_6(3)) {
+            flow = head_tail_flow();
+        } else {
+            switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
+                case EXLM:
+                case SYMBOL: {
+                    switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
+                        case EXLM: {
+                            jj_consume_token(EXLM);
+                            partialSymbol = true;
+                            break;
+                        }
+                        default:
+                            jj_la1[17] = jj_gen;
+                            ;
+                    }
+                    flowSymbol = jj_consume_token(SYMBOL);
+                    if (partialSymbol) {
+                        flow = SymbolTable.CurrentSymbolTable().PutOrGetSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
+                    } else {
+                        flow = SymbolTable.CurrentSymbolTable().PutOrRecurseGetSymbol(flowSymbol.image, SymbolTable.SymbolType.Flow).assertGetFlowable();
+                    }
+                    break;
+                }
+                case LSBR:
+                case HASHTAG: {
+                    flow = list_flow();
+                    break;
+                }
+                case IF: {
+                    flow = if_else_flow();
+                    break;
+                }
+                case WHILE: {
+                    flow = while_flow();
+                    break;
+                }
+                case LCBR: {
+                    flow = block_flow("block");
+                    break;
+                }
+                case FOR: {
+                    flow = for_flow();
+                    break;
+                }
+                default:
+                    jj_la1[18] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
+            }
         }
-      default:
-        jj_la1[19] = jj_gen;
-        break label_8;
-      }
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case MATCHING:{
-        jj_consume_token(MATCHING);
-leftFlow.SetFlowOp(Flowable.FlowOp.Matching);
-        break;
+        {
+            if ("" != null) return flow;
         }
-      case FLOWING:{
-        jj_consume_token(FLOWING);
-leftFlow.SetFlowOp(Flowable.FlowOp.Pushing);
-        break;
-        }
-      default:
-        jj_la1[20] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-      rightFlow = flow();
-leftFlow.SetNextFlowing(rightFlow);
-        leftFlow = rightFlow;
+        throw new Error("Missing return statement in function");
     }
-if (Core.IsEager()) {
+
+    final public Flowable flowing() throws ParseException, ExplainException {
+        Flowable topFlow = new ListFlow();
+        Flowable leftFlow = new ListFlow();
+        Flowable rightFlow = new ListFlow();
+        // 语法：flowing() = flow() ( ( < MATCHING > | < FLOWING > ) flow() )*
+        topFlow = flow();
+        leftFlow = topFlow;
+        label_8:
+        while (true) {
+            switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
+                case FLOWING:
+                case MATCHING: {
+                    ;
+                    break;
+                }
+                default:
+                    jj_la1[19] = jj_gen;
+                    break label_8;
+            }
+            switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
+                case MATCHING: {
+                    jj_consume_token(MATCHING);
+                    leftFlow.SetFlowOp(Flowable.FlowOp.Matching);
+                    break;
+                }
+                case FLOWING: {
+                    jj_consume_token(FLOWING);
+                    leftFlow.SetFlowOp(Flowable.FlowOp.Pushing);
+                    break;
+                }
+                default:
+                    jj_la1[20] = jj_gen;
+                    jj_consume_token(-1);
+                    throw new ParseException();
+            }
+            rightFlow = flow();
+            leftFlow.SetNextFlowing(rightFlow);
+            leftFlow = rightFlow;
+        }
+        if (Core.IsEager()) {
             topFlow.Flowing();
         }
-        {if ("" != null) return topFlow;}
-    throw new Error("Missing return statement in function");
-}
+        {
+            if ("" != null) return topFlow;
+        }
+        throw new Error("Missing return statement in function");
+    }
 
-  final public void def_func_stmt() throws ParseException {Token funcSymbol;
-    int count = 0; // {: +1; }: -1
-    Token curToken;
-    StringBuilder funcBuffer = new StringBuilder();
-    jj_consume_token(FUNC);
-    funcSymbol = jj_consume_token(SYMBOL);
-do{
+    final public void def_func_stmt() throws ParseException, ExplainException {
+        Token funcSymbol;
+        int count = 0; // {: +1; }: -1
+        Token curToken;
+        StringBuilder funcBuffer = new StringBuilder();
+        jj_consume_token(FUNC);
+        funcSymbol = jj_consume_token(SYMBOL);
+        do {
             curToken = token_source.getNextToken();
             funcBuffer.append(curToken);
             funcBuffer.append(" ");
-        } while (curToken.image!= ")");
+        } while (curToken.image != ")");
         curToken = token_source.getNextToken();
-        if (curToken.image=="{"){
+        if (curToken.image == "{") {
             funcBuffer.append(curToken);
             funcBuffer.append(" ");
             count++;
-            do{
+            do {
                 curToken = token_source.getNextToken();
                 funcBuffer.append(curToken);
                 funcBuffer.append(" ");
-                if (curToken.image=="{") {
+                if (curToken.image == "{") {
                     count++;
-                } else if (curToken.image=="}") {
+                } else if (curToken.image == "}") {
                     count--;
                 }
-            }while (count!=0);
+            } while (count != 0);
         }
-SymbolTable.CurrentSymbolTable().PutSymbol(funcSymbol.image, SymbolTable.SymbolType.Function, funcBuffer.toString());
-}
-
-  final public FuncFlow make_func_flow(String funcName) throws ParseException {ListFlow param_flow = null;
-    BlockFlow block_flow;
-    jj_consume_token(LBR);
-SymbolTable.EnterBlock(funcName);
-    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-    case LSBR:
-    case HASHTAG:{
-      param_flow = list_flow();
-      break;
-      }
-    default:
-      jj_la1[21] = jj_gen;
-      ;
+        SymbolTable.CurrentSymbolTable().PutSymbol(funcSymbol.image, SymbolTable.SymbolType.Function, funcBuffer.toString());
     }
-    jj_consume_token(RBR);
-    block_flow = block_flow("func");
-SymbolTable.ExitBlock();
-{if ("" != null) return new FuncFlow(param_flow, block_flow);};
-    throw new Error("Missing return statement in function");
-}
 
-  final public void import_stmt() throws ParseException {Token package_name;
-    Token module_name;
-    jj_consume_token(IMPORT);
-    package_name = jj_consume_token(SYMBOL);
-    jj_consume_token(DOT);
-    module_name = jj_consume_token(SYMBOL);
-try {
-             Class<?> clazz = Class.forName(package_name.image + "." + module_name.image);
-             Method loadModule = clazz.getMethod(Core.ModuleLoadFunc);
-             loadModule.invoke(null);
-        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
-            {if (true) throw new RuntimeException(ex.getMessage());}
+    final public FuncFlow make_func_flow(String funcName) throws ParseException, ExplainException {
+        ListFlow param_flow = null;
+        BlockFlow block_flow;
+        jj_consume_token(LBR);
+        SymbolTable.EnterBlock(funcName);
+        switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
+            case LSBR:
+            case HASHTAG: {
+                param_flow = list_flow();
+                break;
+            }
+            default:
+                jj_la1[21] = jj_gen;
+                ;
         }
-}
-
-  final public void stmt() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-    case LCBR:
-    case LSBR:
-    case IF:
-    case WHILE:
-    case FOR:
-    case HASHTAG:
-    case EXLM:
-    case SYMBOL:{
-      flowing();
-      break;
-      }
-    case FUNC:{
-      def_func_stmt();
-      break;
-      }
-    case IMPORT:{
-      import_stmt();
-{if ("" != null) return;}
-      break;
-      }
-    default:
-      jj_la1[22] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
-    }
-}
-
-  final public void stmts() throws ParseException {
-    label_9:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case LCBR:
-      case LSBR:
-      case IF:
-      case WHILE:
-      case FOR:
-      case FUNC:
-      case HASHTAG:
-      case EXLM:
-      case IMPORT:
-      case SYMBOL:{
+        jj_consume_token(RBR);
+        block_flow = block_flow("func");
+        SymbolTable.ExitBlock();
+        {
+            if ("" != null) return new FuncFlow(param_flow, block_flow);
+        }
         ;
-        break;
+        throw new Error("Missing return statement in function");
+    }
+
+    final public void import_stmt() throws ParseException, ExplainException {
+        Token package_name;
+        Token module_name;
+        jj_consume_token(IMPORT);
+        package_name = jj_consume_token(SYMBOL);
+        jj_consume_token(DOT);
+        module_name = jj_consume_token(SYMBOL);
+        try {
+            Class<?> clazz = Class.forName(package_name.image + "." + module_name.image);
+            Method loadModule = clazz.getMethod(Core.ModuleLoadFunc);
+            loadModule.invoke(null);
+        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
+            {
+                if (true) throw new RuntimeException(ex.getMessage());
+            }
         }
-      default:
-        jj_la1[23] = jj_gen;
-        break label_9;
-      }
-      stmt();
     }
-{if ("" != null) return;}
-}
 
-  final public void program() throws ParseException {
-    stmts();
-    jj_consume_token(0);
-{if ("" != null) return;}
-}
-
-  private boolean jj_2_1(int xla)
- {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return (!jj_3_1()); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(0, xla); }
-  }
-
-  private boolean jj_2_2(int xla)
- {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return (!jj_3_2()); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(1, xla); }
-  }
-
-  private boolean jj_2_3(int xla)
- {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return (!jj_3_3()); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(2, xla); }
-  }
-
-  private boolean jj_2_4(int xla)
- {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return (!jj_3_4()); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(3, xla); }
-  }
-
-  private boolean jj_2_5(int xla)
- {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return (!jj_3_5()); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(4, xla); }
-  }
-
-  private boolean jj_2_6(int xla)
- {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return (!jj_3_6()); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(5, xla); }
-  }
-
-  private boolean jj_3R_expr4_data_366_13_43()
- {
-    if (jj_scan_token(MOD)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_expr4_data_365_13_42()
- {
-    if (jj_scan_token(DIV)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_expr1_data_274_9_33()
- {
-    if (jj_scan_token(LOGIC_AND)) return true;
-    if (jj_3R_expr2_data_299_5_32()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_expr4_data_364_13_41()
- {
-    if (jj_scan_token(MULT)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_expr4_data_364_9_38()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_expr4_data_364_13_41()) {
-    jj_scanpos = xsp;
-    if (jj_3R_expr4_data_365_13_42()) {
-    jj_scanpos = xsp;
-    if (jj_3R_expr4_data_366_13_43()) return true;
+    final public void stmt() throws ParseException, ExplainException {
+        switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
+            case LCBR:
+            case LSBR:
+            case IF:
+            case WHILE:
+            case FOR:
+            case HASHTAG:
+            case EXLM:
+            case SYMBOL: {
+                flowing();
+                break;
+            }
+            case FUNC: {
+                def_func_stmt();
+                break;
+            }
+            case IMPORT: {
+                import_stmt();
+                {
+                    if ("" != null) return;
+                }
+                break;
+            }
+            default:
+                jj_la1[22] = jj_gen;
+                jj_consume_token(-1);
+                throw new ParseException();
+        }
     }
+
+    final public void stmts() throws ParseException, ExplainException {
+        label_9:
+        while (true) {
+            switch ((jj_ntk == -1) ? jj_ntk_f() : jj_ntk) {
+                case LCBR:
+                case LSBR:
+                case IF:
+                case WHILE:
+                case FOR:
+                case FUNC:
+                case HASHTAG:
+                case EXLM:
+                case IMPORT:
+                case SYMBOL: {
+                    ;
+                    break;
+                }
+                default:
+                    jj_la1[23] = jj_gen;
+                    break label_9;
+            }
+            stmt();
+        }
+        {
+            if ("" != null) return;
+        }
     }
-    if (jj_3R_term_390_5_31()) return true;
-    return false;
-  }
 
-  private boolean jj_3R_expr1_data_272_5_23()
- {
-    if (jj_3R_expr2_data_299_5_32()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_expr1_data_274_9_33()) { jj_scanpos = xsp; break; }
+    final public void program() throws ParseException, ExplainException {
+        stmts();
+        jj_consume_token(0);
+        {
+            if ("" != null) return;
+        }
     }
-    return false;
-  }
 
-  private boolean jj_3_6()
- {
-    if (jj_3R_head_tail_flow_502_5_21()) return true;
-    return false;
-  }
-
-  private boolean jj_3_5()
- {
-    if (jj_3R_func_flow_482_5_20()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_expr4_data_362_5_22()
- {
-    if (jj_3R_term_390_5_31()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_expr4_data_364_9_38()) { jj_scanpos = xsp; break; }
+    private boolean jj_2_1(int xla) {
+        jj_la = xla;
+        jj_lastpos = jj_scanpos = token;
+        try {
+            return (!jj_3_1());
+        } catch (LookaheadSuccess ls) {
+            return true;
+        } finally {
+            jj_save(0, xla);
+        }
     }
-    return false;
-  }
 
-  private boolean jj_3R_expr_data_247_9_24()
- {
-    if (jj_scan_token(LOGIC_OR)) return true;
-    if (jj_3R_expr1_data_272_5_23()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_expr3_data_336_13_40()
- {
-    if (jj_scan_token(MINUS)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_expr3_data_335_13_39()
- {
-    if (jj_scan_token(PLUS)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_expr_data_245_5_17()
- {
-    if (jj_3R_expr1_data_272_5_23()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_expr_data_247_9_24()) { jj_scanpos = xsp; break; }
+    private boolean jj_2_2(int xla) {
+        jj_la = xla;
+        jj_lastpos = jj_scanpos = token;
+        try {
+            return (!jj_3_2());
+        } catch (LookaheadSuccess ls) {
+            return true;
+        } finally {
+            jj_save(1, xla);
+        }
     }
-    return false;
-  }
 
-  private boolean jj_3R_expr3_data_335_9_37()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_expr3_data_335_13_39()) {
-    jj_scanpos = xsp;
-    if (jj_3R_expr3_data_336_13_40()) return true;
+    private boolean jj_2_3(int xla) {
+        jj_la = xla;
+        jj_lastpos = jj_scanpos = token;
+        try {
+            return (!jj_3_3());
+        } catch (LookaheadSuccess ls) {
+            return true;
+        } finally {
+            jj_save(2, xla);
+        }
     }
-    if (jj_3R_expr4_data_362_5_22()) return true;
-    return false;
-  }
 
-  private boolean jj_3R_expr3_data_333_5_16()
- {
-    if (jj_3R_expr4_data_362_5_22()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_expr3_data_335_9_37()) { jj_scanpos = xsp; break; }
+    private boolean jj_2_4(int xla) {
+        jj_la = xla;
+        jj_lastpos = jj_scanpos = token;
+        try {
+            return (!jj_3_4());
+        } catch (LookaheadSuccess ls) {
+            return true;
+        } finally {
+            jj_save(3, xla);
+        }
     }
-    return false;
-  }
 
-  private boolean jj_3R_symbol_data_225_7_25()
- {
-    if (jj_scan_token(EXLM)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_symbol_data_225_5_18()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_symbol_data_225_7_25()) jj_scanpos = xsp;
-    if (jj_scan_token(SYMBOL)) return true;
-    return false;
-  }
-
-  private boolean jj_3_4()
- {
-    if (jj_3R_terminal_data_194_5_19()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_expr2_data_307_13_15()
- {
-    if (jj_scan_token(LOGIC_NOT)) return true;
-    return false;
-  }
-
-  private boolean jj_3_3()
- {
-    if (jj_3R_symbol_data_225_5_18()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_expr2_data_306_13_14()
- {
-    if (jj_scan_token(LOGIC_EQUAL)) return true;
-    return false;
-  }
-
-  private boolean jj_3_2()
- {
-    if (jj_3R_expr_data_245_5_17()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_expr2_data_305_13_13()
- {
-    if (jj_scan_token(RIGHT_EQUAL)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_expr2_data_304_13_12()
- {
-    if (jj_scan_token(LEFT_EQUAL)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_head_tail_flow_502_5_21()
- {
-    if (jj_scan_token(LSBR)) return true;
-    if (jj_3R_symbol_data_225_5_18()) return true;
-    if (jj_scan_token(SEMIC)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_expr2_data_303_13_11()
- {
-    if (jj_scan_token(RIGHT)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_expr2_data_302_13_10()
- {
-    if (jj_scan_token(LEFT)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_terminal_data_210_9_30()
- {
-    if (jj_scan_token(NULL_VALUE)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_terminal_data_206_9_29()
- {
-    if (jj_scan_token(STRING_VALUE)) return true;
-    return false;
-  }
-
-  private boolean jj_3_1()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_expr2_data_302_13_10()) {
-    jj_scanpos = xsp;
-    if (jj_3R_expr2_data_303_13_11()) {
-    jj_scanpos = xsp;
-    if (jj_3R_expr2_data_304_13_12()) {
-    jj_scanpos = xsp;
-    if (jj_3R_expr2_data_305_13_13()) {
-    jj_scanpos = xsp;
-    if (jj_3R_expr2_data_306_13_14()) {
-    jj_scanpos = xsp;
-    if (jj_3R_expr2_data_307_13_15()) return true;
+    private boolean jj_2_5(int xla) {
+        jj_la = xla;
+        jj_lastpos = jj_scanpos = token;
+        try {
+            return (!jj_3_5());
+        } catch (LookaheadSuccess ls) {
+            return true;
+        } finally {
+            jj_save(4, xla);
+        }
     }
+
+    private boolean jj_2_6(int xla) {
+        jj_la = xla;
+        jj_lastpos = jj_scanpos = token;
+        try {
+            return (!jj_3_6());
+        } catch (LookaheadSuccess ls) {
+            return true;
+        } finally {
+            jj_save(5, xla);
+        }
     }
+
+    private boolean jj_3R_expr4_data_366_13_43() {
+        if (jj_scan_token(MOD)) return true;
+        return false;
     }
+
+    private boolean jj_3R_expr4_data_365_13_42() {
+        if (jj_scan_token(DIV)) return true;
+        return false;
     }
+
+    private boolean jj_3R_expr1_data_274_9_33() {
+        if (jj_scan_token(LOGIC_AND)) return true;
+        if (jj_3R_expr2_data_299_5_32()) return true;
+        return false;
     }
-    if (jj_3R_expr3_data_333_5_16()) return true;
-    return false;
-  }
 
-  private boolean jj_3R_term_392_10_36()
- {
-    if (jj_scan_token(LBR)) return true;
-    if (jj_3R_expr_data_245_5_17()) return true;
-    if (jj_scan_token(RBR)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_terminal_data_202_9_28()
- {
-    if (jj_scan_token(BOOL_VALUE)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_term_391_10_35()
- {
-    if (jj_3R_symbol_data_225_5_18()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_term_390_10_34()
- {
-    if (jj_3R_terminal_data_194_5_19()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_expr2_data_299_5_32()
- {
-    if (jj_3R_expr3_data_333_5_16()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3_1()) { jj_scanpos = xsp; break; }
+    private boolean jj_3R_expr4_data_364_13_41() {
+        if (jj_scan_token(MULT)) return true;
+        return false;
     }
-    return false;
-  }
 
-  private boolean jj_3R_terminal_data_198_9_27()
- {
-    if (jj_scan_token(DOUBLE_VALUE)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_term_390_5_31()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_term_390_10_34()) {
-    jj_scanpos = xsp;
-    if (jj_3R_term_391_10_35()) {
-    jj_scanpos = xsp;
-    if (jj_3R_term_392_10_36()) return true;
+    private boolean jj_3R_expr4_data_364_9_38() {
+        Token xsp;
+        xsp = jj_scanpos;
+        if (jj_3R_expr4_data_364_13_41()) {
+            jj_scanpos = xsp;
+            if (jj_3R_expr4_data_365_13_42()) {
+                jj_scanpos = xsp;
+                if (jj_3R_expr4_data_366_13_43()) return true;
+            }
+        }
+        if (jj_3R_term_390_5_31()) return true;
+        return false;
     }
+
+    private boolean jj_3R_expr1_data_272_5_23() {
+        if (jj_3R_expr2_data_299_5_32()) return true;
+        Token xsp;
+        while (true) {
+            xsp = jj_scanpos;
+            if (jj_3R_expr1_data_274_9_33()) {
+                jj_scanpos = xsp;
+                break;
+            }
+        }
+        return false;
     }
-    return false;
-  }
 
-  private boolean jj_3R_terminal_data_194_9_26()
- {
-    if (jj_scan_token(INT_VALUE)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_func_flow_482_5_20()
- {
-    if (jj_scan_token(SYMBOL)) return true;
-    if (jj_scan_token(LBR)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_terminal_data_194_5_19()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_terminal_data_194_9_26()) {
-    jj_scanpos = xsp;
-    if (jj_3R_terminal_data_198_9_27()) {
-    jj_scanpos = xsp;
-    if (jj_3R_terminal_data_202_9_28()) {
-    jj_scanpos = xsp;
-    if (jj_3R_terminal_data_206_9_29()) {
-    jj_scanpos = xsp;
-    if (jj_3R_terminal_data_210_9_30()) return true;
+    private boolean jj_3_6() {
+        if (jj_3R_head_tail_flow_502_5_21()) return true;
+        return false;
     }
+
+    private boolean jj_3_5() {
+        if (jj_3R_func_flow_482_5_20()) return true;
+        return false;
     }
+
+    private boolean jj_3R_expr4_data_362_5_22() {
+        if (jj_3R_term_390_5_31()) return true;
+        Token xsp;
+        while (true) {
+            xsp = jj_scanpos;
+            if (jj_3R_expr4_data_364_9_38()) {
+                jj_scanpos = xsp;
+                break;
+            }
+        }
+        return false;
     }
+
+    private boolean jj_3R_expr_data_247_9_24() {
+        if (jj_scan_token(LOGIC_OR)) return true;
+        if (jj_3R_expr1_data_272_5_23()) return true;
+        return false;
     }
-    return false;
-  }
 
-  /** Generated Token Manager. */
-  public FldwCompilerTokenManager token_source;
-  SimpleCharStream jj_input_stream;
-  /** Current token. */
-  public Token token;
-  /** Next token. */
-  public Token jj_nt;
-  private int jj_ntk;
-  private Token jj_scanpos, jj_lastpos;
-  private int jj_la;
-  private int jj_gen;
-  final private int[] jj_la1 = new int[24];
-  static private int[] jj_la1_0;
-  static private int[] jj_la1_1;
-  static {
-	   jj_la1_init_0();
-	   jj_la1_init_1();
-	}
-	private static void jj_la1_init_0() {
-	   jj_la1_0 = new int[] {0x0,0x0,0x800000,0x400000,0xf300000,0x18000,0x18000,0xe0000,0xe0000,0x200,0x0,0x300,0x100,0x20000000,0x4000,0x0,0xd0005000,0x0,0xd0005000,0x0,0x0,0x4000,0xd0005000,0xd0005000,};
-	}
-	private static void jj_la1_init_1() {
-	   jj_la1_1 = new int[] {0xc380,0x10,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1c390,0x8,0x1c390,0x0,0x0,0x8,0x10,0x10018,0x10,0x10018,0x6,0x6,0x8,0x10039,0x10039,};
-	}
-  final private JJCalls[] jj_2_rtns = new JJCalls[6];
-  private boolean jj_rescan = false;
-  private int jj_gc = 0;
-
-  /** Constructor with InputStream. */
-  public FldwCompiler(java.io.InputStream stream) {
-	  this(stream, null);
-  }
-  /** Constructor with InputStream and supplied encoding */
-  public FldwCompiler(java.io.InputStream stream, String encoding) {
-	 try { jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1); } catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }
-	 token_source = new FldwCompilerTokenManager(jj_input_stream);
-	 token = new Token();
-	 jj_ntk = -1;
-	 jj_gen = 0;
-	 for (int i = 0; i < 24; i++) jj_la1[i] = -1;
-	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
-  }
-
-  /** Reinitialise. */
-  public void ReInit(java.io.InputStream stream) {
-	  ReInit(stream, null);
-  }
-  /** Reinitialise. */
-  public void ReInit(java.io.InputStream stream, String encoding) {
-	 try { jj_input_stream.ReInit(stream, encoding, 1, 1); } catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }
-	 token_source.ReInit(jj_input_stream);
-	 token = new Token();
-	 jj_ntk = -1;
-	 jj_gen = 0;
-	 for (int i = 0; i < 24; i++) jj_la1[i] = -1;
-	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
-  }
-
-  /** Constructor. */
-  public FldwCompiler(java.io.Reader stream) {
-	 jj_input_stream = new SimpleCharStream(stream, 1, 1);
-	 token_source = new FldwCompilerTokenManager(jj_input_stream);
-	 token = new Token();
-	 jj_ntk = -1;
-	 jj_gen = 0;
-	 for (int i = 0; i < 24; i++) jj_la1[i] = -1;
-	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
-  }
-
-  /** Reinitialise. */
-  public void ReInit(java.io.Reader stream) {
-	if (jj_input_stream == null) {
-	   jj_input_stream = new SimpleCharStream(stream, 1, 1);
-	} else {
-	   jj_input_stream.ReInit(stream, 1, 1);
-	}
-	if (token_source == null) {
- token_source = new FldwCompilerTokenManager(jj_input_stream);
-	}
-
-	 token_source.ReInit(jj_input_stream);
-	 token = new Token();
-	 jj_ntk = -1;
-	 jj_gen = 0;
-	 for (int i = 0; i < 24; i++) jj_la1[i] = -1;
-	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
-  }
-
-  /** Constructor with generated Token Manager. */
-  public FldwCompiler(FldwCompilerTokenManager tm) {
-	 token_source = tm;
-	 token = new Token();
-	 jj_ntk = -1;
-	 jj_gen = 0;
-	 for (int i = 0; i < 24; i++) jj_la1[i] = -1;
-	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
-  }
-
-  /** Reinitialise. */
-  public void ReInit(FldwCompilerTokenManager tm) {
-	 token_source = tm;
-	 token = new Token();
-	 jj_ntk = -1;
-	 jj_gen = 0;
-	 for (int i = 0; i < 24; i++) jj_la1[i] = -1;
-	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
-  }
-
-  private Token jj_consume_token(int kind) throws ParseException {
-	 Token oldToken;
-	 if ((oldToken = token).next != null) token = token.next;
-	 else token = token.next = token_source.getNextToken();
-	 jj_ntk = -1;
-	 if (token.kind == kind) {
-	   jj_gen++;
-	   if (++jj_gc > 100) {
-		 jj_gc = 0;
-		 for (int i = 0; i < jj_2_rtns.length; i++) {
-		   JJCalls c = jj_2_rtns[i];
-		   while (c != null) {
-			 if (c.gen < jj_gen) c.first = null;
-			 c = c.next;
-		   }
-		 }
-	   }
-	   return token;
-	 }
-	 token = oldToken;
-	 jj_kind = kind;
-	 throw generateParseException();
-  }
-
-  @SuppressWarnings("serial")
-  static private final class LookaheadSuccess extends java.lang.Error {
-    @Override
-    public Throwable fillInStackTrace() {
-      return this;
+    private boolean jj_3R_expr3_data_336_13_40() {
+        if (jj_scan_token(MINUS)) return true;
+        return false;
     }
-  }
-  static private final LookaheadSuccess jj_ls = new LookaheadSuccess();
-  private boolean jj_scan_token(int kind) {
-	 if (jj_scanpos == jj_lastpos) {
-	   jj_la--;
-	   if (jj_scanpos.next == null) {
-		 jj_lastpos = jj_scanpos = jj_scanpos.next = token_source.getNextToken();
-	   } else {
-		 jj_lastpos = jj_scanpos = jj_scanpos.next;
-	   }
-	 } else {
-	   jj_scanpos = jj_scanpos.next;
-	 }
-	 if (jj_rescan) {
-	   int i = 0; Token tok = token;
-	   while (tok != null && tok != jj_scanpos) { i++; tok = tok.next; }
-	   if (tok != null) jj_add_error_token(kind, i);
-	 }
-	 if (jj_scanpos.kind != kind) return true;
-	 if (jj_la == 0 && jj_scanpos == jj_lastpos) throw jj_ls;
-	 return false;
-  }
+
+    private boolean jj_3R_expr3_data_335_13_39() {
+        if (jj_scan_token(PLUS)) return true;
+        return false;
+    }
+
+    private boolean jj_3R_expr_data_245_5_17() {
+        if (jj_3R_expr1_data_272_5_23()) return true;
+        Token xsp;
+        while (true) {
+            xsp = jj_scanpos;
+            if (jj_3R_expr_data_247_9_24()) {
+                jj_scanpos = xsp;
+                break;
+            }
+        }
+        return false;
+    }
+
+    private boolean jj_3R_expr3_data_335_9_37() {
+        Token xsp;
+        xsp = jj_scanpos;
+        if (jj_3R_expr3_data_335_13_39()) {
+            jj_scanpos = xsp;
+            if (jj_3R_expr3_data_336_13_40()) return true;
+        }
+        if (jj_3R_expr4_data_362_5_22()) return true;
+        return false;
+    }
+
+    private boolean jj_3R_expr3_data_333_5_16() {
+        if (jj_3R_expr4_data_362_5_22()) return true;
+        Token xsp;
+        while (true) {
+            xsp = jj_scanpos;
+            if (jj_3R_expr3_data_335_9_37()) {
+                jj_scanpos = xsp;
+                break;
+            }
+        }
+        return false;
+    }
+
+    private boolean jj_3R_symbol_data_225_7_25() {
+        if (jj_scan_token(EXLM)) return true;
+        return false;
+    }
+
+    private boolean jj_3R_symbol_data_225_5_18() {
+        Token xsp;
+        xsp = jj_scanpos;
+        if (jj_3R_symbol_data_225_7_25()) jj_scanpos = xsp;
+        if (jj_scan_token(SYMBOL)) return true;
+        return false;
+    }
+
+    private boolean jj_3_4() {
+        if (jj_3R_terminal_data_194_5_19()) return true;
+        return false;
+    }
+
+    private boolean jj_3R_expr2_data_307_13_15() {
+        if (jj_scan_token(LOGIC_NOT)) return true;
+        return false;
+    }
+
+    private boolean jj_3_3() {
+        if (jj_3R_symbol_data_225_5_18()) return true;
+        return false;
+    }
+
+    private boolean jj_3R_expr2_data_306_13_14() {
+        if (jj_scan_token(LOGIC_EQUAL)) return true;
+        return false;
+    }
+
+    private boolean jj_3_2() {
+        if (jj_3R_expr_data_245_5_17()) return true;
+        return false;
+    }
+
+    private boolean jj_3R_expr2_data_305_13_13() {
+        if (jj_scan_token(RIGHT_EQUAL)) return true;
+        return false;
+    }
+
+    private boolean jj_3R_expr2_data_304_13_12() {
+        if (jj_scan_token(LEFT_EQUAL)) return true;
+        return false;
+    }
+
+    private boolean jj_3R_head_tail_flow_502_5_21() {
+        if (jj_scan_token(LSBR)) return true;
+        if (jj_3R_symbol_data_225_5_18()) return true;
+        if (jj_scan_token(SEMIC)) return true;
+        return false;
+    }
+
+    private boolean jj_3R_expr2_data_303_13_11() {
+        if (jj_scan_token(RIGHT)) return true;
+        return false;
+    }
+
+    private boolean jj_3R_expr2_data_302_13_10() {
+        if (jj_scan_token(LEFT)) return true;
+        return false;
+    }
+
+    private boolean jj_3R_terminal_data_210_9_30() {
+        if (jj_scan_token(NULL_VALUE)) return true;
+        return false;
+    }
+
+    private boolean jj_3R_terminal_data_206_9_29() {
+        if (jj_scan_token(STRING_VALUE)) return true;
+        return false;
+    }
+
+    private boolean jj_3_1() {
+        Token xsp;
+        xsp = jj_scanpos;
+        if (jj_3R_expr2_data_302_13_10()) {
+            jj_scanpos = xsp;
+            if (jj_3R_expr2_data_303_13_11()) {
+                jj_scanpos = xsp;
+                if (jj_3R_expr2_data_304_13_12()) {
+                    jj_scanpos = xsp;
+                    if (jj_3R_expr2_data_305_13_13()) {
+                        jj_scanpos = xsp;
+                        if (jj_3R_expr2_data_306_13_14()) {
+                            jj_scanpos = xsp;
+                            if (jj_3R_expr2_data_307_13_15()) return true;
+                        }
+                    }
+                }
+            }
+        }
+        if (jj_3R_expr3_data_333_5_16()) return true;
+        return false;
+    }
+
+    private boolean jj_3R_term_392_10_36() {
+        if (jj_scan_token(LBR)) return true;
+        if (jj_3R_expr_data_245_5_17()) return true;
+        if (jj_scan_token(RBR)) return true;
+        return false;
+    }
+
+    private boolean jj_3R_terminal_data_202_9_28() {
+        if (jj_scan_token(BOOL_VALUE)) return true;
+        return false;
+    }
+
+    private boolean jj_3R_term_391_10_35() {
+        if (jj_3R_symbol_data_225_5_18()) return true;
+        return false;
+    }
+
+    private boolean jj_3R_term_390_10_34() {
+        if (jj_3R_terminal_data_194_5_19()) return true;
+        return false;
+    }
+
+    private boolean jj_3R_expr2_data_299_5_32() {
+        if (jj_3R_expr3_data_333_5_16()) return true;
+        Token xsp;
+        while (true) {
+            xsp = jj_scanpos;
+            if (jj_3_1()) {
+                jj_scanpos = xsp;
+                break;
+            }
+        }
+        return false;
+    }
+
+    private boolean jj_3R_terminal_data_198_9_27() {
+        if (jj_scan_token(DOUBLE_VALUE)) return true;
+        return false;
+    }
+
+    private boolean jj_3R_term_390_5_31() {
+        Token xsp;
+        xsp = jj_scanpos;
+        if (jj_3R_term_390_10_34()) {
+            jj_scanpos = xsp;
+            if (jj_3R_term_391_10_35()) {
+                jj_scanpos = xsp;
+                if (jj_3R_term_392_10_36()) return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean jj_3R_terminal_data_194_9_26() {
+        if (jj_scan_token(INT_VALUE)) return true;
+        return false;
+    }
+
+    private boolean jj_3R_func_flow_482_5_20() {
+        if (jj_scan_token(SYMBOL)) return true;
+        if (jj_scan_token(LBR)) return true;
+        return false;
+    }
+
+    private boolean jj_3R_terminal_data_194_5_19() {
+        Token xsp;
+        xsp = jj_scanpos;
+        if (jj_3R_terminal_data_194_9_26()) {
+            jj_scanpos = xsp;
+            if (jj_3R_terminal_data_198_9_27()) {
+                jj_scanpos = xsp;
+                if (jj_3R_terminal_data_202_9_28()) {
+                    jj_scanpos = xsp;
+                    if (jj_3R_terminal_data_206_9_29()) {
+                        jj_scanpos = xsp;
+                        if (jj_3R_terminal_data_210_9_30()) return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Generated Token Manager.
+     */
+    public FldwCompilerTokenManager token_source;
+    SimpleCharStream jj_input_stream;
+    /**
+     * Current token.
+     */
+    public Token token;
+    /**
+     * Next token.
+     */
+    public Token jj_nt;
+    private int jj_ntk;
+    private Token jj_scanpos, jj_lastpos;
+    private int jj_la;
+    private int jj_gen;
+    final private int[] jj_la1 = new int[24];
+    static private int[] jj_la1_0;
+    static private int[] jj_la1_1;
+
+    static {
+        jj_la1_init_0();
+        jj_la1_init_1();
+    }
+
+    private static void jj_la1_init_0() {
+        jj_la1_0 = new int[]{0x0, 0x0, 0x800000, 0x400000, 0xf300000, 0x18000, 0x18000, 0xe0000, 0xe0000, 0x200, 0x0, 0x300, 0x100, 0x20000000, 0x4000, 0x0, 0xd0005000, 0x0, 0xd0005000, 0x0, 0x0, 0x4000, 0xd0005000, 0xd0005000,};
+    }
+
+    private static void jj_la1_init_1() {
+        jj_la1_1 = new int[]{0xc380, 0x10, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1c390, 0x8, 0x1c390, 0x0, 0x0, 0x8, 0x10, 0x10018, 0x10, 0x10018, 0x6, 0x6, 0x8, 0x10039, 0x10039,};
+    }
+
+    final private JJCalls[] jj_2_rtns = new JJCalls[6];
+    private boolean jj_rescan = false;
+    private int jj_gc = 0;
+
+    /**
+     * Constructor with InputStream.
+     */
+    public FldwCompiler(java.io.InputStream stream) {
+        this(stream, null);
+    }
+
+    /**
+     * Constructor with InputStream and supplied encoding
+     */
+    public FldwCompiler(java.io.InputStream stream, String encoding) {
+        try {
+            jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1);
+        } catch (java.io.UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        token_source = new FldwCompilerTokenManager(jj_input_stream);
+        token = new Token();
+        jj_ntk = -1;
+        jj_gen = 0;
+        for (int i = 0; i < 24; i++) jj_la1[i] = -1;
+        for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
+    }
+
+    /**
+     * Reinitialise.
+     */
+    public void ReInit(java.io.InputStream stream) {
+        ReInit(stream, null);
+    }
+
+    /**
+     * Reinitialise.
+     */
+    public void ReInit(java.io.InputStream stream, String encoding) {
+        try {
+            jj_input_stream.ReInit(stream, encoding, 1, 1);
+        } catch (java.io.UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        token_source.ReInit(jj_input_stream);
+        token = new Token();
+        jj_ntk = -1;
+        jj_gen = 0;
+        for (int i = 0; i < 24; i++) jj_la1[i] = -1;
+        for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
+    }
+
+    /**
+     * Constructor.
+     */
+    public FldwCompiler(java.io.Reader stream) {
+        jj_input_stream = new SimpleCharStream(stream, 1, 1);
+        token_source = new FldwCompilerTokenManager(jj_input_stream);
+        token = new Token();
+        jj_ntk = -1;
+        jj_gen = 0;
+        for (int i = 0; i < 24; i++) jj_la1[i] = -1;
+        for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
+    }
+
+    /**
+     * Reinitialise.
+     */
+    public void ReInit(java.io.Reader stream) {
+        if (jj_input_stream == null) {
+            jj_input_stream = new SimpleCharStream(stream, 1, 1);
+        } else {
+            jj_input_stream.ReInit(stream, 1, 1);
+        }
+        if (token_source == null) {
+            token_source = new FldwCompilerTokenManager(jj_input_stream);
+        }
+
+        token_source.ReInit(jj_input_stream);
+        token = new Token();
+        jj_ntk = -1;
+        jj_gen = 0;
+        for (int i = 0; i < 24; i++) jj_la1[i] = -1;
+        for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
+    }
+
+    /**
+     * Constructor with generated Token Manager.
+     */
+    public FldwCompiler(FldwCompilerTokenManager tm) {
+        token_source = tm;
+        token = new Token();
+        jj_ntk = -1;
+        jj_gen = 0;
+        for (int i = 0; i < 24; i++) jj_la1[i] = -1;
+        for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
+    }
+
+    /**
+     * Reinitialise.
+     */
+    public void ReInit(FldwCompilerTokenManager tm) {
+        token_source = tm;
+        token = new Token();
+        jj_ntk = -1;
+        jj_gen = 0;
+        for (int i = 0; i < 24; i++) jj_la1[i] = -1;
+        for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
+    }
+
+    private Token jj_consume_token(int kind) throws ParseException, ExplainException {
+        Token oldToken;
+        if ((oldToken = token).next != null) token = token.next;
+        else token = token.next = token_source.getNextToken();
+        jj_ntk = -1;
+        if (token.kind == kind) {
+            jj_gen++;
+            if (++jj_gc > 100) {
+                jj_gc = 0;
+                for (int i = 0; i < jj_2_rtns.length; i++) {
+                    JJCalls c = jj_2_rtns[i];
+                    while (c != null) {
+                        if (c.gen < jj_gen) c.first = null;
+                        c = c.next;
+                    }
+                }
+            }
+            return token;
+        }
+        token = oldToken;
+        jj_kind = kind;
+        throw generateParseException();
+    }
+
+    @SuppressWarnings("serial")
+    static private final class LookaheadSuccess extends java.lang.Error {
+        @Override
+        public Throwable fillInStackTrace() {
+            return this;
+        }
+    }
+
+    static private final LookaheadSuccess jj_ls = new LookaheadSuccess();
+
+    private boolean jj_scan_token(int kind) {
+        if (jj_scanpos == jj_lastpos) {
+            jj_la--;
+            if (jj_scanpos.next == null) {
+                jj_lastpos = jj_scanpos = jj_scanpos.next = token_source.getNextToken();
+            } else {
+                jj_lastpos = jj_scanpos = jj_scanpos.next;
+            }
+        } else {
+            jj_scanpos = jj_scanpos.next;
+        }
+        if (jj_rescan) {
+            int i = 0;
+            Token tok = token;
+            while (tok != null && tok != jj_scanpos) {
+                i++;
+                tok = tok.next;
+            }
+            if (tok != null) jj_add_error_token(kind, i);
+        }
+        if (jj_scanpos.kind != kind) return true;
+        if (jj_la == 0 && jj_scanpos == jj_lastpos) throw jj_ls;
+        return false;
+    }
 
 
-/** Get the next Token. */
-  final public Token getNextToken() {
-	 if (token.next != null) token = token.next;
-	 else token = token.next = token_source.getNextToken();
-	 jj_ntk = -1;
-	 jj_gen++;
-	 return token;
-  }
+    /**
+     * Get the next Token.
+     */
+    final public Token getNextToken() {
+        if (token.next != null) token = token.next;
+        else token = token.next = token_source.getNextToken();
+        jj_ntk = -1;
+        jj_gen++;
+        return token;
+    }
 
-/** Get the specific Token. */
-  final public Token getToken(int index) {
-	 Token t = token;
-	 for (int i = 0; i < index; i++) {
-	   if (t.next != null) t = t.next;
-	   else t = t.next = token_source.getNextToken();
-	 }
-	 return t;
-  }
+    /**
+     * Get the specific Token.
+     */
+    final public Token getToken(int index) {
+        Token t = token;
+        for (int i = 0; i < index; i++) {
+            if (t.next != null) t = t.next;
+            else t = t.next = token_source.getNextToken();
+        }
+        return t;
+    }
 
-  private int jj_ntk_f() {
-	 if ((jj_nt=token.next) == null)
-	   return (jj_ntk = (token.next=token_source.getNextToken()).kind);
-	 else
-	   return (jj_ntk = jj_nt.kind);
-  }
+    private int jj_ntk_f() {
+        if ((jj_nt = token.next) == null)
+            return (jj_ntk = (token.next = token_source.getNextToken()).kind);
+        else
+            return (jj_ntk = jj_nt.kind);
+    }
 
-  private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();
-  private int[] jj_expentry;
-  private int jj_kind = -1;
-  private int[] jj_lasttokens = new int[100];
-  private int jj_endpos;
+    private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();
+    private int[] jj_expentry;
+    private int jj_kind = -1;
+    private int[] jj_lasttokens = new int[100];
+    private int jj_endpos;
 
-  private void jj_add_error_token(int kind, int pos) {
-	 if (pos >= 100) {
-		return;
-	 }
+    private void jj_add_error_token(int kind, int pos) {
+        if (pos >= 100) {
+            return;
+        }
 
-	 if (pos == jj_endpos + 1) {
-	   jj_lasttokens[jj_endpos++] = kind;
-	 } else if (jj_endpos != 0) {
-	   jj_expentry = new int[jj_endpos];
+        if (pos == jj_endpos + 1) {
+            jj_lasttokens[jj_endpos++] = kind;
+        } else if (jj_endpos != 0) {
+            jj_expentry = new int[jj_endpos];
 
-	   for (int i = 0; i < jj_endpos; i++) {
-		 jj_expentry[i] = jj_lasttokens[i];
-	   }
+            for (int i = 0; i < jj_endpos; i++) {
+                jj_expentry[i] = jj_lasttokens[i];
+            }
 
-	   for (int[] oldentry : jj_expentries) {
-		 if (oldentry.length == jj_expentry.length) {
-		   boolean isMatched = true;
+            for (int[] oldentry : jj_expentries) {
+                if (oldentry.length == jj_expentry.length) {
+                    boolean isMatched = true;
 
-		   for (int i = 0; i < jj_expentry.length; i++) {
-			 if (oldentry[i] != jj_expentry[i]) {
-			   isMatched = false;
-			   break;
-			 }
+                    for (int i = 0; i < jj_expentry.length; i++) {
+                        if (oldentry[i] != jj_expentry[i]) {
+                            isMatched = false;
+                            break;
+                        }
 
-		   }
-		   if (isMatched) {
-			 jj_expentries.add(jj_expentry);
-			 break;
-		   }
-		 }
-	   }
+                    }
+                    if (isMatched) {
+                        jj_expentries.add(jj_expentry);
+                        break;
+                    }
+                }
+            }
 
-	   if (pos != 0) {
-		 jj_lasttokens[(jj_endpos = pos) - 1] = kind;
-	   }
-	 }
-  }
+            if (pos != 0) {
+                jj_lasttokens[(jj_endpos = pos) - 1] = kind;
+            }
+        }
+    }
 
-  /** Generate ParseException. */
-  public ParseException generateParseException() {
-	 jj_expentries.clear();
-	 boolean[] la1tokens = new boolean[50];
-	 if (jj_kind >= 0) {
-	   la1tokens[jj_kind] = true;
-	   jj_kind = -1;
-	 }
-	 for (int i = 0; i < 24; i++) {
-	   if (jj_la1[i] == jj_gen) {
-		 for (int j = 0; j < 32; j++) {
-		   if ((jj_la1_0[i] & (1<<j)) != 0) {
-			 la1tokens[j] = true;
-		   }
-		   if ((jj_la1_1[i] & (1<<j)) != 0) {
-			 la1tokens[32+j] = true;
-		   }
-		 }
-	   }
-	 }
-	 for (int i = 0; i < 50; i++) {
-	   if (la1tokens[i]) {
-		 jj_expentry = new int[1];
-		 jj_expentry[0] = i;
-		 jj_expentries.add(jj_expentry);
-	   }
-	 }
-	 jj_endpos = 0;
-	 jj_rescan_token();
-	 jj_add_error_token(0, 0);
-	 int[][] exptokseq = new int[jj_expentries.size()][];
-	 for (int i = 0; i < jj_expentries.size(); i++) {
-	   exptokseq[i] = jj_expentries.get(i);
-	 }
-	 return new ParseException(token, exptokseq, tokenImage);
-  }
+    /**
+     * Generate ParseException.
+     */
+    public ParseException generateParseException() {
+        jj_expentries.clear();
+        boolean[] la1tokens = new boolean[50];
+        if (jj_kind >= 0) {
+            la1tokens[jj_kind] = true;
+            jj_kind = -1;
+        }
+        for (int i = 0; i < 24; i++) {
+            if (jj_la1[i] == jj_gen) {
+                for (int j = 0; j < 32; j++) {
+                    if ((jj_la1_0[i] & (1 << j)) != 0) {
+                        la1tokens[j] = true;
+                    }
+                    if ((jj_la1_1[i] & (1 << j)) != 0) {
+                        la1tokens[32 + j] = true;
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < 50; i++) {
+            if (la1tokens[i]) {
+                jj_expentry = new int[1];
+                jj_expentry[0] = i;
+                jj_expentries.add(jj_expentry);
+            }
+        }
+        jj_endpos = 0;
+        jj_rescan_token();
+        jj_add_error_token(0, 0);
+        int[][] exptokseq = new int[jj_expentries.size()][];
+        for (int i = 0; i < jj_expentries.size(); i++) {
+            exptokseq[i] = jj_expentries.get(i);
+        }
+        return new ParseException(token, exptokseq, tokenImage);
+    }
 
-  private boolean trace_enabled;
+    private boolean trace_enabled;
 
-/** Trace enabled. */
-  final public boolean trace_enabled() {
-	 return trace_enabled;
-  }
+    /**
+     * Trace enabled.
+     */
+    final public boolean trace_enabled() {
+        return trace_enabled;
+    }
 
-  /** Enable tracing. */
-  final public void enable_tracing() {
-  }
+    /**
+     * Enable tracing.
+     */
+    final public void enable_tracing() {
+    }
 
-  /** Disable tracing. */
-  final public void disable_tracing() {
-  }
+    /**
+     * Disable tracing.
+     */
+    final public void disable_tracing() {
+    }
 
-  private void jj_rescan_token() {
-	 jj_rescan = true;
-	 for (int i = 0; i < 6; i++) {
-	   try {
-		 JJCalls p = jj_2_rtns[i];
+    private void jj_rescan_token() {
+        jj_rescan = true;
+        for (int i = 0; i < 6; i++) {
+            try {
+                JJCalls p = jj_2_rtns[i];
 
-		 do {
-		   if (p.gen > jj_gen) {
-			 jj_la = p.arg; jj_lastpos = jj_scanpos = p.first;
-			 switch (i) {
-			   case 0: jj_3_1(); break;
-			   case 1: jj_3_2(); break;
-			   case 2: jj_3_3(); break;
-			   case 3: jj_3_4(); break;
-			   case 4: jj_3_5(); break;
-			   case 5: jj_3_6(); break;
-			 }
-		   }
-		   p = p.next;
-		 } while (p != null);
+                do {
+                    if (p.gen > jj_gen) {
+                        jj_la = p.arg;
+                        jj_lastpos = jj_scanpos = p.first;
+                        switch (i) {
+                            case 0:
+                                jj_3_1();
+                                break;
+                            case 1:
+                                jj_3_2();
+                                break;
+                            case 2:
+                                jj_3_3();
+                                break;
+                            case 3:
+                                jj_3_4();
+                                break;
+                            case 4:
+                                jj_3_5();
+                                break;
+                            case 5:
+                                jj_3_6();
+                                break;
+                        }
+                    }
+                    p = p.next;
+                } while (p != null);
 
-		 } catch(LookaheadSuccess ls) { }
-	 }
-	 jj_rescan = false;
-  }
+            } catch (LookaheadSuccess ls) {
+            }
+        }
+        jj_rescan = false;
+    }
 
-  private void jj_save(int index, int xla) {
-	 JJCalls p = jj_2_rtns[index];
-	 while (p.gen > jj_gen) {
-	   if (p.next == null) { p = p.next = new JJCalls(); break; }
-	   p = p.next;
-	 }
+    private void jj_save(int index, int xla) {
+        JJCalls p = jj_2_rtns[index];
+        while (p.gen > jj_gen) {
+            if (p.next == null) {
+                p = p.next = new JJCalls();
+                break;
+            }
+            p = p.next;
+        }
 
-	 p.gen = jj_gen + xla - jj_la; 
-	 p.first = token;
-	 p.arg = xla;
-  }
+        p.gen = jj_gen + xla - jj_la;
+        p.first = token;
+        p.arg = xla;
+    }
 
-  static final class JJCalls {
-	 int gen;
-	 Token first;
-	 int arg;
-	 JJCalls next;
-  }
+    static final class JJCalls {
+        int gen;
+        Token first;
+        int arg;
+        JJCalls next;
+    }
 
 }

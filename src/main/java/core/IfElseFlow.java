@@ -16,7 +16,7 @@ public class IfElseFlow extends Flow {
     }
 
     @Override
-    public boolean Push(Datable data) {
+    public boolean Push(Datable data)throws ExplainException {
 //        return this.cacheFlow.Push(data);
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new RuntimeException("type mismatch");
@@ -30,7 +30,7 @@ public class IfElseFlow extends Flow {
     }
 
     @Override
-    public boolean Push(Flowable flow) {
+    public boolean Push(Flowable flow)throws ExplainException {
 //        return this.cacheFlow.Push(flow);
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new RuntimeException("type mismatch");
@@ -44,7 +44,7 @@ public class IfElseFlow extends Flow {
     }
 
     @Override
-    public boolean Push(int index, Datable data) {
+    public boolean Push(int index, Datable data) throws ExplainException{
 //        return this.cacheFlow.Push(index,data);
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new RuntimeException("type mismatch");
@@ -58,7 +58,7 @@ public class IfElseFlow extends Flow {
     }
 
     @Override
-    public Datable Pop() {
+    public Datable Pop() throws ExplainException{
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new RuntimeException("type mismatch");
         }
@@ -71,7 +71,7 @@ public class IfElseFlow extends Flow {
     }
 
     @Override
-    public int inLen() {
+    public int inLen()throws ExplainException {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new RuntimeException("type mismatch");
         }
@@ -84,7 +84,7 @@ public class IfElseFlow extends Flow {
     }
 
     @Override
-    public Datable Get(int index) {
+    public Datable Get(int index) throws ExplainException{
 //        return this.cacheFlow.Get(index);
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new RuntimeException("type mismatch");
@@ -98,7 +98,7 @@ public class IfElseFlow extends Flow {
     }
 
     @Override
-    public void SetNextFlowing(Flowable flow) { // 同时绑定 nextFlow
+    public void SetNextFlowing(Flowable flow) throws ExplainException{ // 同时绑定 nextFlow
         this.trueFlow.SetNextFlowing(flow);
         if (this.falseFlow != null) {
             this.falseFlow.SetNextFlowing(flow);
@@ -107,17 +107,17 @@ public class IfElseFlow extends Flow {
     }
 
     @Override
-    public Flowable NextFlowing() {
+    public Flowable NextFlowing()throws ExplainException {
         return this.nextFlow;
     }
 
     @Override
-    public boolean HasNextFlowing() {
+    public boolean HasNextFlowing() throws ExplainException{
         return this.nextFlow != null;
     }
 
     @Override
-    public boolean Flowing() {
+    public boolean Flowing() throws ExplainException{
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new RuntimeException("type mismatch");
         }

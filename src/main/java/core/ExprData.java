@@ -72,7 +72,7 @@ public class ExprData extends Data {
     public ExprData() {
     }
 
-    public ExprData(ExprData exprData) {
+    public ExprData(ExprData exprData) throws ExplainException{
         this.leftData = exprData.leftData.Clone();
         this.rightData = exprData.rightData.Clone();
         this.op = exprData.op;
@@ -93,12 +93,12 @@ public class ExprData extends Data {
     }
 
     @Override
-    public boolean Push(Datable data) {
+    public boolean Push(Datable data)throws ExplainException {
         throw new RuntimeException("unexpected call");
     }
 
     @Override
-    public DataType GetType() {
+    public DataType GetType() throws ExplainException{
         if (this.type == null) {
             this.type = ExprData.CheckExprTypeMatch(this.leftData.GetType(), this.rightData.GetType(), this.op);
         }
@@ -106,7 +106,7 @@ public class ExprData extends Data {
     }
 
     @Override
-    public Object GetValue() {
+    public Object GetValue()throws ExplainException {
         if (this.type == null) { // 任何不提前获取类型的获取值操作都是耍流氓
             throw new RuntimeException("unexpected call");
         }
@@ -215,17 +215,17 @@ public class ExprData extends Data {
     }
 
     @Override
-    public String GetSymbol() {
+    public String GetSymbol()throws ExplainException {
         throw new RuntimeException("unexpected call");
     }
 
     @Override
-    public boolean SetType(DataType type) {
+    public boolean SetType(DataType type)throws ExplainException {
         throw new RuntimeException("unexpected call");
     }
 
     @Override
-    public boolean SetValue(Object value) {
+    public boolean SetValue(Object value)throws ExplainException {
         throw new RuntimeException("unexpected call");
     }
 
@@ -240,7 +240,7 @@ public class ExprData extends Data {
     }
 
     @Override
-    public Datable Clone() {
+    public Datable Clone()throws ExplainException {
         return new ExprData(this);
     }
 }

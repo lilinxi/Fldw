@@ -11,7 +11,7 @@ public class WhileFlow extends Flow {
     }
 
     @Override
-    public boolean Push(Datable data) {
+    public boolean Push(Datable data) throws ExplainException{
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new RuntimeException("type mismatch");
         }
@@ -23,7 +23,7 @@ public class WhileFlow extends Flow {
     }
 
     @Override
-    public boolean Push(Flowable flow) {
+    public boolean Push(Flowable flow)throws ExplainException {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new RuntimeException("type mismatch");
         }
@@ -35,7 +35,7 @@ public class WhileFlow extends Flow {
     }
 
     @Override
-    public boolean Push(int index, Datable data) {
+    public boolean Push(int index, Datable data)throws ExplainException {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new RuntimeException("type mismatch");
         }
@@ -47,7 +47,7 @@ public class WhileFlow extends Flow {
     }
 
     @Override
-    public Datable Pop() {
+    public Datable Pop()throws ExplainException {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new RuntimeException("type mismatch");
         }
@@ -59,7 +59,7 @@ public class WhileFlow extends Flow {
     }
 
     @Override
-    public int inLen() {
+    public int inLen()throws ExplainException {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new RuntimeException("type mismatch");
         }
@@ -71,7 +71,7 @@ public class WhileFlow extends Flow {
     }
 
     @Override
-    public Datable Get(int index) {
+    public Datable Get(int index)throws ExplainException {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new RuntimeException("type mismatch");
         }
@@ -83,23 +83,23 @@ public class WhileFlow extends Flow {
     }
 
     @Override
-    public void SetNextFlowing(Flowable flow) { // 同时绑定 nextFlow
+    public void SetNextFlowing(Flowable flow) throws ExplainException{ // 同时绑定 nextFlow
         this.trueFlow.SetNextFlowing(flow);
         this.nextFlow = flow;
     }
 
     @Override
-    public Flowable NextFlowing() {
+    public Flowable NextFlowing()throws ExplainException {
         return this.nextFlow;
     }
 
     @Override
-    public boolean HasNextFlowing() {
+    public boolean HasNextFlowing()throws ExplainException {
         return this.nextFlow != null;
     }
 
     @Override
-    public boolean Flowing() {
+    public boolean Flowing()throws ExplainException {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new RuntimeException("type mismatch");
         }

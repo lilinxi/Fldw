@@ -2,116 +2,80 @@ package core;
 
 // Flowable 默认实现类
 public class Flow extends Symbol implements Flowable {
-    //    @Override
-//    public int GetIdentity() {
-//        return System.identityHashCode(this);
-//    }
     protected FlowOp flowOp;
-    protected int id;
 
     public Flow() {
         this.flowOp = FlowOp.Pushing;
-        this.id=System.identityHashCode(this);
     }
 
     @Override
-    public void SetGotoNext(boolean gotoNext) {
-
-    }
-
-    @Override
-    public String GetSymbol() {
+    public String GetSymbol() throws ExplainException {
         return null;
     }
 
     @Override
-    public boolean Push(Datable data) {
-        throw new RuntimeException("no impl, wrong call");
+    public boolean Push(Datable data) throws ExplainException {
+        throw new ExplainException("no impl, wrong call");
     }
 
     @Override
-    public boolean Push(Flowable flow) {
-        throw new RuntimeException("no impl, wrong call");
+    public boolean Push(Flowable flow) throws ExplainException {
+        throw new ExplainException("no impl, wrong call");
     }
 
     @Override
-    public boolean Push(int index, Datable data) {
-        throw new RuntimeException("no impl, wrong call");
+    public boolean Push(int index, Datable data) throws ExplainException {
+        throw new ExplainException("no impl, wrong call");
     }
 
     @Override
-    public boolean Match(Flowable flow) {
-        throw new RuntimeException("no impl, wrong call");
+    public boolean Match(Flowable flow) throws ExplainException {
+        throw new ExplainException("no impl, wrong call");
     }
 
     @Override
-    public Datable Pop() {
-        throw new RuntimeException("no impl, wrong call");
+    public Datable Pop() throws ExplainException {
+        throw new ExplainException("no impl, wrong call");
     }
 
     @Override
-    public int inLen() {
+    public int inLen() throws ExplainException {
         return 0;
     }
 
     @Override
-    public int outLen() { // 默认输出长度等于输入长度
+    public int outLen() throws ExplainException { // 默认输出长度等于输入长度
         return this.inLen();
     }
 
     @Override
-    public Datable Get(int index) {
-        throw new RuntimeException("no impl, wrong call");
+    public Datable Get(int index) throws ExplainException {
+        throw new ExplainException("no impl, wrong call");
     }
 
     @Override
-    public void SetFlowOp(FlowOp flowOp) {
+    public void SetFlowOp(FlowOp flowOp) throws ExplainException {
         this.flowOp = flowOp;
     }
 
 
     @Override
-    public void SetNextFlowing(Flowable flow) {
-        throw new RuntimeException("no impl, wrong call");
+    public void SetNextFlowing(Flowable flow) throws ExplainException {
+        throw new ExplainException("no impl, wrong call");
     }
 
     @Override
-    public Flowable NextFlowing() {
-        throw new RuntimeException("no impl, wrong call");
+    public Flowable NextFlowing() throws ExplainException {
+        throw new ExplainException("no impl, wrong call");
     }
 
     @Override
-    public boolean HasNextFlowing() {
+    public boolean HasNextFlowing() throws ExplainException {
         return false;
     }
 
     @Override
-    public boolean Flowing() {
-        return true;
-    }
-
-    @Override
-    public boolean CurFlowing() {
-        return false;
-    }
-
-    @Override
-    public void SetNextMatching(Flowable flow) {
-        throw new RuntimeException("no impl, wrong call");
-    }
-
-    @Override
-    public Flowable NextMatching() {
-        throw new RuntimeException("no impl, wrong call");
-    }
-
-    @Override
-    public boolean HasNextMatching() {
-        return false;
-    }
-
-    @Override
-    public boolean Matching() {
+    public boolean Flowing() throws ExplainException {
         return true;
     }
 }

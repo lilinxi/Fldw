@@ -25,7 +25,7 @@ public class DelayFuncFlow extends Flow {
         this.paramFlow = paramFlow;
     }
 
-    public FuncFlow getFuncFlow() {
+    public FuncFlow getFuncFlow() throws ExplainException{
         if (this.funcFlow == null) {
             try {
                 this.funcFlow = new FldwCompiler(new StringReader(this.funcValue)).make_func_flow(this.symbol);
@@ -43,27 +43,27 @@ public class DelayFuncFlow extends Flow {
     }
 
     @Override
-    public boolean Push(Datable data) {
+    public boolean Push(Datable data)throws ExplainException {
         return this.getFuncFlow().Push(data);
     }
 
     @Override
-    public void SetNextFlowing(Flowable flow) {
+    public void SetNextFlowing(Flowable flow)throws ExplainException {
         this.nextFlow = flow;
     }
 
     @Override
-    public Flowable NextFlowing() {
+    public Flowable NextFlowing()throws ExplainException {
         return this.nextFlow;
     }
 
     @Override
-    public boolean HasNextFlowing() {
+    public boolean HasNextFlowing()throws ExplainException {
         return this.nextFlow != null;
     }
 
     @Override
-    public boolean Flowing() {
+    public boolean Flowing()throws ExplainException {
         return this.getFuncFlow().Flowing();
     }
 

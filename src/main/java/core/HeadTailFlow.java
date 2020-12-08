@@ -12,12 +12,12 @@ public class HeadTailFlow extends Flow {
     }
 
     @Override
-    public String GetSymbol() {
+    public String GetSymbol()throws ExplainException {
         throw new RuntimeException("wrong call"); // 不包含 Symbol，无法被符号表查找
     }
 
     @Override
-    public boolean Push(Datable data) {
+    public boolean Push(Datable data)throws ExplainException {
         if (this.setHead) {
             this.headData.Push(data);
             this.setHead = false;
@@ -28,7 +28,7 @@ public class HeadTailFlow extends Flow {
     }
 
     @Override
-    public boolean Push(Flowable flow) {
+    public boolean Push(Flowable flow)throws ExplainException {
         Datable data;
         while ((data = flow.Pop()) != null) {
             boolean success = this.Push(data);
@@ -38,32 +38,32 @@ public class HeadTailFlow extends Flow {
     }
 
     @Override
-    public Datable Pop() {
+    public Datable Pop()throws ExplainException {
         throw new RuntimeException("wrong call");
     }
 
     @Override
-    public int inLen() {
+    public int inLen()throws ExplainException {
         return 0;
     }
 
     @Override
-    public void SetNextFlowing(Flowable flow) {
+    public void SetNextFlowing(Flowable flow)throws ExplainException {
         throw new RuntimeException("can not set next");
     }
 
     @Override
-    public Flowable NextFlowing() {
+    public Flowable NextFlowing() throws ExplainException{
         throw new RuntimeException("wrong call");
     }
 
     @Override
-    public boolean HasNextFlowing() {
+    public boolean HasNextFlowing()throws ExplainException {
         return false;
     }
 
     @Override
-    public boolean Flowing() {
+    public boolean Flowing()throws ExplainException {
         return true;
     }
 

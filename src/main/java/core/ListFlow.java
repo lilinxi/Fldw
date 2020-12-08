@@ -35,17 +35,12 @@ public class ListFlow extends Flow {
     }
 
     @Override
-    public void SetGotoNext(boolean gotoNext) {
-        this.gotoNext = gotoNext;
-    }
-
-    @Override
-    public String GetSymbol() {
+    public String GetSymbol()throws ExplainException {
         return this.symbol;
     }
 
     @Override
-    public boolean Push(Datable data) {
+    public boolean Push(Datable data)throws ExplainException {
 //        SymbolData tmp = new SymbolData();
 //        tmp.Push(data);
 //        System.err.println("---");
@@ -59,7 +54,7 @@ public class ListFlow extends Flow {
     }
 
     @Override
-    public boolean Push(Flowable flow) {
+    public boolean Push(Flowable flow)throws ExplainException {
         Datable data;
         while ((data = flow.Pop()) != null) {
             boolean success = this.Push(data);
@@ -69,12 +64,12 @@ public class ListFlow extends Flow {
     }
 
     @Override
-    public boolean Push(int index, Datable data) {
+    public boolean Push(int index, Datable data)throws ExplainException {
         return this.Get(index).Push(data);
     }
 
     @Override
-    public boolean Match(Flowable flow) {
+    public boolean Match(Flowable flow) throws ExplainException{
         int minSize = Math.min(this.inLen(), flow.inLen());
         for (int i = 0; i < minSize; i++) {
             boolean success = flow.Push(i, this.Get(i));
@@ -84,7 +79,7 @@ public class ListFlow extends Flow {
     }
 
     @Override
-    public Datable Pop() {
+    public Datable Pop()throws ExplainException {
         if (this.inLen() > 0) {
             return dataList.pop();
         }
@@ -92,12 +87,12 @@ public class ListFlow extends Flow {
     }
 
     @Override
-    public int inLen() {
+    public int inLen()throws ExplainException {
         return this.dataList.size();
     }
 
     @Override
-    public Datable Get(int index) {
+    public Datable Get(int index)throws ExplainException {
         if (index >= 0 && index < this.dataList.size()) {
             if (this.copyValue) {
                 SymbolData tmp = new SymbolData();
@@ -112,22 +107,22 @@ public class ListFlow extends Flow {
     }
 
     @Override
-    public void SetNextFlowing(Flowable flow) {
+    public void SetNextFlowing(Flowable flow)throws ExplainException {
         this.nextFlowing = flow;
     }
 
     @Override
-    public Flowable NextFlowing() {
+    public Flowable NextFlowing()throws ExplainException {
         return this.nextFlowing;
     }
 
     @Override
-    public boolean HasNextFlowing() {
+    public boolean HasNextFlowing()throws ExplainException {
         return this.nextFlowing != null;
     }
 
     @Override
-    public boolean Flowing() {
+    public boolean Flowing()throws ExplainException {
         if (this.nextFlowing == null) {
             return true;
         }

@@ -38,7 +38,7 @@ public class FuncFlow extends Flow {
 //        paramFlow.Flowing();
 //    }
 
-    public void setParamFlow(ListFlow paramFlow) {
+    public void setParamFlow(ListFlow paramFlow) throws ExplainException{
         if (!paramFlow.Match(this.paramFlow)) {
             throw new RuntimeException();
         }
@@ -47,63 +47,63 @@ public class FuncFlow extends Flow {
 
 
     @Override
-    public String GetSymbol() {
+    public String GetSymbol()throws ExplainException {
         return this.symbol;
     }
 
     @Override
-    public boolean Push(Datable data) {
+    public boolean Push(Datable data)throws ExplainException {
         return this.blockFlow.Push(data);
     }
 
     @Override
-    public boolean Push(Flowable flow) {
+    public boolean Push(Flowable flow)throws ExplainException {
         return this.blockFlow.Push(flow);
     }
 
     @Override
-    public boolean Push(int index, Datable data) {
+    public boolean Push(int index, Datable data)throws ExplainException {
         return this.blockFlow.Push(index, data);
     }
 
     @Override
-    public Datable Pop() {
+    public Datable Pop()throws ExplainException {
         return this.blockFlow.Pop();
     }
 
     @Override
-    public int inLen() {
+    public int inLen()throws ExplainException {
         return this.blockFlow.inLen();
     }
 
     @Override
-    public int outLen() {
+    public int outLen()throws ExplainException {
         return this.blockFlow.outLen();
     }
 
     @Override
-    public Datable Get(int index) {
+    public Datable Get(int index)throws ExplainException {
         return this.blockFlow.Get(index);
     }
 
 
     @Override
-    public void SetNextFlowing(Flowable flow) {
+    public void SetNextFlowing(Flowable flow)throws ExplainException {
         this.blockFlow.SetNextFlowing(flow);
     }
 
     @Override
-    public Flowable NextFlowing() {
+    public Flowable NextFlowing()throws ExplainException {
         return this.blockFlow.NextFlowing();
     }
 
     @Override
-    public boolean HasNextFlowing() {
+    public boolean HasNextFlowing()throws ExplainException {
         return this.blockFlow.HasNextFlowing();
     }
 
     @Override
-    public boolean Flowing() {
+    public boolean Flowing() throws ExplainException{
 //        new FldwCompiler(new StringReader(this.getValue().toString())).make_func_flow(this.getSymbol());
 //        System.out.println("begin func=====");
 //        System.err.println("this: "+this);

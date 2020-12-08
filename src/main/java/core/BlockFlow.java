@@ -3,59 +3,57 @@ package core;
 import java.util.ArrayList;
 
 public class BlockFlow extends Flow {
-    private int identity; // System.identityHashCode(this) 返回对象的内存地址，不管该对象的类是否重写了 hashCode() 方法。
     private Flowable inFlow;
     private Flowable outFlow;
     private ArrayList<Flowable> flowList;
 
     public BlockFlow() {
-        this.identity = System.identityHashCode(this);
         this.inFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(SymbolTable.InSymbol).assertGetFlowable();
         this.outFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(SymbolTable.OutSymbol).assertGetFlowable();
         this.flowList = new ArrayList<>();
     }
 
-    public boolean addFlow(Flowable flow) {
+    public boolean addFlow(Flowable flow) throws ExplainException {
         return this.flowList.add(flow);
     }
 
     @Override
-    public boolean Push(Datable data) {
+    public boolean Push(Datable data) throws ExplainException {
         return this.inFlow.Push(data);
     }
 
     @Override
-    public boolean Push(Flowable flow) {
+    public boolean Push(Flowable flow) throws ExplainException {
         return this.inFlow.Push(flow);
     }
 
     @Override
-    public boolean Push(int index, Datable data) {
+    public boolean Push(int index, Datable data) throws ExplainException {
         return this.inFlow.Push(index, data);
     }
 
     @Override
-    public Datable Pop() {
+    public Datable Pop() throws ExplainException {
         return this.outFlow.Pop();
     }
 
     @Override
-    public int inLen() {
+    public int inLen() throws ExplainException {
         return this.inFlow.inLen();
     }
 
     @Override
-    public int outLen() {
+    public int outLen() throws ExplainException {
         return this.outFlow.outLen();
     }
 
     @Override
-    public Datable Get(int index) {
+    public Datable Get(int index) throws ExplainException {
         return this.outFlow.Get(index);
     }
 
     @Override
-    public void SetNextFlowing(Flowable flow) {
+    public void SetNextFlowing(Flowable flow) throws ExplainException {
         DelayFlow delayOutFlow = new DelayFlow(this.outFlow);
         delayOutFlow.SetNextFlowing(flow);
         this.addFlow(delayOutFlow);
@@ -64,17 +62,17 @@ public class BlockFlow extends Flow {
     }
 
     @Override
-    public Flowable NextFlowing() {
+    public Flowable NextFlowing() throws ExplainException {
         return this.outFlow.NextFlowing();
     }
 
     @Override
-    public boolean HasNextFlowing() {
+    public boolean HasNextFlowing() throws ExplainException {
         return this.outFlow.HasNextFlowing();
     }
 
     @Override
-    public boolean Flowing() {
+    public boolean Flowing() throws ExplainException {
 //        System.out.println(this.flowList);
         for (Flowable flow : this.flowList) {
 //            System.out.println("flow: " + flow);

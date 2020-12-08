@@ -1,6 +1,7 @@
 package examples;
 
 import core.Datable;
+import core.ExplainException;
 import core.ExprData;
 import core.SymbolTable;
 import javacc.FldwCompiler;
@@ -18,7 +19,7 @@ import static org.junit.Assert.*;
 public class UnitTest {
     public static boolean UnitTest = true;
 
-    public static void main(String[] args) throws ParseException {
+    public static void main(String[] args) throws ParseException, ExplainException {
         Result result = JUnitCore.runClasses(UnitTest.class);
         for (Failure failure : result.getFailures()) {
             System.err.println("Fail: " + failure.getTestHeader());
@@ -32,7 +33,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestExprDataExample1() throws ParseException {
+    public void TestExprDataExample1() throws ParseException, ExplainException {
         Datable data = new FldwCompiler(
                 new StringReader(
                         "1"
@@ -46,7 +47,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestExprDataExample2() throws ParseException {
+    public void TestExprDataExample2() throws ParseException, ExplainException {
         SymbolTable.Clear();
 
         Datable data = new FldwCompiler(
@@ -62,7 +63,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestExprDataExample3() throws ParseException {
+    public void TestExprDataExample3() throws ParseException, ExplainException {
         SymbolTable.Clear();
 
         Datable data = new FldwCompiler(
@@ -78,7 +79,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestExprDataExample4() throws ParseException {
+    public void TestExprDataExample4() throws ParseException, ExplainException {
         SymbolTable.Clear();
 
         Datable data = new FldwCompiler(
@@ -98,7 +99,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestExprDataExample5() throws ParseException {
+    public void TestExprDataExample5() throws ParseException, ExplainException {
         SymbolTable.Clear();
 
         Datable data = new FldwCompiler(
@@ -118,7 +119,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestExprDataExample6() throws ParseException {
+    public void TestExprDataExample6() throws ParseException, ExplainException {
         SymbolTable.Clear();
 
         Datable data = new FldwCompiler(
@@ -138,7 +139,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestExprDataExample7() throws ParseException {
+    public void TestExprDataExample7() throws ParseException, ExplainException {
         SymbolTable.Clear();
 
         Datable data = new FldwCompiler(
@@ -158,7 +159,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestExprDataExample8() throws ParseException {
+    public void TestExprDataExample8() throws ParseException, ExplainException {
         SymbolTable.Clear();
 
         Datable data = new FldwCompiler(
@@ -178,7 +179,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestExprDataExample9() throws ParseException {
+    public void TestExprDataExample9() throws ParseException, ExplainException {
         SymbolTable.Clear();
 
         Datable data = new FldwCompiler(
@@ -198,7 +199,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestExprDataExample101() throws ParseException {
+    public void TestExprDataExample101() throws ParseException, ExplainException {
         SymbolTable.Clear();
 
         Datable data = new FldwCompiler(
@@ -214,7 +215,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestExprDataExample102() throws ParseException {
+    public void TestExprDataExample102() throws ParseException, ExplainException {
         SymbolTable.Clear();
 
         Datable data = new FldwCompiler(
@@ -230,7 +231,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestExprDataExample103() throws ParseException {
+    public void TestExprDataExample103() throws ParseException, ExplainException {
         SymbolTable.Clear();
 
         Datable data = new FldwCompiler(
@@ -246,7 +247,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestExprDataExample200() throws ParseException {
+    public void TestExprDataExample200() throws ParseException, ExplainException {
         SymbolTable.Clear();
 
         Datable data = new FldwCompiler(
@@ -262,7 +263,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestExprDataExample201() throws ParseException {
+    public void TestExprDataExample201() throws ParseException, ExplainException {
         SymbolTable.Clear();
 
         Datable data = new FldwCompiler(
@@ -278,7 +279,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestExprDataExample301() throws ParseException {
+    public void TestExprDataExample301() throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 
@@ -302,7 +303,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestFlowExample1() {
+    public void TestFlowExample1()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 
@@ -340,7 +341,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestFlowExample2() {
+    public void TestFlowExample2()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 
@@ -379,7 +380,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestFlowExample3() {
+    public void TestFlowExample3()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 
@@ -436,7 +437,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestFlowExample4() {
+    public void TestFlowExample4() throws ParseException, ExplainException{
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 
@@ -477,7 +478,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestFlowExample5() {
+    public void TestFlowExample5() throws ParseException, ExplainException{
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
         System.setIn(new ByteArrayInputStream("1, 1.213, true, \"dada\"".getBytes()));
@@ -514,7 +515,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestFlowExample6() {
+    public void TestFlowExample6()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
         System.setIn(new ByteArrayInputStream("1 1.213 true \"dada\"".getBytes()));
@@ -551,7 +552,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestFlowExample7() {
+    public void TestFlowExample7()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 
@@ -598,7 +599,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestBlockExample1() {
+    public void TestBlockExample1()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 
@@ -655,7 +656,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestBlockExample2() {
+    public void TestBlockExample2()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 
@@ -711,7 +712,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestBlockExample3() {
+    public void TestBlockExample3()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 
@@ -757,7 +758,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestIfElseExample1() {
+    public void TestIfElseExample1()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 
@@ -805,7 +806,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestIfElseExample2() {
+    public void TestIfElseExample2()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 
@@ -845,7 +846,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestIfElseExample3() {
+    public void TestIfElseExample3()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 
@@ -896,7 +897,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestWhileExample1() {
+    public void TestWhileExample1()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 
@@ -944,7 +945,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestWhileExample2() {
+    public void TestWhileExample2()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 
@@ -993,7 +994,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestForExample1() {
+    public void TestForExample1()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 
@@ -1036,7 +1037,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestForExample2() {
+    public void TestForExample2()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 
@@ -1089,7 +1090,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestFuncExample1() {
+    public void TestFuncExample1()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 
@@ -1138,7 +1139,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestFuncExample2() {
+    public void TestFuncExample2()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 
@@ -1191,7 +1192,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestFuncExample3() {
+    public void TestFuncExample3()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 
@@ -1244,7 +1245,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestFuncExample4() {
+    public void TestFuncExample4()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 
@@ -1335,7 +1336,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestFuncExample5() {
+    public void TestFuncExample5()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 
@@ -1382,7 +1383,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestQuickSortExample1() {
+    public void TestQuickSortExample1()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 
@@ -1559,7 +1560,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestQuickSortExample2() {
+    public void TestQuickSortExample2()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 
@@ -1631,7 +1632,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestQuickSortExample3() {
+    public void TestQuickSortExample3()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 
@@ -1728,7 +1729,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestQuickSortExample4() {
+    public void TestQuickSortExample4()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 

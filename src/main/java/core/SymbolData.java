@@ -14,10 +14,10 @@ public class SymbolData extends Data {
         this.symbol = null;
     }
 
-    public SymbolData(Datable data) {
-        super();
-        this.Push(data);
-    }
+//    public SymbolData(Datable data) {
+//        super();
+//        this.Push(data);
+//    }
 
     public SymbolData(String symbol) {
         super();
@@ -26,7 +26,7 @@ public class SymbolData extends Data {
 
 
     @Override
-    public boolean Push(Datable symbolData) {
+    public boolean Push(Datable symbolData) throws ExplainException{
         this.SetType(symbolData.GetType());
         this.SetValue(symbolData.GetValue());
         return true;
@@ -34,22 +34,22 @@ public class SymbolData extends Data {
 
 
     @Override
-    public DataType GetType() {
+    public DataType GetType()throws ExplainException {
         return this.type;
     }
 
     @Override
-    public Object GetValue() {
+    public Object GetValue()throws ExplainException {
         return this.value;
     }
 
     @Override
-    public String GetSymbol() {
+    public String GetSymbol()throws ExplainException {
         return this.symbol;
     }
 
     @Override
-    public boolean SetType(DataType type) {
+    public boolean SetType(DataType type) throws ExplainException{
         if (this.type == null) {
             this.type = type;
             return true;
@@ -61,7 +61,7 @@ public class SymbolData extends Data {
     }
 
     @Override
-    public boolean SetValue(Object value) {
+    public boolean SetValue(Object value)throws ExplainException {
         if (this.type == null) {
             return false;
         } else {

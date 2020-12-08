@@ -1,6 +1,7 @@
 package std;
 
 import core.Datable;
+import core.ExplainException;
 import core.Flow;
 import core.Flowable;
 import examples.UnitTest;
@@ -15,7 +16,7 @@ public class StdOutFlow extends Flow {
     }
 
     @Override
-    public boolean Push(Datable data) {
+    public boolean Push(Datable data) throws ExplainException {
 //        Debug 模式，输出全部信息
         if (UnitTest.UnitTest) {
             System.out.println("stdout: " + data);
@@ -26,7 +27,7 @@ public class StdOutFlow extends Flow {
     }
 
     @Override
-    public boolean Push(Flowable flow) {
+    public boolean Push(Flowable flow)throws ExplainException {
         Datable data;
         while ((data = flow.Pop()) != null) {
             boolean success = this.Push(data);
@@ -36,7 +37,7 @@ public class StdOutFlow extends Flow {
     }
 
     @Override
-    public boolean HasNextFlowing() {
+    public boolean HasNextFlowing()throws ExplainException {
         return false;
     }
 

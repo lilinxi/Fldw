@@ -8,37 +8,37 @@ public class Data extends Symbol implements Datable {
 //    }
 
     @Override
-    public boolean Push(Datable data) {
+    public boolean Push(Datable data) throws ExplainException{
         throw new RuntimeException("no impl, wrong call");
     }
 
     @Override
-    public DataType GetType() {
+    public DataType GetType()throws ExplainException {
         throw new RuntimeException("no impl, wrong call");
     }
 
     @Override
-    public Object GetValue() {
+    public Object GetValue() throws ExplainException{
         throw new RuntimeException("no impl, wrong call");
     }
 
     @Override
-    public String GetSymbol() {
+    public String GetSymbol()throws ExplainException {
         throw new RuntimeException("no impl, wrong call");
     }
 
     @Override
-    public boolean SetType(DataType type) {
+    public boolean SetType(DataType type) throws ExplainException{
         throw new RuntimeException("no impl, wrong call");
     }
 
     @Override
-    public boolean SetValue(Object value) {
+    public boolean SetValue(Object value)throws ExplainException {
         throw new RuntimeException("no impl, wrong call");
     }
 
     @Override
-    public boolean equals(Datable data) {
+    public boolean equals(Datable data) throws ExplainException{
         if (this.GetType() == null && data.GetType() == null) {
             return true;
         } else if (this.GetType() == data.GetType() && this.GetValue().toString().equals(data.GetValue().toString())) {
@@ -49,7 +49,7 @@ public class Data extends Symbol implements Datable {
     }
 
     @Override
-    public Datable Clone() {
+    public Datable Clone()throws ExplainException {
         return this;
     }
 }
