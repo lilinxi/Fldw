@@ -12,6 +12,18 @@ Fldw，寓意数据的流动，是一个支持模式匹配的流式编程语言�
 
 # 快速上手
 
+```shell script
+docker run -it adoptopenjdk/openjdk15 /bin/bash 
+apt-get update
+apt-get install git
+git clone https://github.com/lilinxi/Fldw.git
+exit
+
+docker commit -a "imortal" -m "fldw v0.0.5" 36deecbc7bcd fldw:v0.0.5
+docker images fldw:v0.0.5
+docker tag c1c410f64b46 imortal/fldw:v0.0.5
+docker push imortal/fldw:v0.0.5 
+```
 
 ```shell script
 docker run -it --net host openjdk /bin/bash
