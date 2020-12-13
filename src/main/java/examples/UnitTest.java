@@ -758,6 +758,71 @@ public class UnitTest {
     }
 
     @Test
+    public void TestBlockExample4()throws ParseException, ExplainException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+
+        try {
+            SymbolTable.Clear();
+            FldwCompiler.parse("""
+                    import std.Std
+                    {
+                        ["hello"] | stdout
+                        [1, 2, 3] | stdout
+                        [true, false] | stdout
+                        [1.1 2.2 3.3] | stdout
+                    }
+                    """);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        System.setOut(System.out);
+
+        assertEquals("""
+                stdout: TerminalData{type=String, value="hello"}
+                stdout: TerminalData{type=Int, value=1}
+                stdout: TerminalData{type=Int, value=2}
+                stdout: TerminalData{type=Int, value=3}
+                stdout: TerminalData{type=Bool, value=true}
+                stdout: TerminalData{type=Bool, value=false}
+                stdout: TerminalData{type=Double, value=1.1}
+                stdout: TerminalData{type=Double, value=2.2}
+                stdout: TerminalData{type=Double, value=3.3}
+                """, output.toString());
+    }
+
+    @Test
+    public void TestBlockExample5()throws ParseException, ExplainException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+
+        try {
+            SymbolTable.Clear();
+            FldwCompiler.parse("""
+                    import std.Std
+                    [1, 2, 3, 4] | {
+                        in | [1, 2] | sym
+                        sym | out
+                    } | stdout
+                    """);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        System.setOut(System.out);
+
+        assertEquals("""
+                stdout: TerminalData{type=Int, value=1}
+                stdout: TerminalData{type=Int, value=2}
+                stdout: TerminalData{type=Int, value=1}
+                stdout: TerminalData{type=Int, value=2}
+                stdout: TerminalData{type=Int, value=3}
+                stdout: TerminalData{type=Int, value=4}
+                """, output.toString());
+    }
+
+    @Test
     public void TestIfElseExample1()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
@@ -855,7 +920,7 @@ public class UnitTest {
             FldwCompiler.parse("""
                     import std.Std
                     [1, 2, 3, 4] | if ( 1<2 ) {
-                        in -> [a, b] | out
+                       in -> [a, b] | out
                     } else {
                        in | out
                     } | stdout
@@ -894,6 +959,37 @@ public class UnitTest {
 //                        }
 //                        """,
 //                SymbolTable.CurrentSymbolTable().toString());
+    }
+
+    @Test
+    public void TestIfElseExample4()throws ParseException, ExplainException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+
+        try {
+            SymbolTable.Clear();
+            FldwCompiler.parse("""
+                    import std.Std
+                    [1, 2, 3, 4] | if ( 1<2 ) {
+                       in | [a, b] | out
+                    } else {
+                       in | out
+                    } | stdout
+                    """);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        System.setOut(System.out);
+
+        assertEquals("""
+                stdout: SymbolData{type=null, value=null, symbol='a'}
+                stdout: SymbolData{type=null, value=null, symbol='b'}
+                stdout: TerminalData{type=Int, value=1}
+                stdout: TerminalData{type=Int, value=2}
+                stdout: TerminalData{type=Int, value=3}
+                stdout: TerminalData{type=Int, value=4}
+                """, output.toString());
     }
 
     @Test
@@ -945,7 +1041,7 @@ public class UnitTest {
     }
 
     @Test
-    public void TestWhileExample2()throws ParseException, ExplainException {
+    public void TestWhileExample5()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
 

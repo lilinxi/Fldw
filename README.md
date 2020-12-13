@@ -12,6 +12,8 @@ Fldw，寓意数据的流动，是一个支持模式匹配的流式编程语言�
 
 # 快速上手
 
+https://www.cnblogs.com/lsgxeva/p/8746644.html
+
 ```shell script
 docker run -it adoptopenjdk/openjdk15 /bin/bash 
 apt-get update
@@ -23,10 +25,8 @@ docker commit -a "imortal" -m "fldw v0.0.5" 36deecbc7bcd fldw:v0.0.5
 docker images fldw:v0.0.5
 docker tag c1c410f64b46 imortal/fldw:v0.0.5
 docker push imortal/fldw:v0.0.5 
-```
 
-```shell script
-docker run -it --net host openjdk /bin/bash
+docker pull imortal/fldw:v0.0.5
 ```
 
 ---
@@ -322,15 +322,102 @@ null
 null
 ```
 
-其中
+其中第二个流`[a, b, c, d]`被第一个流的前四个值复制，而之后将其值复制到第三个流`[e, f, g, h, i, j]`的前四个值，并保持后两个值为`null`。
 
 ## 导入包语句
 
-## 块语句
+Fldw 语言支持扩展包的导入，使用插件机制。目前只包含标准输入包和标准输出包`std.Std`
+
+```shell script
+["hello world"] | stdout
+```
+
+在这里没有任何输出，stdout 被解析为一个符号流，因为标准输入输出包并未加载。下面加载标准输入输出包：
+
+```shell script
+import std.Std
+["hello world"] | stdout
+```
+
+此时输出为：`hello world`
+
+> stdin 不能在交互模式中使用，因为交互模式中标准输入被占用，只能在脚本文件中使用。可以参考`cat_example.sh`
 
 ## 表达式语句
 
+Fldw 中目前支持 +，-，*，/，% 等算数运算，<，>，<=，>= 等比较运算，和 &&，||，!=，== 等逻辑运算。
+
+其中针对解析出的表达式，不会进行类型的判断和求值的操作，而在使用到表达式的值的时候，再进行运算符和运算值的类型匹配和求值操作。
+
+在运算中，int 和 double 的运算会被强转为 double 和 double 的运算，例如：
+
+```shell script
+import std.Std
+[1+2 2.2+3.3 true||false 2<3] | stdout
+```
+
+其输出为：
+
+```shell script
+3
+5.5
+true
+true
+```
+
+
+## 块语句
+
+Fldw 中的块为一系列可执行流语句的集合。例如：
+
+```shell script
+import std.Std
+{
+  ["hello"] | stdout
+  [1, 2, 3] | stdout
+  [true, false] | stdout
+  [1.1 2.2 3.3] | stdout
+}
+```
+
+其输出为：
+
+```shell script
+"hello"
+1
+2
+3
+true
+false
+1.1
+2.2
+3.3
+```
+
+在一个块中，所有的语句都会等待块语句解析完成后再执行。
+
+另外，一个块语句也可以作为一个单独的流被调用，其中输入和输出通过`in`和`out`来指定，例如：
+
+```shell script
+import std.Std
+[1, 2, 3, 4] | sym | {
+  in -> [a, b, c] | out
+} | stdout
+```
+
+其输出为：
+
+```shell script
+1
+2
+3
+```
+
+> 因为交互模式是按行输入的，所以暂时不支持换行的 block 输入，如需在交互模式中使用 block，请将 block 写作一行使用。
+
 ## 控制语句
+
+Fldw 中支持的控制语句包括，if-else，while 和 for，其中 for 为遍历一个数据流。其实例为：
 
 ## 函数语句
 
@@ -344,7 +431,122 @@ null
 
 ---
 
-# 语义详解
+# 指称语义详解
+
+## 抽象语义
+
+```
+Command ::= Skip
+     | "[" Data, Data "]"                           //Q
+     | SYMBOL
+     | SYMBOL ( Actual_Parameter_Sequence )
+     | if_expr
+     | while ( Data ) { Command } 
+     | for (Data ) { Command }
+     | Command < MATCHING > Command
+     | Command < FLOWING > Command
+     | Command Command              //Q
+
+if_expr = 
+
+Data ::= INT_VALUE
+     | DOUBLE_VALUE
+              | BOOL_VALUE
+     | NULL_VALUE
+     | STRING_VALUE
+     | SYMBOL
+     | ! SYMBOL
+     | SYMBOL ( Actual_Parameter_Sequence )
+        | ( Expression )
+        | [ Expression more_Expression* ]                //流数据
+        | # [ Expression more_Expression* ]              //取值
+        | Expression && Expression
+        | Expression || Expression
+        | Expression * Expression
+        | Expression / Expression
+        | Expression + Expression
+        | Expression - Expression
+        | % Expression
+        | Expression < Expression
+        | Expression >Expression
+        | Expression <= Expression
+        | Expression >= Expression
+        | Expression == Expression
+        | Expression != Expression
+
+moreData ::= , moreData
+Declaration ::= import SYMBOL . SYMBOL
+      | function SYMBOL ( Formal_Parameter_Sequence ) { Command }
+Formal_Parameter_Sequence ::= Formal_Parameter
+        | Formal_Parameter , Formal_Parameter_Sequence
+Formal_Parameter ::= SYMBOL        //Q:有几种形参类型
+Actual_Parameter_Sequence ::= Actual_Parameter
+        | Actual_Parameter , Actual_Parameter_Sequence
+Actual_Parameter ::= SYMBOL           //Q
+```
+## 语义域
+
+### 错误
+
+### 真值域
+
+### 数字域
+
+### 字符串域
+```
+integer        N
+double        D
+boolean           B = { true, false }
+null        L
+string        S
+symbol        M 
+flow        F 
+function       C
+value        V = N + D + B + L + S + M + F + C
+type        T = { integer , double , boolean , null , string , 
+            symbol , flow , function } 
+store           St
+environ        En
+```
+### 说明
+symbol类型
+```
+```
+flow类型
+```
+```
+store类型
+```
+```
+environ类型
+```
+```
+## 语义函数
+
+```shell script
+execute [ F1 -> F2 ] env sto = 
+    let val = evaluate car(F1) env sto in
+    let variable loc = find(env, car(F2)) in
+    update(sto, loc, val)
+    if !empty(cdr[F1]) && !empty(cdr[F2]) = boolean true
+    then execute [ cdr[F1] -> cdr[F2] ]
+
+execute [ F1 | F2 ] env sto = 
+    let val = evaluate car(F1) env sto in
+    cons(val, F2)
+    if !empty(cdr[F1]) = boolean true
+    then execute [ cdr[F1] | F2 ]
+```
+
+## 辅助函数
+
+```shell script
+empty: list -> boolean
+update: env X env—stack X id X value -> env
+cons: value X list -> list // 合并元素和列表
+car: list -> value  // 获取列表的第一个元素
+cdr: list -> list // 获取列表除去第一个元素的列表
+```
 
 ---
 
@@ -360,6 +562,8 @@ added lines: 18082, removed lines: 9526, total lines: 8556
 ## 基础模型设计
 
 ## 表达式树设计
+
+## 包模块设计
 
 ## 语句块设计
 
