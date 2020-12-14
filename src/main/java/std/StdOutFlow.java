@@ -24,6 +24,7 @@ public class StdOutFlow extends Flow {
         if (UnitTest.UnitTest) {
             System.out.println("stdout: " + data);
         } else {
+            data.GetType();
             System.out.println(data.GetValue());
         }
         return true;

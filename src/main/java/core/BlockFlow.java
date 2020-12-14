@@ -40,6 +40,12 @@ public class BlockFlow extends Flow {
     }
 
     @Override
+    public void SetFlowOp(FlowOp flowOp) throws ExplainException {
+        super.SetFlowOp(flowOp);
+        this.outFlow.SetFlowOp(flowOp);
+    }
+
+    @Override
     public boolean Push(Datable data) throws ExplainException {
         return this.inFlow.Push(data);
     }
@@ -56,7 +62,7 @@ public class BlockFlow extends Flow {
 
     @Override
     public boolean Match(Flowable flow) throws ExplainException {
-        return this.inFlow.Match(flow);
+        return this.outFlow.Match(flow);
     }
 
     @Override
@@ -84,6 +90,7 @@ public class BlockFlow extends Flow {
         // 在中间处理操作中，操作结果不直接输入到下一流，而是使用延迟流，延迟等待所有中间处理操作完成后，再输入到下一流
         DelayFlow delayOutFlow = new DelayFlow(this.outFlow);
         delayOutFlow.SetNextFlowing(flow);
+        this.outFlow = delayOutFlow; // 重写 outflow
         this.addFlow(delayOutFlow);
     }
 
@@ -99,6 +106,7 @@ public class BlockFlow extends Flow {
 
     @Override
     public boolean Flowing() throws ExplainException {
+        this.outFlow.SetFlowOp(this.flowOp);
         for (Flowable flow : this.flowList) {
             boolean success = flow.Flowing();
             if (!success) throw new ExplainException("Flowing Error: " + flow);

@@ -24,12 +24,17 @@ public class Flow extends Symbol implements Flowable {
     }
 
     @Override
-    public void setCopyValue(boolean copyValue) throws ExplainException {
+    public FlowOp GetFlowOp() throws ExplainException {
+        return this.flowOp;
+    }
+
+    @Override
+    public void SetCopyValue(boolean copyValue) throws ExplainException {
         this.copyValue = copyValue;
     }
 
     @Override
-    public void setParamFlow(Flowable paramFlow) throws ExplainException {
+    public void SetParamFlow(Flowable paramFlow) throws ExplainException {
         throw new ExplainException("Illegal call");
     }
 

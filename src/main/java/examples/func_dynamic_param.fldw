@@ -1,0 +1,9 @@
+import std.Std
+function func([a, b, c]) {
+    [a, b, c] | stdout
+}
+func([1, 2])
+["-----"] | stdout
+func([1, 2, 3, 4])
+["-----"] | stdout
+func()

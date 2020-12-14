@@ -181,6 +181,14 @@ public class SymbolTable {
         }
     }
 
+    //    新增符号，若存在则更新，返回新增的符号项
+    public SymbolItem UpdateSymbol(String symbol, SymbolType type, Object value) throws ExplainException {
+//            java TreeMap put 的返回值并不是插入的元素，而是 null 或者被重复 key 覆盖的元素
+        SymbolItem item = new SymbolItem(symbol, type, value);
+        this.SymbolItemTreeMap.put(symbol, item);
+        return item;
+    }
+
     //    遇见一个符号，不确定是已有的还是新增的，若有则返回，没有则新增
     public SymbolItem PutOrRecurseGetSymbol(String symbol, SymbolType type) throws ExplainException {
         SymbolItem symbolItem = this.RecurseGetSymbol(symbol, true); // 默认为 true

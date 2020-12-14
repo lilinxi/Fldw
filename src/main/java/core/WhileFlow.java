@@ -29,7 +29,7 @@ public class WhileFlow extends Flow {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new ExplainException("type mismatch " + conditionData.GetType());
         }
-        if (conditionData.GetValue().equals(true)) {
+        if (conditionData.GetValue().toString().equals("true")) {
             return this.trueFlow.Push(data);
         } else {
             return false;
@@ -41,7 +41,7 @@ public class WhileFlow extends Flow {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new ExplainException("type mismatch " + conditionData.GetType());
         }
-        if (conditionData.GetValue().equals(true)) {
+        if (conditionData.GetValue().toString().equals("true")) {
             return this.trueFlow.Push(flow);
         } else {
             return false;
@@ -53,7 +53,7 @@ public class WhileFlow extends Flow {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new ExplainException("type mismatch " + conditionData.GetType());
         }
-        if (conditionData.GetValue().equals(true)) {
+        if (conditionData.GetValue().toString().equals("true")) {
             return this.trueFlow.Push(index, data);
         } else {
             return false;
@@ -65,7 +65,7 @@ public class WhileFlow extends Flow {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new ExplainException("type mismatch " + conditionData.GetType());
         }
-        if (conditionData.GetValue().equals(true)) {
+        if (conditionData.GetValue().toString().equals("true")) {
             return this.trueFlow.Match(flow);
         } else {
             return false;
@@ -77,7 +77,7 @@ public class WhileFlow extends Flow {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new ExplainException("type mismatch " + conditionData.GetType());
         }
-        if (conditionData.GetValue().equals(true)) {
+        if (conditionData.GetValue().toString().equals("true")) {
             return this.trueFlow.Pop();
         } else {
             return null;
@@ -89,7 +89,7 @@ public class WhileFlow extends Flow {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new ExplainException("type mismatch " + conditionData.GetType());
         }
-        if (conditionData.GetValue().equals(true)) {
+        if (conditionData.GetValue().toString().equals("true")) {
             return this.trueFlow.inLen();
         } else {
             return 0;
@@ -101,7 +101,7 @@ public class WhileFlow extends Flow {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new ExplainException("type mismatch " + conditionData.GetType());
         }
-        if (conditionData.GetValue().equals(true)) {
+        if (conditionData.GetValue().toString().equals("true")) {
             return this.trueFlow.outLen();
         } else {
             return 0;
@@ -113,7 +113,7 @@ public class WhileFlow extends Flow {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new ExplainException("type mismatch " + conditionData.GetType());
         }
-        if (conditionData.GetValue().equals(true)) {
+        if (conditionData.GetValue().toString().equals("true")) {
             return this.trueFlow.Get(index);
         } else {
             return null;
@@ -142,7 +142,7 @@ public class WhileFlow extends Flow {
             throw new ExplainException("type mismatch " + conditionData.GetType());
 
         }
-        while (conditionData.GetValue().equals(true)) {
+        while (conditionData.GetValue().toString().equals("true")) {
             boolean success = this.trueFlow.Flowing();
             if (!success) throw new ExplainException("Flowing Error: " + this.trueFlow);
             if (conditionData.GetType() != Datable.DataType.Bool) {

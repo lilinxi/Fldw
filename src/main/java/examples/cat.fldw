@@ -1,0 +1,2 @@
+import std.Std
+stdin | stdout

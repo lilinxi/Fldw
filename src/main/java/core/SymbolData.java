@@ -20,13 +20,11 @@ public class SymbolData extends Data {
     }
 
     @Override
-    public boolean Push(Datable symbolData) throws ExplainException {
-        boolean ret = true;
-        this.SetType(symbolData.GetType());
-        this.SetValue(symbolData.GetValue());
-        return ret;
+    public boolean Push(Datable symbolData) throws ExplainException { // Push 的时候不做类型的校检。、
+        this.type = symbolData.GetType();
+        this.value = symbolData.GetValue();
+        return true;
     }
-
 
     @Override
     public DataType GetType() throws ExplainException {

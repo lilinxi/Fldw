@@ -1,0 +1,22 @@
+import std.Std
+
+function func([n]) {
+    if ( n == 0 || n==1 ) {
+        [n] | out
+    } else {
+        func([n-1]) -> [n1]
+        func([n-2]) -> [n2]
+        [n1 + n2] | out
+    } | out
+}
+
+func([0]) | stdout
+func([1]) | stdout
+func([2]) | stdout
+func([3]) | stdout
+func([4]) | stdout
+func([5]) | stdout
+func([6]) | stdout
+func([7]) | stdout
+func([8]) | stdout
+func([9]) | stdout

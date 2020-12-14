@@ -1,3 +1,4 @@
+cd $(dirname $0)
 rm ./FldwCompiler.java
 rm ./FldwCompilerConstants.java
 rm ./FldwCompilerTokenManager.java
