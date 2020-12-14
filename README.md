@@ -426,7 +426,221 @@ import std.Std
 
 Fldw 中支持的控制语句包括，if-else，while 和 for，其中 for 为遍历一个数据流。其实例为：
 
+### if 语句
+
+程序实例为：
+
+```shell script
+import std.Std
+if ( 1>2 ) {
+    [1] | stdout
+} else {
+    [2] | stdout
+}
+```
+
+其输出为：
+
+```shell script
+2
+```
+
+当然一个 if 语句块也可以作为一个数据流来进行输入和输出：
+
+程序实例为：
+
+```shell script
+import std.Std
+[1, 2, 3, 4] | if ( 1<2 ) {
+  in -> [a, b] | out
+} else {
+  in | out
+} | stdout
+```
+
+其输出为：
+
+```shell script
+1
+2
+```
+
+### while 语句
+
+程序实例为：
+
+```shell script
+import std.Std
+[1, 2] -> [a, b]
+while ( a<b ) {
+  [a, b] | stdout
+  [b, a] -> [a, b]
+}
+[a, b] | stdout
+```
+
+其输出为：
+
+```shell script
+1
+2
+2
+2
+```
+
+当然一个 while 语句块也可以作为一个数据流来进行输入和输出：
+
+程序实例为：
+
+```shell script
+import std.Std
+[1, 2] -> [a, b] | while ( a<b ) {
+  in -> [b, a] -> [c, d, e, f] | out
+} | stdout
+```
+
+其输出为：
+
+```shell script
+1
+1
+null
+null
+
+```
+
+### for 语句
+
+程序实例为：
+
+```shell script
+import std.Std
+for ( [1, 2, 3] -> x ) {
+  [x] | stdout
+}
+```
+
+其输出为：
+
+```shell script
+1
+2
+3
+```
+
+当然一个 for 语句块也可以作为一个数据流来进行输入和输出：
+
+程序实例为：
+
+```shell script
+import std.Std
+[4, 5, 6] | for ( [1, 2, 3] -> x ) {
+  in | stdout
+  [x] | stdout
+}
+```
+
+其输出为：
+
+```shell script
+4
+5
+6
+1
+4
+5
+6
+2
+4
+5
+6
+3
+```
+
 ## 函数语句
+
+函数语句即为一个命名的语句块，可以被重复调用和执行。
+
+其实例为：
+
+```shell script
+import std.Std
+function func() {
+  [1, 2] | stdout
+}
+func()
+```
+
+其输出为：
+
+```shell script
+1
+2
+```
+
+函数可以传递参数，并且参数的数量可以灵活控制。
+
+其实例为：
+
+```shell script
+import std.Std
+function func([a, b, c]) {
+  [a, b, c] | stdout
+}
+func([1, 2])
+func([1, 2, 3, 4])
+func()
+```
+
+其输出为：
+
+```shell script
+1
+2
+null
+1
+2
+3
+null
+null
+null
+```
+
+函数可以实现递归的调用，例如快速排序：
+
+```shell script
+import std.Std
+function sort() {
+    in | [!head;!tail]
+    if ( head != null ) { 
+        [] | !leftHead
+        [] | !rightHead
+        for ( tail -> !tmp) {
+            if ( tmp < head ) {
+                #[tmp] | leftHead
+            } 
+            else {
+                #[tmp] | rightHead
+            }
+        }
+        leftHead | sort() | out
+        [head] | out
+        rightHead | sort() | out
+    } | out
+}
+[5, 6, 3, 2, 7, 8]  | sort() | stdout
+```
+
+其输出为：
+
+```shell script
+2
+3
+5
+6
+7
+8
+```
 
 ---
 
