@@ -1050,6 +1050,38 @@ public class UnitTest {
     }
 
     @Test
+    public void TestIfElseExample6()throws ParseException, ExplainException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+
+        try {
+            SymbolTable.Clear();
+            FldwCompiler.parse("""
+                    import std.Std
+                    [1 2] | if (true) {
+                        in | stdout
+                    }
+                    
+                    [1 2] | sym
+                    if (true) {
+                        sym | stdout
+                    }
+                    """);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        System.setOut(System.out);
+
+        assertEquals("""
+                stdout: TerminalData{type=Int, value=1}
+                stdout: TerminalData{type=Int, value=2}
+                stdout: TerminalData{type=Int, value=1}
+                stdout: TerminalData{type=Int, value=2}
+                """, output.toString());
+    }
+
+    @Test
     public void TestWhileExample1()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
@@ -1582,6 +1614,9 @@ public class UnitTest {
                     func([1]) | stdout
                     func([2]) | stdout
                     func([3]) | stdout
+                    func([4]) | stdout
+                    func([5]) | stdout
+                    func([6]) | stdout
                     """);
         } catch (ParseException e) {
             e.printStackTrace();
@@ -1590,15 +1625,13 @@ public class UnitTest {
         System.setOut(System.out);
 
         assertEquals("""
-                stdout: SymbolData{type=Int, value=1, symbol='a'}
-                stdout: SymbolData{type=Int, value=2, symbol='b'}
-                stdout: SymbolData{type=null, value=null, symbol='c'}
-                stdout: SymbolData{type=Int, value=1, symbol='a'}
-                stdout: SymbolData{type=Int, value=2, symbol='b'}
-                stdout: SymbolData{type=Int, value=3, symbol='c'}
-                stdout: SymbolData{type=null, value=null, symbol='a'}
-                stdout: SymbolData{type=null, value=null, symbol='b'}
-                stdout: SymbolData{type=null, value=null, symbol='c'}
+                stdout: SymbolData{type=Int, value=0, symbol='n'}
+                stdout: SymbolData{type=Int, value=1, symbol='n'}
+                stdout: ExprData{leftData=SymbolData{type=Int, value=1, symbol='n1'}, rightData=SymbolData{type=Int, value=0, symbol='n2'}, op=AddOp, type=null}
+                stdout: ExprData{leftData=SymbolData{type=Int, value=1, symbol='n1'}, rightData=SymbolData{type=Int, value=1, symbol='n2'}, op=AddOp, type=null}
+                stdout: ExprData{leftData=SymbolData{type=Int, value=2, symbol='n1'}, rightData=SymbolData{type=Int, value=1, symbol='n2'}, op=AddOp, type=null}
+                stdout: ExprData{leftData=SymbolData{type=Int, value=3, symbol='n1'}, rightData=SymbolData{type=Int, value=2, symbol='n2'}, op=AddOp, type=null}
+                stdout: ExprData{leftData=SymbolData{type=Int, value=5, symbol='n1'}, rightData=SymbolData{type=Int, value=3, symbol='n2'}, op=AddOp, type=null}
                 """, output.toString());
     }
 

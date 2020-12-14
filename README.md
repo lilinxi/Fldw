@@ -175,6 +175,254 @@ null
 
 ---
 
+# 词法详解
+
+```shell script
+SKIP : { " " | "\t" | "\n" | "\r" | "\f"}
+SPECIAL_TOKEN : { LINE_COMMIT = "//"(~["\n","\r"])* ("\n"|"\r\n"|"\r")? }
+TOKEN : { ";"  | "," | "(" | ")" | "}" | "{" | "]" | "[" 
+		| "+" | "-" | "*" | "/" | "%" 
+		| "==" | "!=" | "&&" | "||" | "<" | ">" | "<=" | ">=" 
+        | "if" | "else" | "while" | "for" 
+		| "function" 
+	    | "|" 
+        | "->" 
+        | "#" 
+        | "!"
+        | "import" 
+        |  "." 
+        | <INT_VALUE> | < DOUBLE_VALUE > | < BOOL_VALUE > | < STRING_VALUE > | < NULL_VALUE >
+        | < SYMBOL > | < OTHER > }
+```
+
+## 符号
+
+```shell script
+SEMIC = ";" 
+COMMA = "," 
+LBR = "(" 
+RBR = ")" 
+RCBR = "}" 
+LCBR = "{" 
+RSBR = "]" 
+LSBR = "[" 
+DOT = "."
+```
+
+## 运算符
+
+```shell script
+PLUS = "+" 
+MINUS = "-" 
+MULT = "*" 
+DIV = "/" 
+MOD = "%" 
+LOGIC_EQUAL = "==" 
+LOGIC_NOT = "!=" 
+LOGIC_AND = "&&" 
+LOGIC_OR = "||" 
+LEFT = "<" 
+RIGHT = ">"
+LEFT_EQUAL = "<=" 
+RIGHT_EQUAL = ">=" 
+```
+
+## 关键字
+
+```shell script
+IF = "if" 
+ELSE = "else"
+WHILE = "while" 
+FOR = "for" 
+FUNC = "function" 
+IMPORT = "import" 
+```
+
+## 操作符
+
+```shell script
+FLOWING = "|"        // 数据管道操作
+MATCHING = "->"      // 模式匹配操作
+HASHTAG = "#"        // 变量取值操作
+EXLM = "!"           // 显示定义为临时变量
+```
+
+---
+
+# 语法详解
+
+## 基础数据类型
+
+```shell script
+INT_VALUE = ["1"-"9"] (["0"-"9"])*
+            |   "0" ["x", "X"] (["0"-"9", "a"-"f", "A"-"F"])+
+            |   "0" (["0"-"7"])*
+DOUBLE_VALUE = ["1"-"9"] (["0"-"9"])*("."(["0"-"9"])*)? 
+BOOL_VALUE = "true" | "false" 
+NULL_VALUE = "null" 
+terminal_data = < INT_VALUE > | < DOUBLE_VALUE > | < BOOL_VALUE > |  < STRING_VALUE >
+symbol_data = [ < EXLM > ] < SYMBOL>
+data = < expr_data > | < symbol_data > | < terminal_data >
+term = < terminal_data > | < symbol_data > | ( < LBR > < expr_data > < RBR > )
+expr_data = < expr1_data > ( < LOGIC_OR > < expr1_data > )*
+expr1_data = < expr2_data > ( < LOGIC_AND > < expr2_data > )*
+expr2_data = < expr3_data > ( (< LEFT > | < RIGHT > | < LEFT_EQUAL > 
+		     | < RIGHT_EQUAL > | < LOGIC_EQUAL > | < LOGIC_NOT >) < expr3_data > )*
+expr3_data = < expr4_data > ( (< PLUS > | < MINUS >)  < expr4_data > )*
+expr4_data = < term > ( (< MULT > | < DIV > | < MOD >) < term > )*
+```
+
+## 流数据类型
+
+### 列表流
+
+```shell script
+list_flow = [ < HASHTAG > ] < LSBR  > < data > ( [ < COMMA > ] < data > )* < RSBR >
+```
+
+### 控制流
+
+```shell script
+if_else_flow = < IF > < LBR > < data > < RBR > < block > [ < ELSE > < block > ]
+while_flow = < WHILE > < LBR > < data > < RBR > < block >
+for_flow = < FOR > < LBR > < flow > < MATCHING > < symbol_data > < RBR > < block_flow >
+```
+
+### 语句块流
+
+```shell script
+block_flow = < LCBR > ( < flowing > )* < RCBR >
+```
+
+## 可执行语句
+
+### 流执行语句
+
+```shell script
+flow = < func_flow > | < head_tail_flow > | ([ < EXLM > ] < SYMBOL>) | < list_flow > 
+	   | < if_else_flow > | < while_flow > | < block_flow > | < for_flow >
+flowing = < flow > ( ( < MATCHING > | < FLOWING > ) < flow > )*
+```
+
+### import语句
+
+```shell script
+import_stmt = < IMPORT > < SYMBOL > < DOT > < SYMBOL >
+```
+
+### 函数定义语句
+
+```shell script
+def_func_stmt = < FUNC > < SYMBOL > < LBR > [ list_flow() ] < RBR > < block_flow >
+```
+
+## 其他
+
+```shell script
+stmt = < flowing > | < def_func_stmt > | < import_stmt >
+stmts = ( < stmt > )*
+program = < stmts > < EOF >
+```
+
+---
+
+# 指称语义详解
+
+## 抽象语义
+
+```shell script
+Command ::= Skip
+    | [ More_Data ]                             // PointerListFlow
+    | #[ More_Data ]                            // ValueListFlow
+    | SYMBOL                                    // SymbolFlow
+    | !SYMBOL                                   // TmpSymbolFlow
+    | SYMBOL ( Actual_Parameter_Sequence )      // FuncFlow
+    | If_Command                                // IfElseFlow
+    | While_Command                             // WhileFlow
+    | For_Command                               // ForFlow
+    | HeadTail_Command                          // HeadTailFlow
+    | Command -> Command                        // MatchFlowing
+    | Command | Command                         // PushFlowing
+    | Command Command                           // Flowings
+    | { Command }                               // BlockFlow
+
+More_Data ::= Skip
+    | , More_Data
+    | More_Data
+    | Data
+
+If_Command = if ( Data ) { Command } 
+    | if ( Data ) { Command } else { Command }
+
+While_Command ::= while ( Data ) { Command } 
+
+For_Command ::=  for ( Command -> Data ) { Command }
+
+Data ::= INT_VALUE
+    | DOUBLE_VALUE
+    | BOOL_VALUE
+    | NULL_VALUE
+    | STRING_VALUE
+    | SYMBOL
+    | ! SYMBOL
+    | ( Data )
+    | Data Operater Data
+
+Operater ::= + 
+    | - 
+    | * 
+    | / 
+    | % 
+    | < 
+    | > 
+    | <= 
+    | >= 
+    | %% 
+    | || 
+    | == 
+    | !=
+
+Declaration ::= import SYMBOL . SYMBOL
+      | function SYMBOL ( Formal_Parameter_Sequence ) { Command }
+
+Formal_Parameter_Sequence ::= Formal_Parameter
+        | Formal_Parameter , Formal_Parameter_Sequence
+
+Actual_Parameter_Sequence ::= Actual_Parameter
+        | Actual_Parameter , Actual_Parameter_Sequence
+```
+
+## 语义函数
+
+```shell script
+execute [ F1 -> F2 ] env sto = 
+    let val = evaluate car(F1) env sto in
+    let variable loc = find(env, car(F2)) in
+    update(sto, loc, val)
+    if !empty(cdr[F1]) && !empty(cdr[F2]) = boolean true
+    then execute [ cdr[F1] -> cdr[F2] ]
+```
+
+```shell script
+execute [ F1 | F2 ] env sto = 
+    let val = evaluate car(F1) env sto in
+    cons(val, F2)
+    if !empty(cdr[F1]) = boolean true
+    then execute [ cdr[F1] | F2 ]
+```
+
+## 辅助函数
+
+```shell script
+empty: list -> boolean                            // 判断列表是否为空
+update: env X env—stack X id X value -> env       // 赋值操作
+cons: value X list -> list                        // 合并元素和列表
+car: list -> value                                // 获取列表的第一个元素
+cdr: list -> list                                 // 获取列表除去第一个元素的列表
+```
+
+---
+
 # 语法详述
 
 ## 基础语句
@@ -639,133 +887,6 @@ function sort() {
 6
 7
 8
-```
-
----
-
-# 词法详解
-
----
-
-# 语法详解
-
----
-
-# 指称语义详解
-
-## 抽象语义
-
-```
-Command ::= Skip
-     | "[" Data, Data "]"                           //Q
-     | SYMBOL
-     | SYMBOL ( Actual_Parameter_Sequence )
-     | if_expr
-     | while ( Data ) { Command } 
-     | for (Data ) { Command }
-     | Command < MATCHING > Command
-     | Command < FLOWING > Command
-     | Command Command              //Q
-
-if_expr = 
-
-Data ::= INT_VALUE
-     | DOUBLE_VALUE
-              | BOOL_VALUE
-     | NULL_VALUE
-     | STRING_VALUE
-     | SYMBOL
-     | ! SYMBOL
-     | SYMBOL ( Actual_Parameter_Sequence )
-        | ( Expression )
-        | [ Expression more_Expression* ]                //流数据
-        | # [ Expression more_Expression* ]              //取值
-        | Expression && Expression
-        | Expression || Expression
-        | Expression * Expression
-        | Expression / Expression
-        | Expression + Expression
-        | Expression - Expression
-        | % Expression
-        | Expression < Expression
-        | Expression >Expression
-        | Expression <= Expression
-        | Expression >= Expression
-        | Expression == Expression
-        | Expression != Expression
-
-moreData ::= , moreData
-Declaration ::= import SYMBOL . SYMBOL
-      | function SYMBOL ( Formal_Parameter_Sequence ) { Command }
-Formal_Parameter_Sequence ::= Formal_Parameter
-        | Formal_Parameter , Formal_Parameter_Sequence
-Formal_Parameter ::= SYMBOL        //Q:有几种形参类型
-Actual_Parameter_Sequence ::= Actual_Parameter
-        | Actual_Parameter , Actual_Parameter_Sequence
-Actual_Parameter ::= SYMBOL           //Q
-```
-## 语义域
-
-### 错误
-
-### 真值域
-
-### 数字域
-
-### 字符串域
-```
-integer        N
-double        D
-boolean           B = { true, false }
-null        L
-string        S
-symbol        M 
-flow        F 
-function       C
-value        V = N + D + B + L + S + M + F + C
-type        T = { integer , double , boolean , null , string , 
-            symbol , flow , function } 
-store           St
-environ        En
-```
-### 说明
-symbol类型
-```
-```
-flow类型
-```
-```
-store类型
-```
-```
-environ类型
-```
-```
-## 语义函数
-
-```shell script
-execute [ F1 -> F2 ] env sto = 
-    let val = evaluate car(F1) env sto in
-    let variable loc = find(env, car(F2)) in
-    update(sto, loc, val)
-    if !empty(cdr[F1]) && !empty(cdr[F2]) = boolean true
-    then execute [ cdr[F1] -> cdr[F2] ]
-
-execute [ F1 | F2 ] env sto = 
-    let val = evaluate car(F1) env sto in
-    cons(val, F2)
-    if !empty(cdr[F1]) = boolean true
-    then execute [ cdr[F1] | F2 ]
-```
-
-## 辅助函数
-
-```shell script
-empty: list -> boolean
-update: env X env—stack X id X value -> env
-cons: value X list -> list // 合并元素和列表
-car: list -> value  // 获取列表的第一个元素
-cdr: list -> list // 获取列表除去第一个元素的列表
 ```
 
 ---

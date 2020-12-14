@@ -36,7 +36,7 @@ public class IfElseFlow extends Flow {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new ExplainException("type mismatch " + conditionData.GetType());
         }
-        if (conditionData.GetValue().equals(true)) {
+        if (conditionData.GetValue().toString().equals("true")) {
             return this.trueFlow.Push(data);
         } else if (this.falseFlow != null) {
             return this.falseFlow.Push(data);
@@ -49,7 +49,7 @@ public class IfElseFlow extends Flow {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new ExplainException("type mismatch " + conditionData.GetType());
         }
-        if (conditionData.GetValue().equals(true)) {
+        if (conditionData.GetValue().toString().equals("true")) {
             return this.trueFlow.Push(flow);
         } else if (this.falseFlow != null) {
             return this.falseFlow.Push(flow);
@@ -62,7 +62,7 @@ public class IfElseFlow extends Flow {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new ExplainException("type mismatch " + conditionData.GetType());
         }
-        if (conditionData.GetValue().equals(true)) {
+        if (conditionData.GetValue().toString().equals("true")) {
             return this.trueFlow.Push(index, data);
         } else if (this.falseFlow != null) {
             return this.falseFlow.Push(index, data);
@@ -75,7 +75,7 @@ public class IfElseFlow extends Flow {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new ExplainException("type mismatch " + conditionData.GetType());
         }
-        if (conditionData.GetValue().equals(true)) {
+        if (conditionData.GetValue().toString().equals("true")) {
             return this.trueFlow.Match(flow);
         } else if (this.falseFlow != null) {
             return this.falseFlow.Match(flow);
@@ -88,7 +88,7 @@ public class IfElseFlow extends Flow {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new ExplainException("type mismatch " + conditionData.GetType());
         }
-        if (conditionData.GetValue().equals(true)) {
+        if (conditionData.GetValue().toString().equals("true")) {
             return this.trueFlow.Pop();
         } else if (this.falseFlow != null) {
             return this.falseFlow.Pop();
@@ -101,7 +101,7 @@ public class IfElseFlow extends Flow {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new ExplainException("type mismatch " + conditionData.GetType());
         }
-        if (conditionData.GetValue().equals(true)) {
+        if (conditionData.GetValue().toString().equals("true")) {
             return this.trueFlow.inLen();
         } else if (this.falseFlow != null) {
             return this.falseFlow.inLen();
@@ -114,7 +114,7 @@ public class IfElseFlow extends Flow {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new ExplainException("type mismatch " + conditionData.GetType());
         }
-        if (conditionData.GetValue().equals(true)) {
+        if (conditionData.GetValue().toString().equals("true")) {
             return this.trueFlow.outLen();
         } else if (this.falseFlow != null) {
             return this.falseFlow.outLen();
@@ -127,7 +127,7 @@ public class IfElseFlow extends Flow {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new ExplainException("type mismatch " + conditionData.GetType());
         }
-        if (conditionData.GetValue().equals(true)) {
+        if (conditionData.GetValue().toString().equals("true")) {
             return this.trueFlow.Get(index);
         } else if (this.falseFlow != null) {
             return this.falseFlow.Get(index);
@@ -159,12 +159,16 @@ public class IfElseFlow extends Flow {
         if (conditionData.GetType() != Datable.DataType.Bool) {
             throw new ExplainException("type mismatch " + conditionData.GetType());
         }
-        if (conditionData.GetValue().equals(true)) {
+        if (conditionData.GetValue().toString().equals("true")) {
             return this.trueFlow.Flowing();
         } else if (this.falseFlow != null) {
             return this.falseFlow.Flowing();
         }
-        return this.nextFlow.Flowing(); // 判断为假且没有假值流，直接接下一流
+        if (this.HasNextFlowing()) {
+            return this.nextFlow.Flowing(); // 判断为假且没有假值流，直接接下一流
+        }else{
+            return true;
+        }
     }
 
     @Override
