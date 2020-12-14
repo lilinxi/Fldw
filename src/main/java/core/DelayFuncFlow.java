@@ -108,6 +108,7 @@ public class DelayFuncFlow extends Flow {
     @Override
     public boolean Flowing() throws ExplainException {
         this.getFuncFlow().SetFlowOp(this.flowOp);
+
         return this.getFuncFlow().Flowing();
     }
 
