@@ -1,0 +1,4 @@
+import std.Std
+[1, 2] -> [a, b] | while ( a<b ) {
+    in -> [b, a] -> [c, d, e, f] | out
+} | stdout

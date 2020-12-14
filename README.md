@@ -6,7 +6,7 @@ Fldw，寓意数据的流动，是一个支持模式匹配的流式编程语言�
 
 其为动态类型，支持语句块和符号定义域，支持指针和值传递，支持函数的递归调用。
 
-基于 Java 15，其为 LL(3) 语法。
+基于 Java 15，且为 LL(3) 语法。
 
 ---
 
@@ -14,26 +14,59 @@ Fldw，寓意数据的流动，是一个支持模式匹配的流式编程语言�
 
 ## Windows
 
+Windows 下运行 Fldw 需要 Java 15 以上的环境，下载[发行版本](https://github.com/lilinxi/Fldw/releases/tag/v1)，调用启动脚本`.\fldw.bat`，输出 Hello World 如下所示：
+
+```shell script
+C:\学习\projects\Fldw>.\fldw.bat
+
+C:\学习\projects\Fldw>chdir C:\学习\projects\Fldw\
+
+C:\学习\projects\Fldw>java -jar .\jar\Fldw-1.0.0.jar
+Welcome to FLDW, version 1.0.0
+fldw > import std.Std
+fldw > ["Hello World!"] | stdout
+"Hello World!"
+fldw > exit
+Bye!
+
+C:\学习\projects\Fldw>
+```
+
 ## MacOS or Linux
+
+MacOS or Linux 下运行 Fldw 需要 Java 15 以上的环境，下载[发行版本](https://github.com/lilinxi/Fldw/releases/tag/v1)，调用启动脚本`./fldw.sh`，输出 Hello World 如下所示：
+
+```shell script
+(base) limengfan@limengfandeMacBook-Pro 201122_Fldw % ./fldw.sh 
+Welcome to FLDW, version 1.0.0
+fldw > import std.Std
+fldw > ["Hello World"] | stdout
+"Hello World"
+fldw > exit
+Bye!
+(base) limengfan@limengfandeMacBook-Pro 201122_Fldw % 
+```
 
 ## Docker
 
-https://www.cnblogs.com/lsgxeva/p/8746644.html
+如果没有 Java15 环境，安装了 Docker 的环境下也可以通过 Docker 镜像来运行，下载 Docker 镜像并输出 Hello World 如下所示：
 
 ```shell script
-docker run -it adoptopenjdk/openjdk15 /bin/bash 
-apt-get update
-apt-get install git
-git clone https://github.com/lilinxi/Fldw.git
-exit
+(base) limengfan@limengfandeMacBook-Pro ~ % docker pull imortal/fldw:v1.0.0                  
 
-docker commit -a "imortal" -m "fldw v0.0.5" 1283cfcf9bff fldw:v0.0.5
-docker images fldw:v0.0.5
-docker tag 00e5da98e693 imortal/fldw:v0.0.5
-docker push imortal/fldw:v0.0.5 
-
-docker pull imortal/fldw:v0.0.5
-docker run -it --rm imortal/fldw:v0.0.5 /bin/bash
+v1.0.0: Pulling from imortal/fldw
+Digest: sha256:152063ad4e6a8da966bfe40190cc4ab6b961148a62b71f64227457f5446ba9c0
+Status: Image is up to date for imortal/fldw:v1.0.0
+docker.io/imortal/fldw:v1.0.0
+(base) limengfan@limengfandeMacBook-Pro ~ % docker run -it --rm imortal/fldw:v1.0.0 /bin/bash
+root@6022d66718fe:/# ./Fldw/fldw.sh 
+Welcome to FLDW, version 1.0.0
+fldw > import std.Std
+fldw > ["Hello World!"] | stdout
+"Hello World!"
+fldw > exit
+Bye!
+root@6022d66718fe:/# 
 ```
 
 ---
@@ -70,6 +103,26 @@ stdin | stdout
 ```shell script
 import std.std
 ["Hello World!"] | stdout
+```
+
+调用 Fldw 自带的 cat 示例程序`./examples/cat_example.sh`
+
+```shell script
+(base) limengfan@limengfandeMacBook-Pro 201122_Fldw % ./examples/cat_example.sh 
+Cat Example:
+
+import std.Std
+stdin | stdout
+
+==========================================
+Input Flow:
+1 1.23 true "hello" 1+2*3.3
+1
+1.23
+true
+"hello"
+7.6
+(base) limengfan@limengfandeMacBook-Pro 201122_Fldw % 
 ```
 
 ## Elixir
@@ -122,6 +175,45 @@ function sort() {
 stdin | sort() | stdout
 ```
 
+调用 Fldw 自带的快速排序示例程序`./examples/quicksort_example.sh`如下：
+
+```shell script
+(base) limengfan@limengfandeMacBook-Pro 201122_Fldw % ./examples/quicksort_example.sh 
+QuickSort Example:
+
+import std.Std
+function sort() {
+    in | [!head;!tail]
+    if ( head != null ) { 
+        [] | !leftHead
+        [] | !rightHead
+        for ( tail -> !tmp) {
+            if ( tmp < head ) {
+                #[tmp] | leftHead
+            } 
+            else {
+                #[tmp] | rightHead
+            }
+        }
+        leftHead | sort() | out
+        [head] | out
+        rightHead | sort() | out
+    } | out
+}
+stdin | sort() | stdout
+
+==========================================
+Input Number(Int or Double) Flow:
+5 6 3 2 7 8
+2
+3
+5
+6
+7
+8
+(base) limengfan@limengfandeMacBook-Pro 201122_Fldw % 
+```
+
 ## Lua
 
 Lua 被设计易于内嵌和迁移的配置语言。其灵活的函数参数和返回值使得 Lua 脚本作为配置脚本十分易用。
@@ -147,52 +239,69 @@ null
 null
 ```
 
-Fldw 实现的灵活的函数传参实例为：
+调用 Fldw 自带的灵活的函数传参示例程序`func_dynamic_param.sh`如下：
 
 ```shell script
+(base) limengfan@limengfandeMacBook-Pro 201122_Fldw % ./examples/func_dynamic_param.sh 
+FuncDynamicParam Example:
+
 import std.Std
 function func([a, b, c]) {
-  [a, b, c] | stdout
+    [a, b, c] | stdout
 }
 func([1, 2])
+["-----"] | stdout
 func([1, 2, 3, 4])
+["-----"] | stdout
 func()
-```
 
-其输出为：
-
-```shell script
+==========================================
+Expect Output:
 1
 2
 null
+-----
 1
 2
 3
+-----
 null
 null
 null
+==========================================
+Actual Output:
+1
+2
+null
+"-----"
+1
+2
+3
+"-----"
+null
+null
+null
+(base) limengfan@limengfandeMacBook-Pro 201122_Fldw % 
 ```
 
 ---
 
 # 词法详解
 
+## 数据
+
 ```shell script
-SKIP : { " " | "\t" | "\n" | "\r" | "\f"}
-SPECIAL_TOKEN : { LINE_COMMIT = "//"(~["\n","\r"])* ("\n"|"\r\n"|"\r")? }
-TOKEN : { ";"  | "," | "(" | ")" | "}" | "{" | "]" | "[" 
-		| "+" | "-" | "*" | "/" | "%" 
-		| "==" | "!=" | "&&" | "||" | "<" | ">" | "<=" | ">=" 
-        | "if" | "else" | "while" | "for" 
-		| "function" 
-	    | "|" 
-        | "->" 
-        | "#" 
-        | "!"
-        | "import" 
-        |  "." 
-        | <INT_VALUE> | < DOUBLE_VALUE > | < BOOL_VALUE > | < STRING_VALUE > | < NULL_VALUE >
-        | < SYMBOL > | < OTHER > }
+INT_VALUE = ["1"-"9"] (["0"-"9"])*
+            |   "0" ["x", "X"] (["0"-"9", "a"-"f", "A"-"F"])+
+            |   "0" (["0"-"7"])*
+DOUBLE_VALUE = ["1"-"9"] (["0"-"9"])*("."(["0"-"9"])*)? 
+BOOL_VALUE = "true" | "false" 
+STRING_VALUE = < "\"" > 
+                        ( < (~["\"", "\\", "\n", "\r"])+ >
+                            |   < "\\"(["0"-"7"]){3} >
+                            |   < "\\"~[] > )
+               < "\"" >
+NULL_VALUE = "null" 
 ```
 
 ## 符号
@@ -238,7 +347,7 @@ FUNC = "function"
 IMPORT = "import" 
 ```
 
-## 操作符
+## 其他符号
 
 ```shell script
 FLOWING = "|"        // 数据管道操作
@@ -254,22 +363,18 @@ EXLM = "!"           // 显示定义为临时变量
 ## 基础数据类型
 
 ```shell script
-INT_VALUE = ["1"-"9"] (["0"-"9"])*
-            |   "0" ["x", "X"] (["0"-"9", "a"-"f", "A"-"F"])+
-            |   "0" (["0"-"7"])*
-DOUBLE_VALUE = ["1"-"9"] (["0"-"9"])*("."(["0"-"9"])*)? 
-BOOL_VALUE = "true" | "false" 
-NULL_VALUE = "null" 
-terminal_data = < INT_VALUE > | < DOUBLE_VALUE > | < BOOL_VALUE > |  < STRING_VALUE >
-symbol_data = [ < EXLM > ] < SYMBOL>
-data = < expr_data > | < symbol_data > | < terminal_data >
-term = < terminal_data > | < symbol_data > | ( < LBR > < expr_data > < RBR > )
-expr_data = < expr1_data > ( < LOGIC_OR > < expr1_data > )*
-expr1_data = < expr2_data > ( < LOGIC_AND > < expr2_data > )*
-expr2_data = < expr3_data > ( (< LEFT > | < RIGHT > | < LEFT_EQUAL > 
-		     | < RIGHT_EQUAL > | < LOGIC_EQUAL > | < LOGIC_NOT >) < expr3_data > )*
-expr3_data = < expr4_data > ( (< PLUS > | < MINUS >)  < expr4_data > )*
-expr4_data = < term > ( (< MULT > | < DIV > | < MOD >) < term > )*
+terminal_data ::= < INT_VALUE > | < DOUBLE_VALUE > | < BOOL_VALUE > |  < STRING_VALUE >
+symbol_data ::= [ "!" ] < SYMBOL>
+
+data ::= < expr_data > | < symbol_data > | < terminal_data >
+
+expr_data ::= < expr1_data > ( "||" < expr1_data > )*
+expr1_data ::= < expr2_data > ( "&&" < expr2_data > )*
+expr2_data ::= < expr3_data > ( ( "<" | ">" | "<=" 
+		     | ">=" | "==" | "!=" ) < expr3_data > )*
+expr3_data ::= < expr4_data > ( ( "+" | "-" )  < expr4_data > )*
+expr4_data ::= < term > ( ( "*"  | "/" | "%" ) < term > )*
+term ::= < terminal_data > | < symbol_data > | "(" < expr_data > ")" 
 ```
 
 ## 流数据类型
@@ -277,21 +382,27 @@ expr4_data = < term > ( (< MULT > | < DIV > | < MOD >) < term > )*
 ### 列表流
 
 ```shell script
-list_flow = [ < HASHTAG > ] < LSBR  > < data > ( [ < COMMA > ] < data > )* < RSBR >
+list_flow ::= [ "#" ] “[" < data > ( [ "," ] < data > )* "]"
 ```
 
 ### 控制流
 
 ```shell script
-if_else_flow = < IF > < LBR > < data > < RBR > < block > [ < ELSE > < block > ]
-while_flow = < WHILE > < LBR > < data > < RBR > < block >
-for_flow = < FOR > < LBR > < flow > < MATCHING > < symbol_data > < RBR > < block_flow >
+if_else_flow ::= "if" "(" < data > ")" < block > [ "else" < block > ]
+while_flow ::= "while" "(" < data > ")" < block >
+for_flow ::= "for" "(" < flow > "->" < symbol_data > ")" < block_flow >
 ```
 
 ### 语句块流
 
 ```shell script
-block_flow = < LCBR > ( < flowing > )* < RCBR >
+block_flow ::= "{" ( < flowing > )* "}"
+```
+
+### 模式匹配流
+
+```shell script
+head_tail_flow ::= "[" < symbol_data > ";" [ "!" ] < SYMBOL > "]"
 ```
 
 ## 可执行语句
@@ -299,29 +410,29 @@ block_flow = < LCBR > ( < flowing > )* < RCBR >
 ### 流执行语句
 
 ```shell script
-flow = < func_flow > | < head_tail_flow > | ([ < EXLM > ] < SYMBOL>) | < list_flow > 
+flow ::= < func_flow > | < head_tail_flow > | ([ "!" ] < SYMBOL >) | < list_flow > 
 	   | < if_else_flow > | < while_flow > | < block_flow > | < for_flow >
-flowing = < flow > ( ( < MATCHING > | < FLOWING > ) < flow > )*
+flowing ::= < flow > ( ( "->" | "|" ) < flow > )*
 ```
 
 ### import语句
 
 ```shell script
-import_stmt = < IMPORT > < SYMBOL > < DOT > < SYMBOL >
+import_stmt ::= "import" < SYMBOL > "." < SYMBOL >
 ```
 
 ### 函数定义语句
 
 ```shell script
-def_func_stmt = < FUNC > < SYMBOL > < LBR > [ list_flow() ] < RBR > < block_flow >
+def_func_stmt ::= "function" < SYMBOL > "(" [ < list_flow > ] ")" < block_flow >
 ```
 
 ## 其他
 
 ```shell script
-stmt = < flowing > | < def_func_stmt > | < import_stmt >
-stmts = ( < stmt > )*
-program = < stmts > < EOF >
+stmt ::= < flowing > | < def_func_stmt > | < import_stmt >
+stmts ::= ( < stmt > )*
+program ::= < stmts > < EOF >
 ```
 
 ---
@@ -394,6 +505,30 @@ Actual_Parameter_Sequence ::= Actual_Parameter
 
 ## 语义函数
 
+主要介绍数据管道操作和数据匹配操作的语义。
+
+数据管道操作的指称语义为：
+
+```shell script
+execute [ F1 | F2 ] env sto = 
+    let val = evaluate car(F1) env sto in
+    cons(val, F2)
+    if !empty(cdr[F1]) = boolean true
+    then execute [ cdr[F1] | F2 ]
+```
+
+其语法示例为：
+
+```shell script
+[a, b, c, d] | [e, f] 
+```
+
+语义为两个数据流的拼接.
+
+![](./doc/yuyi1.png)
+
+数据匹配的指称语义为：
+
 ```shell script
 execute [ F1 -> F2 ] env sto = 
     let val = evaluate car(F1) env sto in
@@ -403,13 +538,15 @@ execute [ F1 -> F2 ] env sto =
     then execute [ cdr[F1] -> cdr[F2] ]
 ```
 
+其语法示例为：
+
 ```shell script
-execute [ F1 | F2 ] env sto = 
-    let val = evaluate car(F1) env sto in
-    cons(val, F2)
-    if !empty(cdr[F1]) = boolean true
-    then execute [ cdr[F1] | F2 ]
+[1, 2, 3, 4] -> [a, b, c, d] 
 ```
+
+语义为两个数据流的匹配赋值。
+
+![](./doc/yuyi2.png)
 
 ## 辅助函数
 
@@ -671,11 +808,11 @@ import std.Std
 
 ## 控制语句
 
-Fldw 中支持的控制语句包括，if-else，while 和 for，其中 for 为遍历一个数据流。其实例为：
+Fldw 中支持的控制语句包括，if-else，while 和 for，其中 for 为遍历一个数据流。其示例为：
 
 ### if 语句
 
-程序实例为：
+程序示例为：
 
 ```shell script
 import std.Std
@@ -694,7 +831,7 @@ if ( 1>2 ) {
 
 当然一个 if 语句块也可以作为一个数据流来进行输入和输出：
 
-程序实例为：
+程序示例为：
 
 ```shell script
 import std.Std
@@ -714,7 +851,7 @@ import std.Std
 
 ### while 语句
 
-程序实例为：
+程序示例为：
 
 ```shell script
 import std.Std
@@ -737,7 +874,7 @@ while ( a<b ) {
 
 当然一个 while 语句块也可以作为一个数据流来进行输入和输出：
 
-程序实例为：
+程序示例为：
 
 ```shell script
 import std.Std
@@ -758,7 +895,7 @@ null
 
 ### for 语句
 
-程序实例为：
+程序示例为：
 
 ```shell script
 import std.Std
@@ -777,7 +914,7 @@ for ( [1, 2, 3] -> x ) {
 
 当然一个 for 语句块也可以作为一个数据流来进行输入和输出：
 
-程序实例为：
+程序示例为：
 
 ```shell script
 import std.Std
@@ -808,7 +945,7 @@ import std.Std
 
 函数语句即为一个命名的语句块，可以被重复调用和执行。
 
-其实例为：
+其示例为：
 
 ```shell script
 import std.Std
@@ -827,7 +964,7 @@ func()
 
 函数可以传递参数，并且参数的数量可以灵活控制。
 
-其实例为：
+其示例为：
 
 ```shell script
 import std.Std
@@ -1033,11 +1170,11 @@ loadModule.invoke(null);
 Std 包的加载语句为：
 
 ```java
-    //    默认调用 Load 方法将标准包的流导入到当前符号表中
-    public static void Load() throws ExplainException {
-        SymbolTable.CurrentSymbolTable().UpdateSymbol(StdInFlowSymbol, SymbolTable.SymbolType.Flow, new StdInFlow());
-        SymbolTable.CurrentSymbolTable().UpdateSymbol(StdOutFlowSymbol, SymbolTable.SymbolType.Flow, new StdOutFlow());
-    }
+//    默认调用 Load 方法将标准包的流导入到当前符号表中
+public static void Load() throws ExplainException {
+    SymbolTable.CurrentSymbolTable().UpdateSymbol(StdInFlowSymbol, SymbolTable.SymbolType.Flow, new StdInFlow());
+    SymbolTable.CurrentSymbolTable().UpdateSymbol(StdOutFlowSymbol, SymbolTable.SymbolType.Flow, new StdOutFlow());
+}
 ```
 
 即 Std 包的加载，其实质就是在当前符号表栈的栈顶符号表中添加了两个符号流，stdin 和 stdout。
@@ -1089,7 +1226,7 @@ Fldw 使用符号表来存储变量，符号表中可以存储的变量类型为
 
 通过维护一个符号表和字符表的关系，并且对符号表的查找递归查找到所有的父符号表，可以实现语句块外部定义的变量在语句块内部可见，而在语句块内部定义的变量在语句块外部不可见。
 
-符号表实例，以及符号表栈的变化：
+符号表示例，以及符号表栈的变化：
 
 ![](./doc/symboltable_example_full.png)
 
@@ -1099,24 +1236,147 @@ Fldw 中的函数，其本质是一个束定到一个符号的 BlockFlow，其�
 
 并且 FuncFlow 还支持动态传递参数。
 
-调用函数的动态传参实例：`./examples/func_dynamic_param.sh`
+调用函数的动态传参示例：`./examples/func_dynamic_param.sh`
 
-![](png)
+```shell script
+(base) limengfan@limengfandeMacBook-Pro 201122_Fldw % ./examples/func_dynamic_param.sh
+FuncDynamicParam Example:
+
+import std.Std
+function func([a, b, c]) {
+    [a, b, c] | stdout
+}
+func([1, 2])
+["-----"] | stdout
+func([1, 2, 3, 4])
+["-----"] | stdout
+func()
+
+==========================================
+Expect Output:
+1
+2
+null
+-----
+1
+2
+3
+-----
+null
+null
+null
+==========================================
+Actual Output:
+1
+2
+null
+"-----"
+1
+2
+3
+"-----"
+null
+null
+null
+(base) limengfan@limengfandeMacBook-Pro 201122_Fldw % 
+```
 
 在符号表中，函数的束定符号和其语句块被存储在符号表中，为了支持函数的递归调用，不能对函数进行立即的解释并建立语法树（不是不可以立即执行，而是立即解释也不可以），所以需要使用 DelayFuncFlow 来进行函数的延迟解释和执行，即当且仅当对函数执行前才进行解释和建立语法树，由此实现了函数的递归调用。
 
-调用函数的递归调用实例：`./examples/func_dynamic_param.sh`
+调用函数的递归调用求解斐波那契数列示例：`./examples/fibonacci_example.sh`
 
-![](png)
+```shell script
+(base) limengfan@limengfandeMacBook-Pro 201122_Fldw % ./examples/fibonacci_example.sh
+Fibonacci Example:
+
+import std.Std
+
+function func([n]) {
+    if ( n == 0 || n==1 ) {
+        [n] | out
+    } else {
+        func([n-1]) -> [n1]
+        func([n-2]) -> [n2]
+        [n1 + n2] | out
+    } | out
+}
+
+func([0]) | stdout
+func([1]) | stdout
+func([2]) | stdout
+func([3]) | stdout
+func([4]) | stdout
+func([5]) | stdout
+func([6]) | stdout
+func([7]) | stdout
+func([8]) | stdout
+func([9]) | stdout
+
+==========================================
+Expect Output:
+0
+1
+1
+2
+3
+5
+8
+13
+21
+34
+==========================================
+Actual Output:
+0
+1
+1
+2
+3
+5
+8
+13
+21
+34
+(base) limengfan@limengfandeMacBook-Pro 201122_Fldw % 
+```
 
 ---
 
 # 研发理念
 
 1. 使用**接口+默认实现+特殊实现**的研发模式，新增加的特殊实现继承自默认实现即实现了所有的功能，新增加的功能可以后续逐渐添加。
+
+![](./doc/th1.png)
+
 2. 使用**插件模式进行动态的加载**，新增加的扩展包可以动态的被加载和导入。
+
+![](./doc/th2.png)
+
 3. 遍布全文的**异常处理机制**，所有的程序运行异常都可以被捕获并抛出，并附有异常信息，可以便于编程人员进行调试。
+
+运行自带的示例程序`./examples/exception_example.sh`
+
+其第一行定义了 sym 为一个数据流，第二行定义 sym 为数据变量，故报错定义符号冲突。
+
+```shell script
+(base) limengfan@limengfandeMacBook-Pro 201122_Fldw % ./examples/exception_example.sh
+Exception Example:
+
+sym
+[sym]
+
+==========================================
+Expect Output:
+duplicate symbol:sym, Flow, Data
+==========================================
+Actual Output:
+duplicate symbol:sym, Flow, Data
+(base) limengfan@limengfandeMacBook-Pro 201122_Fldw % 
+```
+
 4. **单元测试和集成测试**相辅相成，每一个功能点都新增单元测试，并增加到集成测试中，通过调用集成测试进行回归测试，可以及时发现新增功能是否引入了影响已有功能的 Bug。
+
+![](./doc/th4.png)
+
 5. **版本控制和打包部署**，使用 GitHub 进行团队的协作和版本的控制，使用 Maven 可以对依赖项进行便捷的打包（Ant 老了），通过 jar 包和 Docker 镜像两种部署模式，提高了用户的运行体验。
 
 ---
@@ -1125,7 +1385,7 @@ Fldw 中的函数，其本质是一个束定到一个符号的 BlockFlow，其�
 
 1. 良好的编程习惯不应是自上而下的，也不应是自下而上的，而应是端到端的快速迭代。
 
-- 自上而下：快排实例
+- 自上而下：快排示例
 - 自下而上：Datable 和 Flowable 接口
 
 2. 在敲第一行代码之前，先动脑子和动笔。
