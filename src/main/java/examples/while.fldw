@@ -1,0 +1,7 @@
+import std.Std
+[1, 2] -> [a, b]
+while ( a<b ) {
+    [a, b, "---"] | stdout
+    [b, a] -> [a, b]
+}
+[a, b] | stdout

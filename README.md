@@ -14,7 +14,7 @@ Fldw，寓意数据的流动，是一个支持模式匹配的流式编程语言�
 
 ## Windows
 
-Windows 下运行 Fldw 需要 Java 15 以上的环境，调用启动脚本`.\fldw.bat`，输出 Hello World 如下所示：
+Windows 下运行 Fldw 需要 Java 15 以上的环境，下载[发行版本](https://github.com/lilinxi/Fldw/releases/tag/v1)，调用启动脚本`.\fldw.bat`，输出 Hello World 如下所示：
 
 ```shell script
 C:\学习\projects\Fldw>.\fldw.bat
@@ -34,7 +34,7 @@ C:\学习\projects\Fldw>
 
 ## MacOS or Linux
 
-MacOS or Linux 下运行 Fldw 需要 Java 15 以上的环境，调用启动脚本`./fldw.sh`，输出 Hello World 如下所示：
+MacOS or Linux 下运行 Fldw 需要 Java 15 以上的环境，下载[发行版本](https://github.com/lilinxi/Fldw/releases/tag/v1)，调用启动脚本`./fldw.sh`，输出 Hello World 如下所示：
 
 ```shell script
 (base) limengfan@limengfandeMacBook-Pro 201122_Fldw % ./fldw.sh 
@@ -52,13 +52,21 @@ Bye!
 如果没有 Java15 环境，安装了 Docker 的环境下也可以通过 Docker 镜像来运行，下载 Docker 镜像并输出 Hello World 如下所示：
 
 ```shell script
-(base) limengfan@limengfandeMacBook-Pro ~ % docker pull  imortal/fldw:v0.0.5
-v0.0.5: Pulling from imortal/fldw
-Digest: sha256:c7dc4fdb12ce5b3e09249ee9f0ff2a3a1ebd86ea42d0cd9240032e51533f88da
-Status: Image is up to date for imortal/fldw:v0.0.5
-docker.io/imortal/fldw:v0.0.5
-(base) limengfan@limengfandeMacBook-Pro ~ % 
-(base) limengfan@limengfandeMacBook-Pro ~ % docker run -it --rm imortal/fldw:v0.0.5 /bin/bash
+(base) limengfan@limengfandeMacBook-Pro ~ % docker pull imortal/fldw:v1.0.0                  
+
+v1.0.0: Pulling from imortal/fldw
+Digest: sha256:152063ad4e6a8da966bfe40190cc4ab6b961148a62b71f64227457f5446ba9c0
+Status: Image is up to date for imortal/fldw:v1.0.0
+docker.io/imortal/fldw:v1.0.0
+(base) limengfan@limengfandeMacBook-Pro ~ % docker run -it --rm imortal/fldw:v1.0.0 /bin/bash
+root@6022d66718fe:/# ./Fldw/fldw.sh 
+Welcome to FLDW, version 1.0.0
+fldw > import std.Std
+fldw > ["Hello World!"] | stdout
+"Hello World!"
+fldw > exit
+Bye!
+root@6022d66718fe:/# 
 ```
 
 ---
@@ -356,17 +364,17 @@ EXLM = "!"           // 显示定义为临时变量
 
 ```shell script
 terminal_data ::= < INT_VALUE > | < DOUBLE_VALUE > | < BOOL_VALUE > |  < STRING_VALUE >
-symbol_data = [ "!" ] < SYMBOL>
+symbol_data ::= [ "!" ] < SYMBOL>
 
-data = expr_data | symbol_data | terminal_data
+data ::= < expr_data > | < symbol_data > | < terminal_data >
 
-expr_data = < expr1_data > ( < LOGIC_OR > < expr1_data > )*
-expr1_data = < expr2_data > ( < LOGIC_AND > < expr2_data > )*
-expr2_data = < expr3_data > ( (< LEFT > | < RIGHT > | < LEFT_EQUAL > 
-		     | < RIGHT_EQUAL > | < LOGIC_EQUAL > | < LOGIC_NOT >) < expr3_data > )*
-expr3_data = < expr4_data > ( (< PLUS > | < MINUS >)  < expr4_data > )*
-expr4_data = < term > ( (< MULT > | < DIV > | < MOD >) < term > )*
-term = terminal_data | symbol_data | ( < LBR > expr_data < RBR > )
+expr_data ::= < expr1_data > ( "||" < expr1_data > )*
+expr1_data ::= < expr2_data > ( "&&" < expr2_data > )*
+expr2_data ::= < expr3_data > ( ( "<" | ">" | "<=" 
+		     | ">=" | "==" | "!=" ) < expr3_data > )*
+expr3_data ::= < expr4_data > ( ( "+" | "-" )  < expr4_data > )*
+expr4_data ::= < term > ( ( "*"  | "/" | "%" ) < term > )*
+term ::= < terminal_data > | < symbol_data > | "(" < expr_data > ")" 
 ```
 
 ## 流数据类型
@@ -374,27 +382,27 @@ term = terminal_data | symbol_data | ( < LBR > expr_data < RBR > )
 ### 列表流
 
 ```shell script
-list_flow = [ < HASHTAG > ] < LSBR  > < data > ( [ < COMMA > ] < data > )* < RSBR >
+list_flow ::= [ "#" ] “[" < data > ( [ "," ] < data > )* "]"
 ```
 
 ### 控制流
 
 ```shell script
-if_else_flow = < IF > < LBR > < data > < RBR > < block > [ < ELSE > < block > ]
-while_flow = < WHILE > < LBR > < data > < RBR > < block >
-for_flow = < FOR > < LBR > < flow > < MATCHING > symbol_data < RBR > < block_flow >
+if_else_flow ::= "if" "(" < data > ")" < block > [ "else" < block > ]
+while_flow ::= "while" "(" < data > ")" < block >
+for_flow ::= "for" "(" < flow > "->" < symbol_data > ")" < block_flow >
 ```
 
 ### 语句块流
 
 ```shell script
-block_flow = < LCBR > ( < flowing > )* < RCBR >
+block_flow ::= "{" ( < flowing > )* "}"
 ```
 
 ### 模式匹配流
 
 ```shell script
-head_tail_flow() = < LSBR  > symbol_data() < SEMIC > [ EXLM ] < SYMBOL> < RSBR >
+head_tail_flow ::= "[" < symbol_data > ";" [ "!" ] < SYMBOL > "]"
 ```
 
 ## 可执行语句
@@ -402,29 +410,29 @@ head_tail_flow() = < LSBR  > symbol_data() < SEMIC > [ EXLM ] < SYMBOL> < RSBR >
 ### 流执行语句
 
 ```shell script
-flow = < func_flow > | < head_tail_flow > | ([ < EXLM > ] < SYMBOL>) | < list_flow > 
+flow ::= < func_flow > | < head_tail_flow > | ([ "!" ] < SYMBOL >) | < list_flow > 
 	   | < if_else_flow > | < while_flow > | < block_flow > | < for_flow >
-flowing = < flow > ( ( < MATCHING > | < FLOWING > ) < flow > )*
+flowing ::= < flow > ( ( "->" | "|" ) < flow > )*
 ```
 
 ### import语句
 
 ```shell script
-import_stmt = < IMPORT > < SYMBOL > < DOT > < SYMBOL >
+import_stmt ::= "import" < SYMBOL > "." < SYMBOL >
 ```
 
 ### 函数定义语句
 
 ```shell script
-def_func_stmt = < FUNC > < SYMBOL > < LBR > [ list_flow() ] < RBR > < block_flow >
+def_func_stmt ::= "function" < SYMBOL > "(" [ < list_flow > ] ")" < block_flow >
 ```
 
 ## 其他
 
 ```shell script
-stmt = < flowing > | < def_func_stmt > | < import_stmt >
-stmts = ( < stmt > )*
-program = < stmts > < EOF >
+stmt ::= < flowing > | < def_func_stmt > | < import_stmt >
+stmts ::= ( < stmt > )*
+program ::= < stmts > < EOF >
 ```
 
 ---
@@ -1162,11 +1170,11 @@ loadModule.invoke(null);
 Std 包的加载语句为：
 
 ```java
-    //    默认调用 Load 方法将标准包的流导入到当前符号表中
-    public static void Load() throws ExplainException {
-        SymbolTable.CurrentSymbolTable().UpdateSymbol(StdInFlowSymbol, SymbolTable.SymbolType.Flow, new StdInFlow());
-        SymbolTable.CurrentSymbolTable().UpdateSymbol(StdOutFlowSymbol, SymbolTable.SymbolType.Flow, new StdOutFlow());
-    }
+//    默认调用 Load 方法将标准包的流导入到当前符号表中
+public static void Load() throws ExplainException {
+    SymbolTable.CurrentSymbolTable().UpdateSymbol(StdInFlowSymbol, SymbolTable.SymbolType.Flow, new StdInFlow());
+    SymbolTable.CurrentSymbolTable().UpdateSymbol(StdOutFlowSymbol, SymbolTable.SymbolType.Flow, new StdOutFlow());
+}
 ```
 
 即 Std 包的加载，其实质就是在当前符号表栈的栈顶符号表中添加了两个符号流，stdin 和 stdout。
