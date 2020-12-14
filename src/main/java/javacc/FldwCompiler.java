@@ -400,7 +400,7 @@ if (rightExprData != null) {
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case HASHTAG:{
       jj_consume_token(HASHTAG);
-listFlow.setCopyValue(true);
+listFlow.SetCopyValue(true);
       break;
       }
     default:
@@ -510,7 +510,7 @@ listFlow.Push(data);
     jj_consume_token(RBR);
 funcFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(funcSymbol.image).assertGetDelayFuncFlow();
         if (paramFlow != null) {
-            funcFlow.setParamFlow(paramFlow);
+            funcFlow.SetParamFlow(paramFlow);
         }
         {if ("" != null) return funcFlow;}
     throw new Error("Missing return statement in function");

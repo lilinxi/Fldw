@@ -823,6 +823,31 @@ public class UnitTest {
     }
 
     @Test
+    public void TestBlockExample6()throws ParseException, ExplainException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+
+        try {
+            SymbolTable.Clear();
+            FldwCompiler.parse("""
+                    import std.Std
+                    {
+                        [1, 2] | out
+                    } -> [a, b] | stdout
+                    """);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        System.setOut(System.out);
+
+        assertEquals("""
+                stdout: SymbolData{type=Int, value=1, symbol='a'}
+                stdout: SymbolData{type=Int, value=2, symbol='b'}
+                """, output.toString());
+    }
+
+    @Test
     public void TestIfElseExample1()throws ParseException, ExplainException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
@@ -989,6 +1014,38 @@ public class UnitTest {
                 stdout: TerminalData{type=Int, value=2}
                 stdout: TerminalData{type=Int, value=3}
                 stdout: TerminalData{type=Int, value=4}
+                """, output.toString());
+    }
+
+    @Test
+    public void TestIfElseExample5()throws ParseException, ExplainException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+
+        try {
+            SymbolTable.Clear();
+            FldwCompiler.parse("""
+                    import std.Std
+                    [1] -> [a]
+                    [2] -> [b]
+                    if ( a+1 < b ) {
+                        [a*2] -> [c]
+                        [c] | stdout
+                    } else {
+                        [b+2] -> [c]
+                        [c] | stdout
+                    }
+                    [c] | stdout
+                    """);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        System.setOut(System.out);
+
+        assertEquals("""
+                stdout: SymbolData{type=Int, value=4, symbol='c'}
+                stdout: SymbolData{type=null, value=null, symbol='c'}
                 """, output.toString());
     }
 
@@ -1475,6 +1532,73 @@ public class UnitTest {
                 stdout: TerminalData{type=String, value="bee"}
                 stdout: SymbolData{type=Int, value=8, symbol='x'}
                 stdout: TerminalData{type=String, value="bee"}
+                """, output.toString());
+    }
+
+    @Test
+    public void TestFuncExample6()throws ParseException, ExplainException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+
+        try {
+            SymbolTable.Clear();
+            FldwCompiler.parse("""
+                    import std.Std
+                    function func() {
+                        [1] | out
+                    }
+                    func() -> [a] | stdout
+                    """);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        System.setOut(System.out);
+
+        assertEquals("""
+                stdout: SymbolData{type=Int, value=1, symbol='a'}
+                """, output.toString());
+    }
+
+    @Test
+    public void TestFuncExample7()throws ParseException, ExplainException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+
+        try {
+            SymbolTable.Clear();
+            FldwCompiler.parse("""
+                    import std.Std
+                    function func([n]) {
+                        if ( n == 0 || n==1 ) {
+                            [n] | out
+                        } else {
+                            func([n-1]) -> [n1]
+                            func([n-2]) -> [n2]
+                            [n1 + n2] | out
+                        } | out
+                    }
+                    func([0]) | stdout
+                    func([1]) | stdout
+                    func([2]) | stdout
+                    func([3]) | stdout
+                    """);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        System.setOut(System.out);
+
+        assertEquals("""
+                stdout: SymbolData{type=Int, value=1, symbol='a'}
+                stdout: SymbolData{type=Int, value=2, symbol='b'}
+                stdout: SymbolData{type=null, value=null, symbol='c'}
+                stdout: SymbolData{type=Int, value=1, symbol='a'}
+                stdout: SymbolData{type=Int, value=2, symbol='b'}
+                stdout: SymbolData{type=Int, value=3, symbol='c'}
+                stdout: SymbolData{type=null, value=null, symbol='a'}
+                stdout: SymbolData{type=null, value=null, symbol='b'}
+                stdout: SymbolData{type=null, value=null, symbol='c'}
                 """, output.toString());
     }
 

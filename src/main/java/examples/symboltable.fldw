@@ -1,0 +1,11 @@
+import std.Std
+[1] -> [a]
+[2] -> [b]
+if ( a+1 < b ) {
+    [a*2] -> [c]
+    [c] | stdout
+} else {
+    [b+2] -> [c]
+    [c] | stdout
+}
+[c] | stdout

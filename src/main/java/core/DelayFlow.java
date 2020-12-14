@@ -13,9 +13,10 @@ public class DelayFlow extends Flow {
     private Flowable curFlow;   // 当前复制流
     private Flowable nextFlow;  // 下一流
 
-    public DelayFlow(Flowable flow) {
+    public DelayFlow(Flowable flow) throws ExplainException {
         this.curFlow = flow;
         this.nextFlow = null;
+        this.SetFlowOp(flow.GetFlowOp());
     }
 
     @Override

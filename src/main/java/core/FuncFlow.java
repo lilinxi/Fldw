@@ -18,12 +18,17 @@ public class FuncFlow extends Flow {
     }
 
     @Override
-    public void setParamFlow(Flowable paramFlow) throws ExplainException {
+    public void SetFlowOp(FlowOp flowOp) throws ExplainException {
+        super.SetFlowOp(flowOp);
+        this.blockFlow.SetFlowOp(flowOp);
+    }
+
+    @Override
+    public void SetParamFlow(Flowable paramFlow) throws ExplainException {
         if (!paramFlow.Match(this.paramFlow)) {
             throw new RuntimeException();
         }
     }
-
 
     @Override
     public boolean Push(Datable data) throws ExplainException {

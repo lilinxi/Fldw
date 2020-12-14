@@ -28,7 +28,7 @@ public class DelayFuncFlow extends Flow {
     }
 
     @Override
-    public void setParamFlow(Flowable paramFlow) throws ExplainException {
+    public void SetParamFlow(Flowable paramFlow) throws ExplainException {
         this.paramFlow = paramFlow;
     }
 
@@ -38,10 +38,10 @@ public class DelayFuncFlow extends Flow {
             try {
                 this.funcFlow = new FldwCompiler(new StringReader(this.funcValue)).make_func_flow(this.symbol);
                 if (this.paramFlow != null) {
-                    funcFlow.setParamFlow(paramFlow);
+                    this.funcFlow.SetParamFlow(paramFlow);
                 }
                 if (this.nextFlow != null) {
-                    funcFlow.SetNextFlowing(this.nextFlow);
+                    this.funcFlow.SetNextFlowing(this.nextFlow);
                 }
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -107,6 +107,7 @@ public class DelayFuncFlow extends Flow {
 
     @Override
     public boolean Flowing() throws ExplainException {
+        this.getFuncFlow().SetFlowOp(this.flowOp);
         return this.getFuncFlow().Flowing();
     }
 

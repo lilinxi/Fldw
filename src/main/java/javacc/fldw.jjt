@@ -418,7 +418,7 @@ ListFlow list_flow() throws ExplainException :
 }
 {
     // 语法：list_flow() = [ < HASHTAG > ] < LSBR  > data() ( [ < COMMA > ] data() )* < RSBR >
-    [ < HASHTAG > { listFlow.setCopyValue(true);} ] < LSBR  >
+    [ < HASHTAG > { listFlow.SetCopyValue(true);} ] < LSBR  >
     ( [< COMMA >] data = data()
         {
             listFlow.Push(data);
@@ -481,12 +481,12 @@ DelayFuncFlow func_flow() throws ExplainException :
     // 语法：func_flow() = < SYMBOL > < LBR > [ list_flow() ] < RBR >
     funcSymbol = < SYMBOL > < LBR > [ paramFlow = list_flow()] < RBR >
     {
-        funcFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(funcSymbol.image).assertGetDelayFuncFlow();
-        if (paramFlow != null) {
-            funcFlow.setParamFlow(paramFlow);
-        }
-        return funcFlow;
+    funcFlow = SymbolTable.CurrentSymbolTable().RecurseGetSymbol(funcSymbol.image).assertGetDelayFuncFlow();
+    if (paramFlow != null) {
+        funcFlow.SetParamFlow(paramFlow);
     }
+    return funcFlow;
+}
 }
 
 HeadTailFlow head_tail_flow() throws ExplainException :

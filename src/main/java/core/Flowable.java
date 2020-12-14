@@ -13,9 +13,11 @@ public interface Flowable {
 
     void SetFlowOp(FlowOp flowOp) throws ExplainException;              // 设置流操作
 
-    void setCopyValue(boolean copyValue) throws ExplainException;       // 设置取指针还是取值
+    FlowOp GetFlowOp() throws ExplainException;                         // 获取流操作
 
-    void setParamFlow(Flowable paramFlow) throws ExplainException;      // 设置流参数
+    void SetCopyValue(boolean copyValue) throws ExplainException;       // 设置取指针还是取值
+
+    void SetParamFlow(Flowable paramFlow) throws ExplainException;      // 设置流参数
 
     boolean Push(Datable data) throws ExplainException;                 // 流入一个元素，返回是否成功
 
