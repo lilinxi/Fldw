@@ -12,6 +12,12 @@ Fldw，寓意数据的流动，是一个支持模式匹配的流式编程语言�
 
 # 快速上手
 
+## Windows
+
+## MacOS or Linux
+
+## Docker
+
 https://www.cnblogs.com/lsgxeva/p/8746644.html
 
 ```shell script
@@ -21,12 +27,13 @@ apt-get install git
 git clone https://github.com/lilinxi/Fldw.git
 exit
 
-docker commit -a "imortal" -m "fldw v0.0.5" 36deecbc7bcd fldw:v0.0.5
+docker commit -a "imortal" -m "fldw v0.0.5" 1283cfcf9bff fldw:v0.0.5
 docker images fldw:v0.0.5
-docker tag c1c410f64b46 imortal/fldw:v0.0.5
+docker tag 00e5da98e693 imortal/fldw:v0.0.5
 docker push imortal/fldw:v0.0.5 
 
 docker pull imortal/fldw:v0.0.5
+docker run -it --rm imortal/fldw:v0.0.5 /bin/bash
 ```
 
 ---
@@ -552,29 +559,227 @@ cdr: list -> list // 获取列表除去第一个元素的列表
 
 # 设计思路
 
-代码贡献：
+总代码量：
 
 ```shell script
 (base) limengfan@limengfandeMacBook-Pro javacc % git log --author="lilinxi" --pretty=tformat: --numstat | awk '{ add += $1; subs += $2; loc += $1 - $2 } END { printf "added lines: %s, removed lines: %s, total lines: %s\n", add, subs, loc }' -
-added lines: 18082, removed lines: 9526, total lines: 8556
+added lines: 19484, removed lines: 10123, total lines: 9361
 ```
 
 ## 基础模型设计
 
+Fldw 核心包，core 包的类图如下图所示：
+
+![](./doc/类图.png)
+
+由类图可得，Fldw 语言中最重要的两个类型分别为 Data 和 Flow，其分别实现了 Datable 接口和 Flowable 接口，意为数据类和数据流类。而 Data 和 Flow 均继承自 Symbol 类，Symbol 包含了变量的指针，在 Fldw 中，不论是束定到符号的变量，还是未束定到符号的临时变量，均有指针，但是未束定的变量无法在语言编码中进行寻址。
+
+在设计和实现中，均采用了**接口，默认实现加特殊实现**的模式。通过默认实现 Data 和 Flow，可以设定接口的默认实现，和未实现的报错，这样针对特殊实现，只需要继承自默认实现即可，不需要在针对接口的每一个方法去一一实现。
+
+Datable 中的部分关键接口如下：
+
+```java
+public interface Datable {
+    DataType GetType() throws ExplainException;                     // 获取类型
+
+    Object GetValue() throws ExplainException;                      // 获取值
+
+    String GetSymbol() throws ExplainException;                     // 获取符号
+
+    boolean SetType(DataType type) throws ExplainException;         // 设置类型，返回是否设置成功
+
+    boolean SetValue(Object value) throws ExplainException;         // 设置值，返回是否设置成功，需要先设置类型再设置值
+
+    Datable Clone() throws ExplainException;                        // 拷贝数据，深拷贝
+}
+```
+
+其中，Datable 接口共有三个特殊实现，分别为：
+
+1. TerminalData：终结符数据，其值即为字面量当量，无法被赋值。
+2. SymbolData：符号变量，将数据关联到符号，可以在符号表中寻址，可以被重复赋值。
+3. ExprData：由 Datable 组成的表达式树，使用懒求值，在其值被使用的时候，在动态地进行类型的推定和求值。
+
+Flowable 中的部分关键接口如下：
+
+```java
+public interface Flowable {
+    boolean Push(Flowable flow) throws ExplainException;                // 流入一个流，返回是否成功
+
+    boolean Match(Flowable flow) throws ExplainException;               // 将当前流的值模式匹配到参数流
+
+    int inLen() throws ExplainException;                                // 当前流输入长度
+
+    int outLen() throws ExplainException;                               // 当前流输出长度
+
+    void SetNextFlowing(Flowable flow) throws ExplainException;         // 设置下一个流
+
+    Flowable NextFlowing() throws ExplainException;                     // 返回下一个流
+
+    boolean HasNextFlowing() throws ExplainException;                   // 是否有下一个流
+
+    boolean Flowing() throws ExplainException;                          // 解释执行：开始元素的流动
+}
+```
+
+而 Flowable 接口共有九个特殊实现，分别为：
+
+1. ListFlow：最基础的数据流类，一个包含数据列表的数据流。
+2. BlockFlow：若干个数据流的集合，另外包含一个专门接受输入的流，和专门进行输出的流。
+3. DelayFlow：封装了一个 Flowable，用来对流的执行进行懒加载，来延迟流的执行。
+4. HeadTailFlow：封装了一个数据和一个数据流，用来执行首位数据和剩余数据流的模式匹配。
+5. IfElseFlow：封装了两个流，if-流和 else-流（可选），根据条件变量的真假值来判断执行哪一个流。
+6. WhileFlow：循环执行所封装的流，直到条件变量的真假值为假。
+7. ForFlow：对数据流的每个数据，执行所封装的流。
+8. FuncFlow：封装了一个 BlockFlow 和一个参数流，并束定了一个符号作为一个函数流。
+9. DelayFuncFlow：封装了一个函数流，延迟了函数流的执行，用来实现动态的函数递归调用。
+
+另外，在核心包 Core 包中，还包含了：
+
+1. 符号表的实现（后面介绍）
+2. 异常类的实现
+3. Core 类：用来进行 Core 包的加载
+
 ## 表达式树设计
+
+Datable 接口和表达式树类的设计，使得数据运算树的建立的求值十分的直观。
+
+Datable 中关键的两个接口为：
+
+```java
+public interface Datable {
+    DataType GetType() throws ExplainException;                     // 获取类型
+
+    Object GetValue() throws ExplainException;                      // 获取值
+}
+```
+
+在 ExprData 中，伪代码可为：
+
+```java
+public class ExprData extends Data {
+    private Datable leftData;       // 运算左值
+    private Datable rightData;      // 运算右值
+    private ExprOp op;              // 运算符
+    private DataType type;          // 表达式的类型
+
+    @Override
+    public DataType GetType() throws ExplainException {
+        if (this.type == null) {
+            this.type = ExprData.CheckExprTypeMatch(this.leftData.GetType(), this.rightData.GetType(), this.op);
+        }
+        return this.type;
+    }
+
+    @Override
+    public Object GetValue() throws ExplainException {
+        switch (this.op) {
+            return Solve(this.leftData.GetValue(), this.rightData.GetValue(), this.op);
+        }
+    }
+}
+```
+
+其巧妙之处在于 ExprData 的左孩子和右孩子的 Datable 接口的实现均可为 ExprData，由此得到的 ExprData 的 GetType() 方法和 GetValue() 方法其实是一个递归的类型推断和求值的过程，由此实现了表达式树的建立和懒求值。
 
 ## 包模块设计
 
+Fldw 中支持包的导入和加载，目前仅实现了 Std 包，包含标准输入和标准输出。
+
+包的加载语句为`import packname.modulename`，其通过 Java 的反射机制，调用被加载包的`Load()`方法来进行动态的包加载。
+
+例如，加载包的语句为：
+
+```java
+Class<?> clazz = Class.forName(package_name + "." + module_name);
+Method loadModule = clazz.getMethod(Core.ModuleLoadFunc);
+loadModule.invoke(null);
+```
+
+Std 包的加载语句为：
+
+```java
+    //    默认调用 Load 方法将标准包的流导入到当前符号表中
+    public static void Load() throws ExplainException {
+        SymbolTable.CurrentSymbolTable().UpdateSymbol(StdInFlowSymbol, SymbolTable.SymbolType.Flow, new StdInFlow());
+        SymbolTable.CurrentSymbolTable().UpdateSymbol(StdOutFlowSymbol, SymbolTable.SymbolType.Flow, new StdOutFlow());
+    }
+```
+
+即 Std 包的加载，其实质就是在当前符号表栈的栈顶符号表中添加了两个符号流，stdin 和 stdout。
+
 ## 语句块设计
+
+语句块，即 BlockFlow 是 Fldw 设计和实现和核心，其他控制流，例如 if-else-flow，while-flow，for-flow 和函数流 func-flow，都是通过 BlockFlow 来实现的。
+
+BlockFlow 即封装了一系列的 Flowable 列表，也实现了 Flowable 接口，即 BlockFlow 本身也可以看做一个数据流来进行处理。
+
+当 BlockFlow 被看做一个数据流来处理时，其输入被导入到默认的输入流`in`中，输出从默认的输出流`out`中读取。
+
+BlockFlow 的部分实现如下：
+
+```java
+public class BlockFlow extends Flow {
+    private Flowable inFlow;                // 输入流
+    private Flowable outFlow;               // 输出流
+    private ArrayList<Flowable> flowList;   // 中间处理流
+
+    @Override
+    public boolean Push(Datable data) throws ExplainException {
+        return this.inFlow.Push(data);
+    }
+
+    @Override
+    public Datable Pop() throws ExplainException {
+        return this.outFlow.Pop();
+    }
+
+    @Override
+    public boolean Flowing() throws ExplainException {
+        for (Flowable flow : this.flowList) {
+            boolean success = flow.Flowing();
+            if (!success) throw new ExplainException("Flowing Error: " + flow);
+        }
+        return true;
+    }
+}
+```
 
 ## 符号表和符号表栈设计
 
+Fldw 使用符号表来存储变量，符号表中可以存储的变量类型为：数据、数据流、函数和子符号表。
+
+通过符号表在存储符号表的机制，实现了命名空间的嵌套和子命名空间。并使用符号表栈来维护所有的符号表之间的关系。
+
+当前所使用的符号表，即为符号表栈的栈顶符号表。而每进入到一个语句块，即建立子符号表并且压栈，之后新定义的符号都在子符号表中，在离开语句块时将当前符号表出栈。
+
+通过维护一个符号表和字符表的关系，并且对符号表的查找递归查找到所有的父符号表，可以实现语句块外部定义的变量在语句块内部可见，而在语句块内部定义的变量在语句块外部不可见。
+
 ## 函数设计
+
+Fldw 中的函数，其本质是一个束定到一个符号的 BlockFlow，其可以通过束定的符号来进行查找个调用，而 BlockFlow 即是一个匿名的函数，只能被调用一次。
+
+并且 FuncFlow 还支持动态传递参数。
+
+在符号表中，函数的束定符号和其语句块被存储在符号表中，为了支持函数的递归调用，不能对函数进行立即的解释并建立语法树（不是不可以立即执行，而是立即解释也不可以），所以需要使用 DelayFuncFlow 来进行函数的延迟解释和执行，即当且仅当对函数执行前才进行解释和建立语法树，由此实现了函数的递归调用。
 
 ---
 
 # 研发理念
 
+1. 使用**接口+默认实现+特殊实现**的研发模式，新增加的特殊实现继承自默认实现即实现了所有的功能，新增加的功能可以后续逐渐添加。
+2. 使用**插件模式进行动态的加载**，新增加的扩展包可以动态的被加载和导入。
+3. 遍布全文的**异常处理机制**，所有的程序运行异常都可以被捕获并抛出，并附有异常信息，可以便于编程人员进行调试。
+4. **单元测试和集成测试**相辅相成，每一个功能点都新增单元测试，并增加到集成测试中，通过调用集成测试进行回归测试，可以及时发现新增功能是否引入了影响已有功能的 Bug。
+5. **版本控制和打包部署**，使用 GitHub 进行团队的协作和版本的控制，使用 Maven 可以对依赖项进行便捷的打包（Ant 老了），通过 jar 包和 Docker 镜像两种部署模式，提高了用户的运行体验。
+
 ---
 
 # 感悟体会
+
+1. 良好的编程习惯不应是自上而下的，也不应是自下而上的，而应是端到端的快速迭代。
+
+- 自上而下：快排实例
+- 自下而上：Datable 和 Flowable 接口
+
+2. 在敲第一行代码之前，先动脑子和动笔。
