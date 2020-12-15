@@ -437,7 +437,7 @@ program ::= < stmts > < EOF >
 
 ---
 
-# 指称语义详解
+# 指称语义
 
 ## 抽象语义
 
@@ -468,6 +468,8 @@ If_Command = if ( Data ) { Command }
 While_Command ::= while ( Data ) { Command } 
 
 For_Command ::=  for ( Command -> Data ) { Command }
+
+HeadTail_Command ::= [ SYMBOL ; SYMBOL ]
 
 Data ::= INT_VALUE
     | DOUBLE_VALUE
@@ -554,6 +556,28 @@ execute [ F1 -> F2 ] env sto =
 
 ![](./doc/yuyi2.png)
 
+模式匹配的指称语义为：
+
+```shell script
+execute [ C | [ HEAD ; TAIL ] ] env sto = 
+    let head = evaluate car(C) env sto in
+    let tail = evaluate cdr(C) env sto in
+    let variable loc_head = find(env, HEAD) in
+    let variable loc_tail = find(env, TAIL) in
+    update(sto, loc_tail, tail)
+    update(sto, loc_head, head)
+```
+
+其语法示例为：
+
+```shell script
+[5, 6, 3, 2, 7, 8] | [head;tail]
+```
+
+语义为两个数据流的匹配赋值。
+
+![](./doc/yuyi2.png)
+
 其他语义：
 
 ```shell script
@@ -581,34 +605,34 @@ execute_for
 execute [ { C } ] env sto =
 { execute C }
 
-execute [ S(APS) ] env sto =
+execute [ Func(APS) ] env sto =
 let function func = find(env S) in
 let arg = give_argument APS env in
 func arg
 
-evaluate : Data → ( Environ → Store → Value )    //表达式求值
+evaluate : Data → ( Environ → Store → Value )   
 
 evaluate [ S ] env sto = 
-	coerce( sto , identify S env sto )            //获取符号变量的值
+	coerce( sto , identify S env sto )          
 
 
 evaluate [ D ] env sto =
-	get_value( D )                                //获取终结符的值
+	get_value( D )                        
 
 evaluate [ Op D] env sto =
-let operator op = find ( env Op ) in              //find函数：找出字符代表的运算符
+let operator op = find ( env Op ) in           
 let val = evaluate E env sto in
 op val
 
 evaluate [ D1 Op D2 ] env sto =
 let val1 = evaluate D1 env sto in
 let val2 = evaluate D2 env sto in
-cal( D1,D2 )                                      //计算函数
+cal( D1,D2 )                                 
 
 evaluate [ ( D ) ] env sto =
 	evaluate D
 
-identify : SYMBOL → ( Environ → Store → Value)    //变量取值
+identify : SYMBOL → ( Environ → Store → Value)   
 
 identify [ S ] env sto = find( env , S )
 ```
@@ -616,14 +640,11 @@ identify [ S ] env sto = find( env , S )
 ## 辅助函数
 
 ```shell script
-empty: list -> boolean                            // 判断列表是否为空
-update: env X env—stack X id X value -> env       // 赋值操作
-cons: value X list -> list                        // 合并元素和列表
-car: list -> value                                // 获取列表的第一个元素
-cdr: list -> list                                 // 获取列表除去第一个元素的列表
-coerce( sto, identify S env sto )                 //获取符号变量的值
-get_value( D )                                    //获取终结符的值
-cal( D1, D2 )                                     //计算函数
+empty: list → boolean                            // 判断列表是否为空
+update: store × location × value → store         // 赋值操作
+cons: value × list → list                        // 合并元素和列表
+car: list → value                                // 获取列表的第一个元素
+cdr: list → list                                 // 获取列表除去第一个元素的列表
 ```
 
 ---
