@@ -1124,7 +1124,7 @@ function sort() {
 ```shell script
 (base) limengfan@limengfandeMacBook-Pro javacc % git log --author="lilinxi" --pretty=tformat: --numstat | 
   awk '{ add += $1; subs += $2; loc += $1 - $2 } END { printf "added lines: %s, removed lines: %s, total lines: %s\n", add, subs, loc }' -
-added lines: 21091, removed lines: 10517, total lines: 10574
+added lines: 21345, removed lines: 10533, total lines: 10812
 ```
 
 ## 基础模型设计
