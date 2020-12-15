@@ -14,7 +14,7 @@ Fldw，寓意数据的流动，是一个支持模式匹配的流式编程语言�
 
 ## Windows
 
-Windows 下运行 Fldw 需要 Java 15 以上的环境，下载[发行版本](https://github.com/lilinxi/Fldw/releases/tag/v1)，调用启动脚本`.\fldw.bat`，输出 Hello World 如下所示：
+Windows 下运行 Fldw 需要 Java 15 以上的环境，下载[发行版本](https://github.com/lilinxi/Fldw/releases/tag/V1)，调用启动脚本`.\fldw.bat`，输出 Hello World 如下所示：
 
 ```shell script
 C:\学习\projects\Fldw>.\fldw.bat
@@ -34,7 +34,7 @@ C:\学习\projects\Fldw>
 
 ## MacOS or Linux
 
-MacOS or Linux 下运行 Fldw 需要 Java 15 以上的环境，下载[发行版本](https://github.com/lilinxi/Fldw/releases/tag/v1)，调用启动脚本`./fldw.sh`，输出 Hello World 如下所示：
+MacOS or Linux 下运行 Fldw 需要 Java 15 以上的环境，下载[发行版本](https://github.com/lilinxi/Fldw/releases/tag/V1)，调用启动脚本`./fldw.sh`，输出 Hello World 如下所示：
 
 ```shell script
 (base) limengfan@limengfandeMacBook-Pro 201122_Fldw % ./fldw.sh 
@@ -1033,8 +1033,9 @@ function sort() {
 总代码量：
 
 ```shell script
-(base) limengfan@limengfandeMacBook-Pro javacc % git log --author="lilinxi" --pretty=tformat: --numstat | awk '{ add += $1; subs += $2; loc += $1 - $2 } END { printf "added lines: %s, removed lines: %s, total lines: %s\n", add, subs, loc }' -
-added lines: 19484, removed lines: 10123, total lines: 9361
+(base) limengfan@limengfandeMacBook-Pro javacc % git log --author="lilinxi" --pretty=tformat: --numstat | 
+  awk '{ add += $1; subs += $2; loc += $1 - $2 } END { printf "added lines: %s, removed lines: %s, total lines: %s\n", add, subs, loc }' -
+added lines: 21091, removed lines: 10517, total lines: 10574
 ```
 
 ## 基础模型设计
@@ -1059,7 +1060,8 @@ public interface Datable {
 
     boolean SetType(DataType type) throws ExplainException;         // 设置类型，返回是否设置成功
 
-    boolean SetValue(Object value) throws ExplainException;         // 设置值，返回是否设置成功，需要先设置类型再设置值
+    boolean SetValue(Object value) throws ExplainException;         // 设置值，返回是否设置成功，
+                                                                    // 需要先设置类型再设置值
 
     Datable Clone() throws ExplainException;                        // 拷贝数据，深拷贝
 }
@@ -1137,7 +1139,8 @@ public class ExprData extends Data {
     @Override
     public DataType GetType() throws ExplainException {
         if (this.type == null) {
-            this.type = ExprData.CheckExprTypeMatch(this.leftData.GetType(), this.rightData.GetType(), this.op);
+            this.type = ExprData.CheckExprTypeMatch(this.leftData.GetType(), this.rightData.GetType(), 
+                this.op);
         }
         return this.type;
     }
@@ -1172,8 +1175,10 @@ Std 包的加载语句为：
 ```java
 //    默认调用 Load 方法将标准包的流导入到当前符号表中
 public static void Load() throws ExplainException {
-    SymbolTable.CurrentSymbolTable().UpdateSymbol(StdInFlowSymbol, SymbolTable.SymbolType.Flow, new StdInFlow());
-    SymbolTable.CurrentSymbolTable().UpdateSymbol(StdOutFlowSymbol, SymbolTable.SymbolType.Flow, new StdOutFlow());
+    SymbolTable.CurrentSymbolTable().UpdateSymbol(StdInFlowSymbol, SymbolTable.SymbolType.Flow, 
+        new StdInFlow());
+    SymbolTable.CurrentSymbolTable().UpdateSymbol(StdOutFlowSymbol, SymbolTable.SymbolType.Flow, 
+        new StdOutFlow());
 }
 ```
 
