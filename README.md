@@ -494,13 +494,19 @@ Operater ::= +
     | !=
 
 Declaration ::= import SYMBOL . SYMBOL
-      | function SYMBOL ( Formal_Parameter_Sequence ) { Command }
+          | function SYMBOL ( Formal_Parameter_Sequence ) { Command }
 
 Formal_Parameter_Sequence ::= Formal_Parameter
-        | Formal_Parameter , Formal_Parameter_Sequence
+                          | Formal_Parameter , Formal_Parameter_Sequence
 
 Actual_Parameter_Sequence ::= Actual_Parameter
-        | Actual_Parameter , Actual_Parameter_Sequence
+                          | Actual_Parameter , Actual_Parameter_Sequence
+
+Formal_Parameter ::= [ More_Data ]
+                  | SYMBOL
+
+Actual_Parameter ::= [ More_Data ]
+                  | SYMBOL
 ```
 
 ## 语义函数
@@ -548,6 +554,65 @@ execute [ F1 -> F2 ] env sto =
 
 ![](./doc/yuyi2.png)
 
+其他语义：
+
+```shell script
+execute [ if D1 { C1 } else { C2 } ] env sto =
+if evaluate D1 env sto = boolean true
+{ execute C1 }
+else { execute C2 }
+
+execute [ while D { C } ]
+let execute_while env sto =
+	if evaluate D env sto = boolean true
+	{ execute_while env (execute C env sto ) }
+	else sto
+in
+execute_while
+
+execute [ for ( C1 -> D ) { C2 } ] env sto =
+let execute_for encv sto =
+	if execute C1->D env (execute C1 env sto) = boolean true
+	{ execute_for env (execute C2 env sto) }
+	else sto
+in
+execute_for
+
+execute [ { C } ] env sto =
+{ execute C }
+
+execute [ S(APS) ] env sto =
+let function func = find(env S) in
+let arg = give_argument APS env in
+func arg
+
+evaluate : Data → ( Environ → Store → Value )    //表达式求值
+
+evaluate [ S ] env sto = 
+	coerce( sto , identify S env sto )            //获取符号变量的值
+
+
+evaluate [ D ] env sto =
+	get_value( D )                                //获取终结符的值
+
+evaluate [ Op D] env sto =
+let operator op = find ( env Op ) in              //find函数：找出字符代表的运算符
+let val = evaluate E env sto in
+op val
+
+evaluate [ D1 Op D2 ] env sto =
+let val1 = evaluate D1 env sto in
+let val2 = evaluate D2 env sto in
+cal( D1,D2 )                                      //计算函数
+
+evaluate [ ( D ) ] env sto =
+	evaluate D
+
+identify : SYMBOL → ( Environ → Store → Value)    //变量取值
+
+identify [ S ] env sto = find( env , S )
+```
+
 ## 辅助函数
 
 ```shell script
@@ -556,6 +621,9 @@ update: env X env—stack X id X value -> env       // 赋值操作
 cons: value X list -> list                        // 合并元素和列表
 car: list -> value                                // 获取列表的第一个元素
 cdr: list -> list                                 // 获取列表除去第一个元素的列表
+coerce( sto, identify S env sto )                 //获取符号变量的值
+get_value( D )                                    //获取终结符的值
+cal( D1, D2 )                                     //计算函数
 ```
 
 ---
