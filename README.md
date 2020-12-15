@@ -513,7 +513,7 @@ Actual_Parameter ::= [ More_Data ]
 
 ## 语义函数
 
-主要介绍数据管道操作和数据匹配操作的语义。
+主要介绍数据管道操作，数据匹配操作和模式匹配操作的语义。
 
 数据管道操作的指称语义为：
 
@@ -556,7 +556,7 @@ execute [ F1 -> F2 ] env sto =
 
 ![](./doc/yuyi2.png)
 
-模式匹配的指称语义为：
+模式匹配操作的指称语义为：
 
 ```shell script
 execute [ C | [ HEAD ; TAIL ] ] env sto = 
@@ -574,9 +574,9 @@ execute [ C | [ HEAD ; TAIL ] ] env sto =
 [5, 6, 3, 2, 7, 8] | [head;tail]
 ```
 
-语义为两个数据流的匹配赋值。
+语义为一个数据流到其首部数据和尾部数据流的模式匹配。
 
-![](./doc/yuyi2.png)
+![](./doc/yuyi3.png)
 
 其他语义：
 
